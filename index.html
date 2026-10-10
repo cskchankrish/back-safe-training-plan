@@ -1631,6 +1631,7 @@ const WARM = {
   main: [{ x: 'bike', rx: '5 min easy' }, { x: 'curlup', rx: '3-2-1 × 10 s' }, { x: 'sideplank', rx: '3-2-1 × 10 s each side' }, { x: 'birddog', rx: '3-2-1 × 10 s each side' }, { t: 'Ramp-up sets', rx: '2–3 lighter sets of your first lift' }],
   sprint: [{ x: 'walk', rx: '5 min brisk, then easy jog' }, { t: 'Leg swings and A-skips', rx: '2 × 10 each' }, { x: 'birddog', rx: '3-2-1 × 10 s each side' }, { t: 'Build-up runs', rx: '2 runs at 60% and 80%' }],
   short: [{ x: 'bike', rx: '5 min easy' }, { x: 'birddog', rx: '3-2-1 × 10 s each side' }],
+  fit: [{ x: 'bike', rx: '5 min easy' }, { t: 'Dynamic warm-up', rx: '5 minutes of comfortable, controlled movement' }, { t: 'Ramp-up sets', rx: '2–3 lighter sets of your first lift' }],
   care: BACKCARE,
 };
 const COOL = [{ x: 'hipflexor', rx: '2 × 30 s each side' }, { x: 'childpose', rx: '5 slow breaths' }];
@@ -1678,11 +1679,66 @@ day('p0_gymA_gate', Object.assign({}, D.p0_gymA, { id: 'p0_gymA_gate', t: 'Gym A
     { x: 'walk', s: 1, r: '10 min easy', log: 'min' },
   ]) }));
 day('p0_gate', { t: 'Rest and gate check', f: 'About 30 min', warm: 'care', cool: false, gate: true,
-  intro: 'Review the gate checklist on the Back Care tab. All five ticked means you start Rebuild tomorrow. Any missing: shift the plan by one week in Settings and repeat the Restart week.',
+  intro: 'Review the gate checklist on the Back Care tab. All five ticked means you start Rebuild tomorrow. If any are missing, use the exact Plan start date in Settings to give Restart another week.',
   items: [{ x: 'walk', s: 1, r: '20–30 min easy', log: 'min' }] });
 day('rest', { t: 'Rest and recover', f: 'Recovery day', warm: null, cool: false, rest: true,
   intro: 'No gym. Sleep 7–8 hours, hit your protein, get your steps in. The Back Care routine is optional today.',
   items: [{ x: 'walk', s: 1, r: '20–40 min easy', log: 'min' }] });
+
+/* Separate five-day strength plan for a healthy adult. Workout logs stay in a separate local profile. */
+day('fit_push', { t: 'Push: chest, shoulders and triceps', f: 'About 55–65 min', warm: 'fit', cool: false,
+  intro: 'Work smoothly and leave 2–3 good reps in reserve. Tap an exercise for technique notes and available swaps.',
+  items: [
+    { x: 'incdb', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
+    { x: 'chestpress', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
+    { x: 'sdbpress', s: 2, r: '8–12', rest: 90 },
+    { x: 'latraise', s: 3, r: '12–20', rest: 60 },
+    { x: 'pushdown', s: 3, r: '10–15', rest: 60 },
+    { x: 'deadbug', s: 3, r: '8–10 each side', rest: 45, log: 'r' },
+  ] });
+day('fit_pull', { t: 'Pull: back and biceps', f: 'About 50–60 min', warm: 'fit', cool: false,
+  intro: 'Use controlled reps and a comfortable range. Stop each set before your form breaks down.',
+  items: [
+    { x: 'pulldown_n', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
+    { x: 'csrow', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
+    { x: 'facepull', s: 2, r: '12–20', rest: 60 },
+    { x: 'dbcurl', s: 3, r: '8–12', rest: 60 },
+    { x: 'hammer', s: 2, r: '10–15', rest: 60 },
+  ] });
+day('fit_lower_a', { t: 'Legs A: quads, hamstrings and core', f: 'About 55–65 min', warm: 'fit', cool: false,
+  intro: 'Use a range you can control. Keep 2–3 good reps in reserve on the main lifts.',
+  items: [
+    { x: 'hack', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
+    { x: 'legpress', s: 3, r: '10–12', rest: 120 },
+    { x: 'curl_seated', s: 3, r: '10–15', rest: 75 },
+    { x: 'hipthrust', s: 3, r: '8–12', rest: 90 },
+    { x: 'calf_stand', s: 3, r: '10–15', rest: 60 },
+    { x: 'pallof', s: 3, r: '10–12 each side', rest: 45 },
+  ] });
+day('fit_upper', { t: 'Upper: chest, back, shoulders and arms', f: 'About 55–65 min', warm: 'fit', cool: false,
+  intro: 'Build on the first two sessions without rushing. Leave 2–3 good reps in reserve.',
+  items: [
+    { x: 'incdb', s: 3, r: '8–12', rest: 120 },
+    { x: 'chestpress', s: 2, r: '10–15', rest: 90 },
+    { x: 'pulldown_n', s: 2, r: '8–12', rest: 90 },
+    { x: 'csrow', s: 2, r: '10–15', rest: 90 },
+    { x: 'latraise', s: 2, r: '12–20', rest: 60 },
+    { x: 'pushdown', s: 2, r: '10–15', rest: 60 },
+    { x: 'dbcurl', s: 2, r: '10–15', rest: 60 },
+    { x: 'plank', s: 3, r: '20–40 s', rest: 45, log: 't' },
+  ] });
+day('fit_lower_b', { t: 'Legs B: glutes, hamstrings and core', f: 'About 55–65 min', warm: 'fit', cool: false,
+  intro: 'Use steady repetitions and stop if a movement causes pain. Add load gradually as your reps improve.',
+  items: [
+    { x: 'goblet', s: 3, r: '8–12', rest: 120 },
+    { x: 'bss', s: 2, r: '8–12 each leg', rest: 90 },
+    { x: 'curl_lying', s: 3, r: '10–15', rest: 75 },
+    { x: 'hipthrust', s: 3, r: '8–12', rest: 90 },
+    { x: 'calf_seated', s: 3, r: '10–15', rest: 60 },
+    { x: 'cablecrunch', s: 3, r: '10–15', rest: 60 },
+  ] });
+day('fit_rest', { t: 'Rest and recover', f: 'No lifting scheduled', warm: null, cool: false, rest: true,
+  intro: 'No workout is scheduled today. Rest, or take an easy walk if you feel like it.', items: [] });
 
 const BEXT_P1 = { 1: { rx: 'Bodyweight, top half of the range: 3 × 8–10' }, 2: { rx: 'Bodyweight, top half: 3 × 12' }, 3: { rx: 'Bodyweight, full range: 3 × 10–12' }, 4: { rx: 'Bodyweight, full range: 3 × 15' }, 5: { x: 'bext_w', rx: 'Hug 2.5–5 kg: 3 × 10' }, 6: { rx: 'Bodyweight: 2 × 12 (deload)' } };
 const SEXT_P1 = { 1: { x: 'sext_iso', rx: 'Hold 3 × 15–20 s each side', log: 't' }, 2: { x: 'sext_iso', rx: 'Hold 3 × 25–30 s each side', log: 't' }, 3: { rx: 'Bodyweight, top half: 3 × 8 each side' }, 4: { rx: 'Bodyweight, full range: 3 × 10 each side' }, 5: { rx: 'Bodyweight, full range: 3 × 12–15 each side' }, 6: { rx: 'Bodyweight: 2 × 10 each side (deload)' } };
@@ -1975,12 +2031,13 @@ const CYCLES = [
 const PLAN_START = '2026-09-25';
 const ymd = d => d.toISOString().slice(0, 10);
 const parseD = s => { const [y, m, dd] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, dd)); };
+const validYmd = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && ymd(parseD(s)) === s;
 const addDays = (s, n) => { const d = parseD(s); d.setUTCDate(d.getUTCDate() + n); return ymd(d); };
 const diffDays = (a, b) => Math.round((parseD(a) - parseD(b)) / 864e5);
 
-// Where does a date fall in the plan? shiftWeeks moves the whole plan later.
-function planDay(date, shiftWeeks) {
-  const start = addDays(PLAN_START, 7 * (shiftWeeks || 0));
+// Where does a date fall in the back-safe plan? The selected date is its exact Day 1.
+function planDay(date, startDate) {
+  const start = startDate || PLAN_START;
   const d = diffDays(date, start);
   if (d < 0) return { before: true, start, days: -d };
   if (d < 10) {
@@ -1999,8 +2056,8 @@ function planDay(date, shiftWeeks) {
   return { phase: block, cycle, week: bw, of: P.weeks, wd, dayId, deload: P.deload.includes(bw), start, weekStart: addDays(start, 10 + w * 7) };
 }
 // Date ranges for the roadmap
-function planRanges(shiftWeeks) {
-  const s = addDays(PLAN_START, 7 * (shiftWeeks || 0));
+function planRanges(startDate) {
+  const s = startDate || PLAN_START;
   const out = [{ phase: 'p0', from: s, to: addDays(s, 9) }, { phase: 'p1', from: addDays(s, 10), to: addDays(s, 51) }];
   for (let c = 0; c < 6; c++) {
     const base = addDays(s, 52 + c * CYCLE_WEEKS * 7);
@@ -2009,6 +2066,15 @@ function planRanges(shiftWeeks) {
     out.push({ phase: 'C', cycle: c + 1, from: addDays(base, 77), to: addDays(base, 111) });
   }
   return out;
+}
+
+const STRENGTH_WEEK = ['fit_push', 'fit_pull', 'fit_lower_a', 'fit_upper', 'fit_lower_b', 'fit_rest', 'fit_rest'];
+function strengthDay(date, startDate) {
+  const start = startDate || todayStr(), elapsed = diffDays(date, start);
+  if (elapsed < 0) return { before: true, start, days: -elapsed, phase: 'strength' };
+  const dayIdx = elapsed % 7, week = Math.floor(elapsed / 7) + 1;
+  return { phase: 'strength', week, dayIdx, dayNo: dayIdx + 1, trainingDay: dayIdx < 5 ? dayIdx + 1 : null,
+    rest: dayIdx >= 5, dayId: STRENGTH_WEEK[dayIdx], start, weekStart: addDays(date, -dayIdx) };
 }
 
 /* ===== Back care guidance ===== */
@@ -2041,7 +2107,7 @@ const FAQ = [
   { q: 'Why no deadlifts at all?', a: 'With long femurs, a pull from the floor puts your torso close to horizontal, which is the position that strained your erectors. You’ll build the same posterior chain with 45° back extensions, hip thrusts, cable pull-throughs and Nordic curls, without that long lever on your lower back.' },
   { q: 'Why these squat choices?', a: 'Long femurs force a big forward lean in a barbell back squat. Hack squats, leg press, split squats and heel-elevated goblet squats let you train your legs hard with a more upright torso. A safety-bar or front squat is an option from cycle 2 if you’re pain-free.' },
   { q: 'What happens to my physio exercises?', a: 'They stay. The Back Care routine keeps the best of them (breathing, cat–camel, glute bridge, clamshells) and adds McGill’s big three: curl-up, side plank and bird dog. Keep your other drills on rest days if you like them.' },
-  { q: 'I’m travelling again. What now?', a: 'Do the Back Care routine daily, walk, and add bodyweight squats, push-ups and side planks in the hotel. When you’re back, shift the plan by the weeks you missed (Settings, in the interactive version) and make your first week back a little lighter.' },
+  { q: 'I’m travelling again. What now?', a: 'Do the Back Care routine daily, walk, and add bodyweight squats, push-ups and side planks in the hotel. If you need to move the calendar, enter the exact new Plan start date in Settings, then make your first week back a little lighter.' },
   { q: 'What if I miss a day?', a: 'Don’t double up. Do today’s session. If you missed a lower-body day, move it into the next rest or optional day.' },
 ];
 const RECOVERY = ['Sleep 7–8 hours.', 'Protein about 1.6–2 g per kg of body weight daily; your vegetarian protein list from Phase 2 still works.', '8–10k steps on most days.', '3–4 litres of water.'];
@@ -2088,19 +2154,44 @@ const BENCH = [
   };
 
   /* ---------- state ---------- */
-  const LS = 'rebuild-build.v1';
-  const defP = () => ({ bw: null, shift: 0, auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, gate: {}, bench: {}, u: 0 });
-  const S = { profile: defP(), days: {}, tab: 'today', date: todayStr(), planSel: null, libCat: 'all', libQ: '', status: 'local', resetArm: false };
+  const LS = 'rebuild-build.v2', LS_OLD = 'rebuild-build.v1';
+  const defP = (mode = 'back') => ({ bw: null, startDate: mode === 'strength' ? todayStr() : PLAN_START, auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, gate: {}, bench: {}, u: 0 });
+  const emptyMode = mode => ({ profile: defP(mode), days: {} });
+  const S = { profile: defP('back'), days: {}, modes: { back: emptyMode('back'), strength: emptyMode('strength') }, mode: 'back', tab: 'today', date: todayStr(), planSel: null, libCat: 'all', libQ: '', status: 'local', resetArm: false };
+  function activateMode(mode) {
+    S.mode = mode === 'strength' ? 'strength' : 'back';
+    if (!S.modes[S.mode]) S.modes[S.mode] = emptyMode(S.mode);
+    S.profile = S.modes[S.mode].profile;
+    S.days = S.modes[S.mode].days;
+  }
+  function normalizeMode(mode, saved) {
+    const src = saved || {}, oldProfile = src.profile || {};
+    const profile = Object.assign(defP(mode), oldProfile);
+    if (!validYmd(oldProfile.startDate)) profile.startDate = mode === 'back'
+      ? addDays(PLAN_START, 7 * (Number(oldProfile.shift) || 0))
+      : todayStr();
+    delete profile.shift;
+    return { profile, days: src.days && typeof src.days === 'object' ? src.days : {} };
+  }
   function loadLocal() {
     try {
-      const raw = localStorage.getItem(LS);
-      if (!raw) return;
-      const o = JSON.parse(raw);
-      if (o && o.profile) S.profile = Object.assign(defP(), o.profile);
-      if (o && o.days) S.days = o.days;
+      const raw = localStorage.getItem(LS), o = raw ? JSON.parse(raw) : null;
+      if (o && o.modes) {
+        S.modes = { back: normalizeMode('back', o.modes.back), strength: normalizeMode('strength', o.modes.strength) };
+        activateMode(o.activeMode || o.mode || 'back');
+        return;
+      }
+      const oldRaw = localStorage.getItem(LS_OLD), old = oldRaw ? JSON.parse(oldRaw) : null;
+      if (old && (old.profile || old.days)) S.modes.back = normalizeMode('back', old);
+      activateMode('back');
     } catch (e) { /* storage unavailable */ }
   }
-  function saveLocal() { try { localStorage.setItem(LS, JSON.stringify({ profile: S.profile, days: S.days })); } catch (e) { /* ignore */ } }
+  function saveLocal() {
+    try {
+      S.modes[S.mode] = { profile: S.profile, days: S.days };
+      localStorage.setItem(LS, JSON.stringify({ activeMode: S.mode, modes: S.modes }));
+    } catch (e) { /* ignore */ }
+  }
   const rec = (date, create) => { let r = S.days[date]; if (!r && create) r = S.days[date] = { sets: {}, chk: {}, u: 0 }; if (r) { r.sets = r.sets || {}; r.chk = r.chk || {}; } return r; };
   let touchT = null;
   function touch(date, soon) {
@@ -2208,7 +2299,7 @@ const BENCH = [
   }
 
   /* ---------- plan helpers ---------- */
-  const pday = date => planDay(date, S.profile.shift);
+  const pday = date => S.mode === 'strength' ? strengthDay(date, S.profile.startDate) : planDay(date, S.profile.startDate);
   function resolveItem(it, week, deload) {
     const ov = it.p && week ? it.p[week] : null;
     const x = (ov && ov.x) || it.x;
@@ -2271,6 +2362,25 @@ const BENCH = [
       `</div><div class="painscale"><span>No pain</span><span>Worst imaginable</span></div>`;
   }
   const checkBtn = (attr, on, label) => `<button type="button" class="check" ${attr} aria-pressed="${!!on}" aria-label="${esc(label || 'Mark done')}">${I.check}</button>`;
+
+  function vStrengthToday() {
+    const date = S.date, today = todayStr(), pd = pday(date), T = D[pd.dayId], r = rec(date) || {};
+    let h = `<div class="col"><div class="datebar"><button class="iconbtn" data-nav="-1" aria-label="Previous day">${I.prev}</button><div class="d">${fmtLong(date)}</div><button class="iconbtn" data-nav="1" aria-label="Next day">${I.next}</button></div>`;
+    if (date !== today) h += `<div style="text-align:center;margin:-6px 0 12px"><button class="btn sm ghost" data-nav="0">Back to today, ${esc(fmtMed(today))}</button></div>`;
+    if (pd.before) return h + `<div class="card stack"><h2>Your five-day plan starts ${esc(fmtLong(pd.start))}</h2><p class="muted">That’s ${pd.days} day${pd.days === 1 ? '' : 's'} away. You can change the exact start date in Settings.</p><button class="btn primary" data-go="${pd.start}">See day 1</button></div></div>`;
+    const label = pd.rest ? 'Rest day' : `Week ${pd.week} · Day ${pd.trainingDay} of 5`;
+    h += `<section class="hero"><div class="plate"><span>${pd.rest ? 'REST' : `D${pd.trainingDay}`}</span></div><div><div class="phase">${label}</div><h1>${esc(T.t)}</h1><div class="muted small">${esc(T.f)}</div></div></section>`;
+    if (T.intro) h += `<p class="muted" style="margin:14px 0 0">${esc(T.intro)}</p>`;
+    if (T.rest) return h + `<section class="card sec stack"><h2>Recovery day</h2><p class="muted">No lifting is scheduled. Rest or take an easy walk if you like.</p></section></div>`;
+    h += block('Warm-up', WARM.fit, date, 'fwarm', 'About 8–10 min, before the first lift');
+    h += `<div class="banner sec"><b>Progress gradually.</b> Start with a load that leaves 2–3 good reps in reserve. When every set reaches the top of its rep range with controlled form, add a small amount of weight next time.</div>`;
+    const items = T.items.map(it => resolveItem(it, pd.week, false));
+    h += `<div class="stack sec">${items.map((it, i) => exCard(it, i, date, null, pd)).join('')}</div>`;
+    h += finishStrength(date);
+    const tomorrow = addDays(date, 1), next = pday(tomorrow);
+    h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tomorrow}">${esc(D[next.dayId].t)}</button></p>`;
+    return h + '</div>';
+  }
 
   function vToday() {
     const date = S.date, t = todayStr();
@@ -2379,9 +2489,21 @@ const BENCH = [
     return h + '</section>';
   }
 
+  function finishStrength(date) {
+    const r = rec(date) || {};
+    let h = `<section class="card sec finish stack"><h3>Workout notes</h3><label class="small muted" for="notes">Notes</label>
+      <textarea id="notes" data-notes placeholder="Loads, reps, or anything to remember next time">${esc(r.notes || '')}</textarea>`;
+    if (r.done) {
+      const n = Object.values(r.sets || {}).reduce((a, arr) => a + (arr || []).filter(s => s && s[2]).length, 0);
+      h += `<div class="done-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>Workout complete: ${n} set${n === 1 ? '' : 's'} ticked.</div><button class="btn sm ghost" data-act="undone">Mark as not done</button>`;
+    } else h += `<button class="btn primary" data-act="done">Mark workout complete</button>`;
+    return h + '</section>';
+  }
+
   /* plan */
   function currentPhaseId() { const pd = pday(todayStr()); return pd.before ? 'p0' : pd.phase; }
   function vPlan() {
+    if (S.mode === 'strength') return vStrengthPlan();
     const sel = S.planSel || currentPhaseId();
     const opts = ['p0', 'p1', 'A', 'B', 'C'];
     let h = `<div class="col"><div class="phasepick" role="group" aria-label="Choose a phase">` + opts.map(id => `<button type="button" data-plan="${id}" aria-pressed="${sel === id}">${plateHTML(PHASES[id], true)}${esc(PHASES[id].name)}</button>`).join('') +
@@ -2389,8 +2511,20 @@ const BENCH = [
     h += sel === 'road' ? vRoad() : vPhase(sel);
     return h + '</div>';
   }
+  function vStrengthPlan() {
+    const start = S.profile.startDate, today = todayStr();
+    const firstWeek = STRENGTH_WEEK.slice(0, 5);
+    let h = `<div class="col"><div class="phasehead"><div class="plate" style="--pc:var(--accent);--pi:#fff" aria-hidden="true"><span>5</span></div><div><h2>Five-day strength plan</h2><div class="muted small">Day 1 starts ${esc(fmtLong(start))}</div></div></div>`;
+    h += `<p>Build muscle and core strength with five gym sessions across the first five days, followed by two recovery days. This is a general plan for a healthy adult; adjust exercises to your equipment and experience.</p>`;
+    h += `<div class="card sec"><h3 style="margin-bottom:8px">Weekly schedule</h3><div class="week">` + STRENGTH_WEEK.map((id, i) => `<div class="wrow${i >= 5 ? ' rest' : ''}"><div class="wd">${WDN[i]}</div><div class="t">${esc(D[id].t)}</div><div class="tiny">${esc(D[id].f.replace(/^About /, ''))}</div></div>`).join('') + `</div></div>`;
+    h += `<div class="banner sec"><b>Progression:</b> choose a load that leaves about 2–3 good reps in reserve. When all sets reach the top of the rep range with steady form, add a small amount of weight. Keep at least one rest day after the fifth session.</div>`;
+    h += `<div class="stack sec">${firstWeek.map(id => sessionDetails(D[id], 'strength')).join('')}</div>`;
+    h += `<p class="tiny sec">Every gym session starts with an easy bike warm-up, comfortable dynamic movement, and lighter ramp-up sets. The workout log is kept separately from the Back-safe plan in this browser.</p>`;
+    if (today < start) h += `<p class="tiny">The plan has not started yet. You can change its exact start date in Settings.</p>`;
+    return h + '</div>';
+  }
   function vPhase(id) {
-    const P = PHASES[id], R = planRanges(S.profile.shift).filter(r => r.phase === id);
+    const P = PHASES[id], R = planRanges(S.profile.startDate).filter(r => r.phase === id);
     let dates;
     if (id === 'p0' || id === 'p1') dates = `${fmtMed(R[0].from)} to ${fmtYear(R[0].to)}${id === 'p1' ? ', 6 weeks' : ', 10 days'}`;
     else dates = `${P.weeks} weeks, repeated in each of the six 16-week cycles`;
@@ -2444,7 +2578,7 @@ const BENCH = [
     return svg;
   }
   function vRoad() {
-    const R = planRanges(S.profile.shift), t = todayStr();
+    const R = planRanges(S.profile.startDate), t = todayStr();
     let h = `<h2 style="margin-top:6px">Two years, loaded like a bar</h2><p class="muted">Each block is colour-coded like competition plates: the heavier the plate, the heavier the training. Width shows how long each block lasts. Tap a plate to open it.</p>`;
     h += `<div class="card sleeve">${plateBar(R, t)}</div><div class="legend">` + ['p0', 'p1', 'C', 'B', 'A'].map(id => `<span>${plateHTML(PHASES[id], true)} ${esc(PHASES[id].name)}</span>`).join('') + '</div>';
     h += `<div class="sec"><h3 style="margin-bottom:8px">What changes each cycle</h3><div class="stack">` + CYCLES.map(c => {
@@ -2470,7 +2604,7 @@ const BENCH = [
       return `<div class="card ladder"><h3>${esc(Lg.t)}</h3><ol>${Lg.steps.map((s, i) => `<li class="${i === cur ? 'cur' : i < cur ? 'past' : ''}"><div><b>${esc(s[0])}</b>${esc(s[1])}</div></li>`).join('')}</ol>
         <div style="display:flex;gap:8px;align-items:center"><button class="btn sm" data-ladder="${k}|-1" ${cur === 0 ? 'disabled' : ''}>Step down</button><button class="btn sm primary" data-ladder="${k}|1" ${cur === Lg.steps.length - 1 ? 'disabled' : ''}>I moved up a step</button></div></div>`;
     }).join('') + '</div></div>';
-    h += `<div class="card sec gate"><h2 style="margin-bottom:4px">Gate test: Restart to Rebuild</h2><p class="muted small">Check these on ${esc(fmtMed(addDays(pday(t).start || PLAN_START, 9)))}. All five means Rebuild starts the next day. Any missing: shift the plan one week in Settings and repeat the Restart week.</p><ul>` +
+    h += `<div class="card sec gate"><h2 style="margin-bottom:4px">Gate test: Restart to Rebuild</h2><p class="muted small">Check these on ${esc(fmtMed(addDays(pday(t).start || PLAN_START, 9)))}. All five means Rebuild starts the next day. If any are missing, use the exact Plan start date in Settings to give Restart another week.</p><ul>` +
       GATE.map((g, i) => `<li>${checkBtn(`data-gate="${i}"`, S.profile.gate[i], g)}<span>${esc(g)}</span></li>`).join('') + `</ul></div>`;
     h += `<div class="flag sec" role="note"><h3 style="margin-bottom:6px">See a doctor instead of training if you notice</h3><p class="small" style="margin:0">${esc(REDFLAGS)}</p></div>`;
     h += `<div class="card sec faq"><h2 style="margin-bottom:4px">Questions</h2>${FAQ.map(f => `<details><summary><span>${esc(f.q)}</span>${I.caret}</summary><p>${esc(f.a)}</p></details>`).join('')}</div>`;
@@ -2481,9 +2615,11 @@ const BENCH = [
   /* library */
   function vLib() {
     const q = S.libQ.trim().toLowerCase(), cat = S.libCat;
-    const ids = Object.keys(EX).filter(id => (cat === 'all' || EX[id].c === cat) && (!q || (EX[id].n + ' ' + EX[id].m + ' ' + (EX[id].eq || '')).toLowerCase().includes(q)));
+    const categories = S.mode === 'strength' ? CATS.filter(([k]) => k !== 'care' && k !== 'spine') : CATS;
+    const visibleCat = S.mode === 'strength' && (cat === 'care' || cat === 'spine') ? 'all' : cat;
+    const ids = Object.keys(EX).filter(id => !(S.mode === 'strength' && ['care', 'spine'].includes(EX[id].c)) && (visibleCat === 'all' || EX[id].c === visibleCat) && (!q || (EX[id].n + ' ' + EX[id].m + ' ' + (EX[id].eq || '')).toLowerCase().includes(q)));
     let h = `<div><input class="search" type="search" placeholder="Search exercises or muscles" value="${esc(S.libQ)}" data-q aria-label="Search exercises">
-      <div class="filters" role="group" aria-label="Filter by type"><button type="button" data-cat="all" aria-pressed="${cat === 'all'}">All</button>${CATS.map(([k, l]) => `<button type="button" data-cat="${k}" aria-pressed="${cat === k}">${esc(l)}</button>`).join('')}</div>`;
+      <div class="filters" role="group" aria-label="Filter by type"><button type="button" data-cat="all" aria-pressed="${visibleCat === 'all'}">All</button>${categories.map(([k, l]) => `<button type="button" data-cat="${k}" aria-pressed="${visibleCat === k}">${esc(l)}</button>`).join('')}</div>`;
     h += ids.length ? `<div class="grid">${ids.map(id => `<button type="button" class="tile" data-ex="${id}"><div class="fig-t">${thumb(id)}</div><b>${esc(EX[id].n)}</b><small>${esc(EX[id].m)}</small></button>`).join('')}</div>`
       : `<div class="empty">No exercise matches “${esc(S.libQ)}”. Try a muscle, such as glutes.</div>`;
     return h + '</div>';
@@ -2491,6 +2627,7 @@ const BENCH = [
 
   /* progress */
   function vProgress() {
+    if (S.mode === 'strength') return vStrengthProgress();
     const t = todayStr(), days = Object.keys(S.days).sort();
     const done = days.filter(d => S.days[d].done);
     const pdT = pday(t);
@@ -2516,6 +2653,20 @@ const BENCH = [
         <label class="fld"><input type="text" inputmode="decimal" data-bench="${b.id}" placeholder="${lastB ? esc(lastB[1]) : ''}" aria-label="${esc(b.n)} result"><span>${esc(b.unit)}</span></label>
         <button class="btn sm" data-benchsave="${b.id}">Save</button></div>`;
     }).join('') + '</section></div>';
+    return h;
+  }
+  function vStrengthProgress() {
+    const t = todayStr(), days = Object.keys(S.days).sort();
+    const done = days.filter(d => S.days[d].done);
+    const pdT = pday(t), wkStart = addDays(t, -((parseD(t).getUTCDay() + 6) % 7));
+    const thisWeek = done.filter(d => d >= wkStart && d <= t).length;
+    const since = pdT.before ? 0 : diffDays(t, pdT.start) + 1;
+    let h = `<div class="col"><div class="stats"><div class="stat"><div class="v">${done.length}</div><div class="k">Workouts completed</div></div><div class="stat"><div class="v">${thisWeek}/5</div><div class="k">This week</div></div><div class="stat"><div class="v">${since}</div><div class="k">Days into the plan</div></div></div>`;
+    h += `<section class="card sec chart"><h3 style="margin-bottom:8px">Workouts per week</h3><p class="tiny" style="margin:0 0 8px">A five-workout target is shown against your recent 12 weeks.</p>${weekBars(t)}</section>`;
+    const recent = done.slice().reverse().slice(0, 10);
+    h += `<section class="card sec"><h3 style="margin-bottom:8px">Recent workouts</h3>` + (recent.length
+      ? `<div class="week">${recent.map(d => { const pd = pday(d), title = D[pd.dayId] ? D[pd.dayId].t : 'Workout'; return `<div class="wrow"><div class="wd">${esc(fmtShort(d))}</div><div class="t">${esc(title)}</div><div class="tiny">${Object.values(S.days[d].sets || {}).reduce((n, a) => n + (a || []).filter(s => s && s[2]).length, 0)} sets ticked</div></div>`; }).join('')}</div>`
+      : `<div class="empty">Mark a workout complete and your history will appear here.</div>`) + `</section></div>`;
     return h;
   }
   function painChart(pts) {
@@ -2598,16 +2749,17 @@ const BENCH = [
     openSheet(h, 'ex');
   }
   function openSettings() {
-    const P = S.profile, start = addDays(PLAN_START, 7 * P.shift);
+    const P = S.profile, start = P.startDate;
     const sw = (k, l, d) => `<div class="setrow2"><div><div style="font-weight:600">${esc(l)}</div>${d ? `<div class="tiny">${esc(d)}</div>` : ''}</div><button class="switch" role="switch" aria-checked="${!!P[k]}" data-sw="${k}" aria-label="${esc(l)}"></button></div>`;
     let h = `<div class="sheet-h"><h2>Settings</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.close}</button></div>
-      <div class="setrow2"><div><div style="font-weight:600">Body weight</div><div class="tiny">Used for benchmark targets</div></div><label class="fld" style="width:120px"><input type="text" inputmode="decimal" data-bw value="${esc(P.bw || '')}" placeholder="80" aria-label="Body weight in kg"><span>kg</span></label></div>
-      <div class="setrow2"><div><div style="font-weight:600">Plan start</div><div class="tiny">Day 1 is ${esc(fmtLong(start))} ${start.slice(0, 4)}. Shift by whole weeks after travel or illness.</div></div><div class="stepper"><button class="btn sm" data-shift="-1" ${P.shift <= 0 ? 'disabled' : ''} aria-label="Shift one week earlier">−1 wk</button><span class="num">${P.shift}</span><button class="btn sm" data-shift="1" aria-label="Shift one week later">+1 wk</button></div></div>
+      <div class="setrow2"><div><div style="font-weight:600">Workout plan</div><div class="tiny">Each plan has its own settings and workout log on this browser.</div></div><div class="seg" role="group" aria-label="Choose workout plan"><button type="button" data-mode="back" aria-pressed="${S.mode === 'back'}">Back-safe</button><button type="button" data-mode="strength" aria-pressed="${S.mode === 'strength'}">5-day strength</button></div></div>
+      <div class="setrow2"><div><div style="font-weight:600">Plan start date</div><div class="tiny">Day 1 starts ${esc(fmtLong(start))}. Choose any date.</div></div><label class="fld" style="width:160px"><input type="date" data-start-date value="${esc(start)}" aria-label="Plan start date"></label></div>
+      ${S.mode === 'back' ? `<div class="setrow2"><div><div style="font-weight:600">Body weight</div><div class="tiny">Used for benchmark targets</div></div><label class="fld" style="width:120px"><input type="text" inputmode="decimal" data-bw value="${esc(P.bw || '')}" placeholder="80" aria-label="Body weight in kg"><span>kg</span></label></div>` : ''}
       ${sw('auto', 'Start rest timer when I tick a set')}${sw('sound', 'Beep and vibrate when rest ends')}${sw('anim', 'Animate exercise figures', 'Turn off to save battery')}
       <div class="setrow2"><div style="font-weight:600">Appearance</div><div class="seg">${[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button type="button" data-themeset="${k}" aria-pressed="${P.theme === k}">${l}</button>`).join('')}</div></div>
-      <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${S.status === 'local' ? 'On this device only. Open the plan from your Claude account to save across devices.' : 'Your Claude account (private to you), with a copy on this device.'}</div></div></div>
+      <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${S.status === 'local' ? 'In this browser on this device. The two workout plans keep separate logs.' : 'In your connected account, with a copy on this device. The two workout plans keep separate logs.'}</div></div></div>
       ${Cloud.dl ? `<div class="setrow2"><div style="font-weight:600">Export your log</div><button class="btn sm" data-act="csv">Download CSV</button></div>` : ''}
-      <div class="setrow2"><div><div style="font-weight:600">Reset everything</div><div class="tiny">Deletes your logs, pain scores and settings.</div></div><button class="btn sm" data-act="reset">${S.resetArm ? 'Tap again to delete' : 'Reset'}</button></div>`;
+      <div class="setrow2"><div><div style="font-weight:600">Reset this plan</div><div class="tiny">Deletes only this plan’s logs and settings. The other plan stays saved.</div></div><button class="btn sm" data-act="reset">${S.resetArm ? 'Tap again to delete' : 'Reset'}</button></div>`;
     openSheet(h, 'settings');
   }
 
@@ -2649,6 +2801,11 @@ const BENCH = [
   function render(keepScroll) {
     const y = window.scrollY, m = main();
     FIG.unobserveAll(m);
+    if (S.mode === 'strength' && S.tab === 'care') S.tab = 'today';
+    const tabSet = [['today', 'Today', I.today], ['plan', 'Plan', I.plan]];
+    if (S.mode === 'back') tabSet.push(['care', 'Back care', I.care]);
+    tabSet.push(['lib', 'Exercises', I.lib], ['prog', 'Progress', I.prog]);
+    $('.tabs').innerHTML = tabSet.map(([k, l, ic]) => `<button type="button" data-tab="${k}">${ic}<span>${l}</span></button>`).join('');
     const v = { today: vToday, plan: vPlan, care: vCare, lib: vLib, prog: vProgress }[S.tab] || vToday;
     m.innerHTML = v();
     mountLive(m);
@@ -2716,14 +2873,18 @@ const BENCH = [
     if (d.act === 'close') { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } return; }
     if (d.act === 'reset') {
       if (!S.resetArm) { S.resetArm = true; return openSettings(); }
-      S.resetArm = false; S.days = {}; const keepShift = 0; S.profile = defP(); S.profile.shift = keepShift; touchProf();
+      S.resetArm = false; S.days = {}; S.profile = defP(S.mode); S.modes[S.mode] = { profile: S.profile, days: S.days }; touchProf();
       if (Cloud.db) { Cloud.dirty.clear(); Cloud.remoteU = {}; Cloud.exists.forEach(m => Cloud.months.doc(m).set({ days: {} }).catch(() => {})); }
       saveLocal(); closeSheet(); applyTheme(); return render(false);
+    }
+    if (d.mode) {
+      if (d.mode === S.mode) return;
+      saveLocal(); activateMode(d.mode); S.tab = 'today'; S.date = todayStr(); S.planSel = null; S.libCat = 'all'; S.libQ = ''; S.resetArm = false;
+      applyTheme(); FIG.setEnabled(S.profile.anim); closeSheet(); render(false); return openSettings();
     }
     if (d.act === 'csv') { exportCSV(); return; }
     if (d.sw) { S.profile[d.sw] = !S.profile[d.sw]; touchProf(); if (d.sw === 'anim') { FIG.setEnabled(S.profile.anim); render(true); } return openSettings(); }
     if (d.themeset) { S.profile.theme = d.themeset; touchProf(); applyTheme(); return openSettings(); }
-    if (d.shift) { S.profile.shift = Math.max(0, S.profile.shift + +d.shift); touchProf(); openSettings(); return render(true); }
     if (d.ladder) { const [k, dv] = d.ladder.split('|'); const n = LADDERS[k].steps.length; S.profile.ladder[k] = Math.max(0, Math.min(n - 1, (S.profile.ladder[k] || 0) + +dv)); touchProf(); return render(true); }
     if (d.gate != null) { S.profile.gate[d.gate] = !S.profile.gate[d.gate]; touchProf(); t.setAttribute('aria-pressed', !!S.profile.gate[d.gate]); return; }
     if (d.benchsave) {
@@ -2744,6 +2905,12 @@ const BENCH = [
     if (d.notes != null) { const r = rec(S.date, true); r.notes = t.value; touch(S.date, true); return; }
     if (d.q != null) { S.libQ = t.value; const pos = t.selectionStart; render(true); const n = $('[data-q]'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
     if (d.bw != null) { const v = parseFloat(t.value); S.profile.bw = isFinite(v) && v > 20 && v < 300 ? v : null; touchProf(); return; }
+  });
+  document.addEventListener('change', e => {
+    const t = e.target;
+    if (t.dataset.startDate == null) return;
+    if (!validYmd(t.value)) { t.value = S.profile.startDate; return; }
+    S.profile.startDate = t.value; touchProf(); render(false); openSettings();
   });
   document.addEventListener('focusout', () => { setTimeout(() => { if (pendingSoft && !S.sheet) { const a = document.activeElement; if (!a || !(a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) { pendingSoft = false; render(true); } } }, 50); });
   $('#scrim').addEventListener('click', () => { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } });
