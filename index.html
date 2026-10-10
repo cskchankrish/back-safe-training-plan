@@ -2910,7 +2910,10 @@ const BENCH = [
     const t = e.target;
     if (t.dataset.startDate == null) return;
     if (!validYmd(t.value)) { t.value = S.profile.startDate; return; }
-    S.profile.startDate = t.value; touchProf(); render(false); openSettings();
+    S.profile.startDate = t.value;
+    S.date = t.value;
+    S.tab = 'today';
+    touchProf(); render(false); openSettings();
   });
   document.addEventListener('focusout', () => { setTimeout(() => { if (pendingSoft && !S.sheet) { const a = document.activeElement; if (!a || !(a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) { pendingSoft = false; render(true); } } }, 50); });
   $('#scrim').addEventListener('click', () => { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } });
