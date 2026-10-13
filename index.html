@@ -1336,6 +1336,52 @@ const FIGS = (() => {
     props: [{ k: 'line', a: [-72, -2], b: [78, 10], w: 5 }, { k: 'line', a: [74, 9], b: [78, 112], w: 4 }, { k: 'line', a: [78, 110], b: [54, 108], w: 4 }],
     hl: ['glutes', 'calves1'],
   });
+  /* ---------- barbell lifts, jumps and extra core ---------- */
+  const sqBar = { j: 'sh', perp: ['hip', 'sh'], l: 6 };
+  const sqL = { a1: { ik: sqBar, bend: 1 }, a2: { ik: sqBar, bend: 1 }, anchor: { j: 'an1', at: [0, 3] } };
+  S('backsquat', {
+    p0: X(sqL, { t: 88, l1: [-90, -90, 0], l2: [-90, -90, 0] }),
+    p1: X(sqL, { t: 52, h: 62, l1: [-6, -112, 0], l2: [-8, -113, 0] }),
+    props: [{ k: 'plate', at: sqBar, r: 12, layer: 'front' }], hl: ['quads1', 'glutes'],
+  });
+  const fsL = { anchor: { j: 'an1', at: [0, 3] } };
+  S('frontsquat', {
+    p0: X(fsL, { t: 89, a1: [2, 150], a2: [4, 152], l1: [-90, -90, 0], l2: [-90, -90, 0] }),
+    p1: X(fsL, { t: 68, h: 76, a1: [8, 156], a2: [10, 158], l1: [-6, -118, 0], l2: [-8, -119, 0] }),
+    props: [{ k: 'plate', at: 'h1', r: 12, layer: 'front' }], hl: ['quads1', 'glutes'],
+  });
+  const rdlL = { anchor: { j: 'an1', at: [0, 3] } };
+  const rdl0 = X(rdlL, { t: 88, a1: [-93, -93], a2: [-91, -91], l1: [-88, -92, 0], l2: [-89, -91, 0] });
+  const rdl1 = X(rdlL, { t: 25, h: 18, a1: [-100, -100], a2: [-98, -98], l1: [-50, -96, 0], l2: [-51, -95, 0] });
+  S('rdl', { p0: rdl0, p1: rdl1, props: [{ k: 'plate', at: 'h1', r: 13, layer: 'front' }], hl: ['hams1', 'glutes'] });
+  S('dbrdl', { p0: rdl0, p1: rdl1, props: dbs, hl: ['hams1', 'glutes'] });
+  const rowL = X(rdlL, { t: 30, h: 22, l1: [-50, -96, 0], l2: [-51, -95, 0] });
+  S('bbrow', { p0: X(rowL, { a1: [-93, -93], a2: [-91, -91] }), p1: X(rowL, { a1: [-155, -95], a2: [-153, -93] }), props: [{ k: 'plate', at: 'h1', r: 13, layer: 'front' }], hl: ['lats', 'upperback'] });
+  V('ohp', {
+    p0: { a1: [-140, 80], a2: [-40, 100] },
+    p1: { a1: [100, 95], a2: [80, 85] },
+    props: [{ k: 'bbar', a: 'h1', b: 'h2', ext: 18, layer: 'front' }], hl: ['delts', 'triceps'],
+  });
+  S('broadjump', {
+    p0: { t: 48, a1: [-150, -148], a2: [-148, -146], l1: [-36, -110, 0], l2: [-37, -109, 0], anchor: { j: 'an1', at: [0, 3] } },
+    p1: { t: 66, a1: [6, 26], a2: [8, 28], l1: [-34, -106, 0], l2: [-35, -105, 0], anchor: { j: 'an1', at: [96, 3] } },
+    hl: ['quads1', 'glutes'],
+  });
+  V('latbound', {
+    p0: { hip: [0, 78], tb: -4, a1: [-60, -76], a2: [-120, -104], l1: [-104, -84], l2: [-58, -122], anchor: { j: 'an1', at: [0, 3] } },
+    p1: { hip: [0, 78], tb: 4, a1: [-60, -76], a2: [-120, -104], l1: [-58, -122], l2: [-76, -96], anchor: { j: 'an2', at: [86, 3] } },
+    hl: ['glutes', 'quads'],
+  });
+  V('chop', {
+    p0: { hip: [0, 84], tb: 6, a1: { ik: [-40, 132], bend: 1 }, a2: { ik: [-32, 132], bend: -1 }, l1: [-104, -96], l2: [-76, -84] },
+    p1: { hip: [0, 84], tb: -6, a1: { ik: [24, 72], bend: 1 }, a2: { ik: [32, 72], bend: -1 }, l1: [-104, -96], l2: [-76, -84] },
+    props: [{ k: 'line', a: [-94, 0], b: [-94, 182], w: 5 }, { k: 'cable', from: [-90, 176], to: { mid: ['h1', 'h2'] } }, { k: 'grip', at: { mid: ['h1', 'h2'] }, r: 3.6, layer: 'front' }],
+    hl: ['obl1', 'obl2'],
+  });
+  const hol = { hip: [0, 7], t: 172, h: 168, a1: [176, 176], a2: [174, 174], l1: [14, 14, 10], l2: [13, 13, 9] };
+  S('hollow', { p0: hol, p1: X(hol, { tb: -1.5 }), still: true, hl: ['abs'] });
+  F.chinup = F.pullup;
+  F.bikeint = F.bike;
   /* ---------- Calm phase: nerve-friendly moves ---------- */
   const prone = { l1: [181, 180, 192], l2: [180, 179, 191] };
   S('extseq', {
@@ -1434,10 +1480,10 @@ const EX = {
     cues: ['Turn sideways on the bench: hip on the pad, feet staggered under the roller.', 'Hold your body in one straight line, arms crossed.', 'Lying on your right hip trains your left (injured) side, so do that side first.'],
     avoid: 'Rotating the chest toward the floor.' },
   sext: { n: '45° side extension', c: 'spine', m: 'Obliques, quadratus lumborum, iliocostalis', eq: '45° back-extension bench',
-    cues: ['Hip on the pad, body side-on, feet staggered under the roller.', 'Lower sideways toward the floor in a pain-free range, then lift back to straight.', 'Right hip on the pad trains your left side. Match reps both sides.'],
+    cues: ['Hip on the pad, body side-on, feet staggered under the roller.', 'Lower sideways toward the floor in a pain-free range, then lift back to straight.', 'Right hip on the pad trains your left side. Match reps both sides.', 'With your left hip on the pad you bend toward your left side at the bottom: keep that side to a mid range, and stop the set if anything travels into your left leg.'],
     avoid: 'Twisting or bending forward. Move straight sideways.' },
   sext_w: { n: 'Weighted 45° side extension', c: 'spine', m: 'Obliques, quadratus lumborum, iliocostalis', eq: '45° bench, plate or dumbbell',
-    cues: ['Hug a plate to your chest, or hold a dumbbell in the lower hand.', '2 s down, 1 s pause at the top.', 'Add 2.5 kg when 3 × 12 per side is easy and pain-free.'],
+    cues: ['Hug a plate to your chest, or hold a dumbbell in the lower hand.', '2 s down, 1 s pause at the top.', 'Add 2.5 kg when 3 × 12 per side is easy and pain-free.', 'With your left hip on the pad you bend toward your left side at the bottom: keep that side to a mid range, and stop the set if anything travels into your left leg.'],
     avoid: 'Bouncing out of the bottom.' },
 
   deadbug: { n: 'Dead bug', c: 'core', m: 'Deep abdominals (anti-extension)', eq: 'Floor',
@@ -1450,10 +1496,10 @@ const EX = {
     cues: ['Stand side-on to a cable at chest height, feet hip-width.', 'Press the handle straight out, hold 2 s, bring it back.', 'Don’t let the cable turn you. Ribs stacked over hips.'],
     avoid: 'Leaning away from the cable.', swap: 'Half-kneeling version early on.' },
   suitcase: { n: 'Suitcase carry', c: 'core', m: 'Obliques, quadratus lumborum, grip', eq: 'One dumbbell or kettlebell', log: 'wd',
-    cues: ['One weight in one hand, stand tall.', 'Walk slowly without leaning toward or away from it.', 'Shoulders level, short steps. Switch hands each length.'],
-    avoid: 'Hitching the hip or leaning.' },
+    cues: ['One dumbbell in one hand, taken from the rack or a bench, never one-handed off the floor.', 'Walk slowly and tall without leaning toward or away from it. Shoulders level, short steps.', 'Walk 15 m out and 15 m back to the bench, then switch hands there.'],
+    avoid: 'Hitching the hip, leaning, or stooping to pick the weight up or put it down.' },
   farmer: { n: 'Farmer’s walk', c: 'core', m: 'Grip, traps, core', eq: 'Two dumbbells', log: 'wd',
-    cues: ['Heavy dumbbells at your sides, stand tall.', 'Short quick steps, ribs down, shoulders back.', 'Put the weights down with a squat, never a stoop.'],
+    cues: ['Heavy dumbbells at your sides, stand tall.', 'Short quick steps, ribs down, shoulders back.', 'Lift the dumbbells from and return them to a rack, bench or box, never from the floor.'],
     avoid: 'Picking the weights up with a rounded back.' },
   ballrollout: { n: 'Stability-ball rollout', c: 'core', m: 'Abdominals (anti-extension)', eq: 'Gym ball',
     cues: ['Kneel with forearms on a gym ball.', 'Roll forward, moving hips and arms together in one line.', 'Go only as far as you can without the back sagging.'],
@@ -1465,10 +1511,10 @@ const EX = {
     cues: ['Lie with knees bent and hips at 90°.', 'Curl the pelvis so the hips lift slightly off the floor.', 'Lower slowly.'],
     avoid: 'Swinging the legs.' },
   hangknee: { n: 'Hanging knee raise', c: 'core', m: 'Abdominals, hip flexors', eq: 'Pull-up bar',
-    cues: ['Hang with active shoulders, not shrugged into the ears.', 'Bring knees to hip height and curl the pelvis slightly.', 'Lower in 2 s without swinging.'],
+    cues: ['Hang with active shoulders, not shrugged into the ears.', 'Lift your knees to hip height with your pelvis level; no curl.', 'Lower in 2–3 s without swinging.'],
     avoid: 'Kipping or swinging.' },
   hangleg: { n: 'Hanging leg raise', c: 'core', m: 'Abdominals, hip flexors', eq: 'Pull-up bar',
-    cues: ['Hang with active shoulders.', 'Raise straight legs to hip height, curling the pelvis.', 'Lower in 2–3 s.'],
+    cues: ['Hang with active shoulders.', 'Lift straight legs to hip height with your pelvis level; no curl.', 'Lower in 2–3 s.'],
     avoid: 'Swinging for momentum.' },
   cablecrunch: { n: 'Cable crunch', c: 'core', m: 'Abdominals', eq: 'High cable, rope',
     cues: ['Kneel facing a high cable, rope beside your head.', 'Curl your ribs toward your hips; the hips stay still.', 'Pause, then return slowly.'],
@@ -1657,7 +1703,7 @@ const EX = {
     avoid: 'Rounding over the handles.' },
   sprint: { n: 'Sprints (hill or flat)', c: 'athletic', m: 'Glutes, hamstrings, conditioning', eq: 'Track, hill or field', log: 'x',
     cues: ['Warm up 8–10 min: jog, skips, two build-up runs.', 'Run tall with fast arms. Hills are gentlest on the hamstrings.', 'Walk back for full recovery, 90–120 s.'],
-    avoid: 'Sprinting on an amber back day.', swap: 'Bike sprints.' },
+    avoid: 'Sprinting cold, on an amber back day or on sore hamstrings: do bike sprints those days.', swap: 'Bike sprints.' },
   bikesprint: { n: 'Bike sprints', c: 'athletic', m: 'Legs, conditioning', eq: 'Stationary bike', log: 'x',
     cues: ['Moderate resistance, seated.', 'Sprint all-out for the prescribed time, then spin easy.', 'Keep your back neutral; no rocking.'],
     avoid: 'Standing up and yanking the bars.' },
@@ -1693,6 +1739,66 @@ Object.assign(EX, {
     avoid: 'Going deeper than is comfortable, or letting your knees cave in.' },
 });
 
+/* Barbell lifts, jumps and extra core work. No deadlifts: every hinge starts from standing and is lowered first. */
+Object.assign(EX, {
+  backsquat: { n: 'Barbell back squat', c: 'legs', m: 'Quads, glutes, adductors, trunk', eq: 'Squat rack with safety pins, barbell',
+    cues: ['Bar across your upper back (high-bar), hands just outside your shoulders, safeties set just below your lowest depth.', 'Big breath into your belly and brace, then sit down between your heels with knees tracking over your toes.', 'Go as deep as you can while your lower back stays neutral, then drive up through the whole foot, chest and hips rising together.'],
+    avoid: 'Your lower back rounding at the bottom, or your hips shooting up first. Shorten the depth and lighten the load until it is clean.',
+    swap: 'Hack squat, safety-bar squat, front squat, leg press.' },
+  frontsquat: { n: 'Barbell front squat', c: 'legs', m: 'Quads, glutes, upper back, trunk', eq: 'Squat rack with safety pins, barbell',
+    cues: ['Bar resting on the front of your shoulders, fingertips under the bar or arms crossed, elbows high.', 'Brace, then sit straight down with a tall chest; the torso stays more upright than in a back squat.', 'Drive up leading with the elbows. Rack the bar after the last rep, never drop it forward.'],
+    avoid: 'Elbows dropping, which tips the bar forward and rounds your upper back.',
+    swap: 'Goblet squat, hack squat.', spine: 'The upright torso puts less shear on the lower back than a back squat at the same effort.' },
+  rdl: { n: 'Romanian deadlift (from the rack)', c: 'legs', m: 'Hamstrings, glutes, back extensors', eq: 'Barbell in a rack or on blocks at mid-thigh',
+    cues: ['Unrack the bar standing tall. This is not a deadlift: the bar never starts on the floor.', 'Soft knees, push your hips straight back and slide the bar down your thighs with a long, neutral spine, until you feel a strong hamstring stretch, usually just below the knees.', 'Squeeze your glutes to stand back up. Put the bar back in the rack, never down on the floor.'],
+    avoid: 'Rounding your back to reach lower, or letting the bar drift away from your legs.',
+    swap: 'Dumbbell RDL, cable pull-through, 45° back extension.' },
+  dbrdl: { n: 'Dumbbell Romanian deadlift', c: 'legs', m: 'Hamstrings, glutes, back extensors', eq: 'Two dumbbells from the rack',
+    cues: ['Take the dumbbells from the rack at hip height and stand tall.', 'Soft knees, hips back, dumbbells sliding down the front of your thighs; spine long and neutral.', 'Stop at a strong hamstring stretch, then squeeze your glutes to stand.'],
+    avoid: 'Rounding your back, or reaching past the point where your hips stop moving back.',
+    swap: 'Cable pull-through.' },
+  bbrow: { n: 'Barbell row (from the hang)', c: 'pull', m: 'Upper back, lats, rear delts, back extensors', eq: 'Barbell in a rack at mid-thigh',
+    cues: ['Unrack the bar standing, then hinge until your torso is about 30–45° above horizontal, knees soft.', 'Row the bar to your lower ribs, elbows travelling back, and squeeze your shoulder blades.', 'Lower under control with your torso still. Rack the bar at the end of the set.'],
+    avoid: 'Heaving with your hips, or standing up more on every rep.',
+    swap: 'Chest-supported T-bar or dumbbell row.' },
+  ohp: { n: 'Standing barbell overhead press', c: 'push', m: 'Delts, triceps, upper chest, trunk', eq: 'Barbell, rack',
+    cues: ['Bar on the front of your shoulders, grip just outside them, glutes and abs squeezed.', 'Press straight up, moving your head back slightly so the bar passes your chin, then push your head through at the top.', 'Lower to your collarbones under control.'],
+    avoid: 'Leaning back into an arch to finish the rep. Lighten the load instead.',
+    swap: 'Seated dumbbell shoulder press, half-kneeling landmine press.' },
+  broadjump: { n: 'Broad jump', c: 'athletic', m: 'Glutes, quads, calves (horizontal power)', eq: 'Flat, non-slip floor or grass', log: 'r',
+    cues: ['Feet hip-width, swing your arms back and dip into a quarter squat.', 'Explode forward and up, throwing your arms forward.', 'Land softly in a half squat, knees over toes, and stick it for 2 s. Walk back and reset.'],
+    avoid: 'Landing with stiff legs or knees caving in. Quality, not quantity: stop when distance drops.' },
+  latbound: { n: 'Lateral bound', c: 'athletic', m: 'Glute medius, quads, ankles (side-to-side power)', eq: 'Open floor', log: 'r',
+    cues: ['Stand on one leg, sink into a quarter squat.', 'Push off sideways and land on the other foot, absorbing the landing quietly.', 'Hold the landing for 1–2 s before the next bound.'],
+    avoid: 'Knee collapsing inward on landing.' },
+  chop: { n: 'Cable woodchop (high to low)', c: 'core', m: 'Obliques, deep core (rotation control)', eq: 'Cable with a handle or rope',
+    cues: ['Stand side-on to a high cable, feet wide, arms long.', 'Pull the handle down and across to the opposite hip, turning through your hips and upper back together.', 'Return slowly, resisting the cable. Do all reps on one side, then switch.'],
+    avoid: 'Twisting only from the lower back, or bending forward.' },
+  hollow: { n: 'Hollow-body hold', c: 'core', m: 'Abdominals (anti-extension)', eq: 'Floor or mat', log: 't',
+    cues: ['Lie on your back and press your lower back gently into the floor.', 'Lift your shoulders and legs a little, arms reaching overhead.', 'Hold while breathing. Bend your knees or bring your arms forward to make it easier.'],
+    avoid: 'Your lower back peeling off the floor. Shorten the lever until it stays down.' },
+  bikeint: { n: 'Bike intervals', c: 'athletic', m: 'Aerobic power', eq: 'Stationary bike', log: 'min',
+    cues: ['Hard but steady: RPE 8, only a few words possible.', 'Spin easy between efforts.', 'Sit tall, relaxed grip.'],
+    avoid: 'Going all-out in the first minute.' },
+  chinup: { n: 'Chin-up', c: 'pull', m: 'Lats, biceps', eq: 'Bar, dip belt when weighted',
+    cues: ['Underhand grip, shoulder-width, start from a dead hang.', 'Pull your chest toward the bar until your chin clears it.', 'Lower in 2–3 s to a full hang.'],
+    avoid: 'Kipping or half reps.', swap: 'Assisted chin-up, underhand pulldown.' },
+});
+
+/* Wording for the general Build plan, where the back-specific notes don't apply */
+const GEN_EX = {
+  sideplank: { cues: ['Elbow under shoulder, feet stacked or staggered.', 'Body in one straight line from head to heels.', 'Do both sides; if one side is clearly weaker, start with that side and match the times.'] },
+  calf_stand: { spine: null },
+  mbrot: { avoid: 'Throwing from a bent, twisted spine. Rotate from the hips first.' },
+  sprint: { avoid: 'Sprinting cold, or on sore hamstrings. Swap for bike sprints on those days.' },
+  cablecrunch: { avoid: 'Sitting back and pulling with the arms.' },
+  pullthrough: { spine: null },
+  hangknee: { cues: ['Hang with active shoulders, not shrugged into the ears.', 'Bring knees to hip height and curl the pelvis slightly.', 'Lower in 2 s without swinging.'] },
+  hangleg: { cues: ['Hang with active shoulders.', 'Raise straight legs to hip height, curling the pelvis.', 'Lower in 2–3 s.'] },
+  suitcase: { cues: ['One weight in one hand, from a rack, bench or box. If it starts on the floor, squat straight down beside it with a tall spine, or lift it onto a bench with both hands first.', 'Walk slowly and tall without leaning. Shoulders level, short steps.', 'Walk 15 m out and 15 m back, then switch hands at the bench.'] },
+  farmer: { cues: ['Heavy dumbbells at your sides, taken from a rack or bench.', 'Short quick steps, ribs down, shoulders back.', 'If they start on the floor, squat down between them with a tall spine; never stoop.'] },
+};
+
 /* ===== Routines ===== */
 const BACKCARE = [
   { x: 'breath360', rx: '2 rounds of 5 breaths' },
@@ -1707,13 +1813,16 @@ const WARM = {
   p0: [{ x: 'bike', rx: '5 min easy' }, { x: 'curlup', rx: '5-3-1 × 10 s' }, { x: 'sideplank_k', rx: '5-3-1 × 10 s each side' }, { x: 'birddog', rx: '5-3-1 × 10 s each side' }],
   p1: [{ x: 'bike', rx: '5 min easy' }, { x: 'curlup', rx: '5-3-1 × 10 s' }, { x: 'sideplank_k', rx: '5-3-1 × 10 s each side' }, { x: 'birddog', rx: '5-3-1 × 10 s each side' }, { t: 'Ramp-up sets', rx: '2 light sets of your first exercise' }],
   main: [{ x: 'bike', rx: '5 min easy' }, { x: 'curlup', rx: '3-2-1 × 10 s' }, { x: 'sideplank', rx: '3-2-1 × 10 s each side' }, { x: 'birddog', rx: '3-2-1 × 10 s each side' }, { t: 'Ramp-up sets', rx: '2–3 lighter sets of your first lift' }],
-  sprint: [{ x: 'walk', rx: '5 min brisk, then easy jog' }, { t: 'Leg swings and A-skips', rx: '2 × 10 each' }, { x: 'birddog', rx: '3-2-1 × 10 s each side' }, { t: 'Build-up runs', rx: '2 runs at 60% and 80%' }],
+  sprint: [{ x: 'walk', rx: '5 min brisk, then easy jog' }, { t: 'Leg swings and A-skips', rx: '2 × 10 each' }, { x: 'birddog', rx: '3-2-1 × 10 s each side' }, { t: 'Build-up runs', rx: '3 runs at 60%, 75% and 90%' }],
   short: [{ x: 'bike', rx: '5 min easy' }, { x: 'birddog', rx: '3-2-1 × 10 s each side' }],
-  fit: [{ x: 'bike', rx: '5 min easy' }, { t: 'Dynamic warm-up', rx: '5 minutes of comfortable, controlled movement' }, { t: 'Ramp-up sets', rx: '2–3 lighter sets of your first lift' }],
+  gen: [{ x: 'bike', rx: '5 min easy' }, { t: 'Leg swings, hip circles, arm circles', rx: '10 each way' }, { t: 'Walking lunge with a reach', rx: '6 each leg' }, { x: 'pullapart', rx: '15 with a light band' }, { t: 'Ramp-up sets', rx: '3–4 lighter sets of your first lift: empty bar, then about 40%, 60% and 80%' }],
+  gsprint: [{ x: 'walk', rx: '5 min brisk, then 3 min easy jog' }, { t: 'Leg swings, A-skips, high knees', rx: '2 × 10–20 m each' }, { t: 'Pogo hops', rx: '2 × 10 quick, stiff-ankle hops (cycle 3+: forward and back; cycle 5+: 2 × 8 each leg)' }, { t: 'Build-up runs', rx: '3 runs at 60%, 75% and 90%' }],
+  gshort: [{ x: 'bike', rx: '5 min easy' }, { t: 'Arm circles and band pull-aparts', rx: '10 each way, then 15' }],
   nerve: [{ x: 'extseq', rx: '1–2 min face down, 1–2 min on elbows, then 10 slow press-ups' }, { x: 'glide_sc', rx: '10 slow reps, if your symptoms are at the back or outside of the thigh' }, { x: 'glide_fem', rx: '10 slow reps, if your symptoms are at the front of the thigh' }],
   care: BACKCARE,
 };
 const COOL = [{ x: 'hipflexor', rx: '2 × 30 s each side' }, { x: 'childpose', rx: '5 slow breaths' }];
+const COOLS = { gen: [{ x: 'hipflexor', rx: '2 × 30 s each side' }, { x: 'walk', rx: '3–5 min easy, breathing slowly through your nose' }] };
 
 /* ===== Sessions ===== */
 // item: x exercise, s sets, r reps, rest s, rpe, n note, g superset group, main, log override, p week overrides
@@ -1762,62 +1871,310 @@ day('p0_gate', { t: 'Rest and gate check', f: 'About 30 min', warm: 'care', cool
   items: [{ x: 'walk', s: 1, r: '20–30 min easy', log: 'min' }] });
 day('rest', { t: 'Rest and recover', f: 'Recovery day', warm: null, cool: false, rest: true,
   intro: 'No gym. Sleep 7–8 hours, hit your protein, get your steps in. The Back Care routine is optional today.',
-  items: [{ x: 'walk', s: 1, r: '20–40 min easy', log: 'min' }] });
+  items: [{ x: 'walk', s: 1, r: '30–45 min easy', log: 'min' }] });
 
-/* Separate five-day strength plan for a healthy adult. Workout logs stay in a separate local profile. */
-day('fit_push', { t: 'Push: chest, shoulders and triceps', f: 'About 55–65 min', warm: 'fit', cool: false,
-  intro: 'Work smoothly and leave 2–3 good reps in reserve. Tap an exercise for technique notes and available swaps.',
+/* ===== Build plan: the general two-year plan for any healthy adult (no back care, no deadlifts) =====
+   Same shape as the back-safe plan: Start, 6-week Foundation, then six 16-week cycles of
+   Strength base (5 wk), Hypertrophy (6 wk) and Athletic power (5 wk). Workout logs stay in a separate local profile.
+   cy: changes from cycle N onwards (the highest cycle number at or below the current cycle wins; {} returns to the base item). */
+const EVEN = o => ({ 2: o, 3: {}, 4: o, 5: {}, 6: o });
+const ROLL_G = { 3: { r: '8–12, 3 s on the way out' }, 5: { r: '3–6 standing, rolling out to a wall', n: 'Standing rollouts: start close to a wall so it stops the wheel, and move back a little each week. Kneeling 3 × 12 on days it feels too hard.' } };
+const ROLL_B = { 3: { r: '8–12, 3 s on the way out' }, 5: { r: '10–12, 3 s out, 1 s pause at full reach' } };
+const CARRY_N = 'Start and finish at a rack or bench, not the floor.';
+const CALF_N = 'Full range: pause 2 s in the bottom stretch.';
+const SUPER_N = 'Superset A: press, rest 90 s, pull-ups, rest 90 s. Each lift still gets about 3.5 min between its own sets.';
+const HANG_G = { 2: { x: 'hangleg', r: '8–12' }, 4: { x: 'hangleg', r: '6–10, 3 s lowering, 1 s pause at hip height' }, 6: { x: 'hangleg', r: '6–10 with a light dumbbell between the feet' } };
+const PALLOF_R = '8–12 each side, step-out, 2 s hold';
+const CRUNCH_N = 'Short range: curl your ribs toward your hips and stop before your lower back fully rounds. Never to failure. Hollow hold instead on amber days.';
+
+day('grest', { t: 'Rest and recover', f: 'Recovery day', warm: null, cool: false, rest: true,
+  intro: 'No gym today. Sleep 7–9 hours, hit your protein and get your steps in. Muscle is built between sessions.',
+  items: [{ x: 'walk', s: 1, r: '30–45 min easy', log: 'min' }] });
+
+/* Start: learn the lifts and record a baseline */
+day('g0_up', { t: 'Learn the lifts: upper body', f: 'Light, about 50 min', warm: 'gen', cool: 'gen',
+  intro: 'Everything is light in the Start phase. Finish each set with 4 or more good reps left. You are learning the movements and finding your starting weights.',
   items: [
-    { x: 'incdb', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
-    { x: 'chestpress', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
-    { x: 'sdbpress', s: 2, r: '8–12', rest: 90 },
-    { x: 'latraise', s: 3, r: '12–20', rest: 60 },
-    { x: 'pushdown', s: 3, r: '10–15', rest: 60 },
-    { x: 'deadbug', s: 3, r: '8–10 each side', rest: 45, log: 'r' },
+    { x: 'bench', s: 3, r: '8', rest: 120, rpe: '6', n: 'Start with the empty bar and add small jumps while every rep looks the same. Write down the weight where 8 reps feel easy.' },
+    { x: 'bbrow', s: 3, r: '8', rest: 120, rpe: '6', n: 'Take the bar from the rack at mid-thigh. Learn to hold a flat back in the hinge.' },
+    { x: 'ohp', s: 3, r: '8', rest: 120, rpe: '6' },
+    { x: 'pulldown', s: 2, r: '10', rest: 90, rpe: '6' },
+    { x: 'pushup', s: 1, r: 'max reps, stop 2 short of failure', log: 'r', test: true, n: 'Baseline. Knees on the floor is fine; note which version you did.' },
+    { x: 'dbcurl', s: 2, r: '12', rest: 0, g: 'A' },
+    { x: 'pushdown', s: 2, r: '12', rest: 60, g: 'A' },
   ] });
-day('fit_pull', { t: 'Pull: back and biceps', f: 'About 50–60 min', warm: 'fit', cool: false,
-  intro: 'Use controlled reps and a comfortable range. Stop each set before your form breaks down.',
+day('g0_low', { t: 'Learn the lifts: lower body', f: 'Light, about 50 min', warm: 'gen', cool: 'gen',
+  intro: 'Light again. Spend the time on technique: depth you control on the squat, a long flat back on the RDL.',
   items: [
-    { x: 'pulldown_n', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
-    { x: 'csrow', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
-    { x: 'facepull', s: 2, r: '12–20', rest: 60 },
-    { x: 'dbcurl', s: 3, r: '8–12', rest: 60 },
-    { x: 'hammer', s: 2, r: '10–15', rest: 60 },
+    { x: 'backsquat', s: 3, r: '8', rest: 150, rpe: '6', n: 'Empty bar first. Set the safety pins. Find the deepest squat you can do with a neutral lower back.' },
+    { x: 'rdl', s: 3, r: '8', rest: 120, rpe: '6', n: 'From the rack, never from the floor. Hinge until a strong hamstring stretch, then stand tall.' },
+    { x: 'bss', s: 2, r: '8 each leg', rest: 60, n: 'Bodyweight.' },
+    { x: 'curl_seated', s: 2, r: '12', rest: 60 },
+    { x: 'calf_stand', s: 2, r: '12', rest: 45, n: CALF_N },
+    { x: 'plank', s: 1, r: 'max hold, stop at 120 s', log: 't', test: true, n: 'Baseline.' },
   ] });
-day('fit_lower_a', { t: 'Legs A: quads, hamstrings and core', f: 'About 55–65 min', warm: 'fit', cool: false,
-  intro: 'Use a range you can control. Keep 2–3 good reps in reserve on the main lifts.',
+day('g0_cond', { t: 'Baseline: jump, carry and walk', f: 'About 45 min', warm: 'gsprint', cool: 'gen',
+  intro: 'A few simple tests so you can see your progress over the next two years.',
   items: [
-    { x: 'hack', s: 3, r: '8–12', rest: 120, rpe: '7–8' },
+    { x: 'broadjump', s: 3, r: 'best of 3 jumps', log: 'cm', rest: 60, test: true, n: 'First, 2 practice jumps at about 50% and 75%; hold each landing for 2 s. Measure from the start line to your back heel.' },
+    { x: 'sideplank', s: 2, r: 'max hold: right, then left, stop at 90 s', log: 't', test: true },
+    { x: 'suitcase', s: 2, r: '30 m each side, moderate', rest: 60, n: CARRY_N },
+    { x: 'deadbug', s: 2, r: '8 each side', rest: 45, log: 'r' },
+    { x: 'walk', s: 1, r: '20–30 min brisk', log: 'min' },
+  ] });
+day('g0_walk', { t: 'Active recovery: walk', f: 'About 40 min', warm: null, cool: 'gen',
+  intro: 'An easy day between the learning sessions.',
+  items: [{ x: 'walk', s: 1, r: '30–40 min brisk', log: 'min' }, { x: 'deadbug', s: 2, r: '8 each side', rest: 45, log: 'r' }, { x: 'sideplank', s: 2, r: '20–30 s each side', rest: 30, log: 't' }] });
+
+/* Foundation: technique, muscle and work capacity */
+day('g1_upA', { t: 'Upper A: bench and row', f: 'About 60 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'bench', s: 3, r: '6–10', rest: 150, rpe: '7→8', main: true, n: 'Add 2.5 kg when all three sets reach 10 clean reps.' },
+    { x: 'bbrow', s: 3, r: '8–10', rest: 120, rpe: '7' },
+    { x: 'incdb', s: 3, r: '8–12', rest: 90, n: 'Take dumbbells from the rack, not the floor.' },
+    { x: 'pulldown', s: 3, r: '10–12', rest: 90 },
+    { x: 'clatraise', s: 3, r: '12–15 each side', rest: 60 },
+    { x: 'facepull', s: 2, r: '15', rest: 60 },
+    { x: 'pushdown', s: 2, r: '12–15', rest: 0, g: 'A' },
+    { x: 'dbcurl', s: 2, r: '10–12', rest: 60, g: 'A' },
+    { x: 'deadbug', s: 3, r: '8 each side', rest: 45, log: 'r' },
+  ] });
+day('g1_lowA', { t: 'Lower A: squat', f: 'About 60 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'backsquat', s: 3, r: '6–10', rest: 180, rpe: '7→8', main: true, n: 'Add 2.5–5 kg when all three sets reach 10.' },
     { x: 'legpress', s: 3, r: '10–12', rest: 120 },
-    { x: 'curl_seated', s: 3, r: '10–15', rest: 75 },
-    { x: 'hipthrust', s: 3, r: '8–12', rest: 90 },
-    { x: 'calf_stand', s: 3, r: '10–15', rest: 60 },
-    { x: 'pallof', s: 3, r: '10–12 each side', rest: 45 },
+    { x: 'legext', s: 2, r: '12–15', rest: 60 },
+    { x: 'curl_seated', s: 3, r: '10–12', rest: 60 },
+    { x: 'calf_stand', s: 3, r: '10–15', rest: 60, n: CALF_N },
+    { x: 'plank', s: 3, r: '30–45 s', rest: 45, log: 't', p: { 4: { rx: '3 × 45–60 s' }, 5: { rx: '3 × 45–60 s' } } },
   ] });
-day('fit_upper', { t: 'Upper: chest, back, shoulders and arms', f: 'About 55–65 min', warm: 'fit', cool: false,
-  intro: 'Build on the first two sessions without rushing. Leave 2–3 good reps in reserve.',
+day('g1_cond', { t: 'Speed, core and conditioning', f: 'About 65 min', warm: 'gsprint', cool: false,
+  items: [
+    { x: 'sprint', s: 4, r: '60 m strides at 70–80%, walk back', rest: 90, n: 'Weeks 1–2: stop the warm-up build-up runs at 75%.', p: { 3: { s: 5, rx: '5 × 60 m strides at 80%, walk back' }, 4: { s: 6, rx: '6 × 10 s hill sprints at 85%, walk back' }, 5: { s: 6, rx: '6 × 10 s hill sprints at 90%, walk back' } } },
+    { x: 'boxjump', s: 3, r: '3', rest: 90, n: 'Low box. Step down every rep.' },
+    { x: 'pallof', s: 3, r: '10 each side', rest: 45 },
+    { x: 'abwheel', s: 3, r: '6–10', rest: 60, log: 'r', p: { 1: { x: 'deadbug', rx: '3 × 8 each side (ab wheel from week 3)' }, 2: { x: 'deadbug', rx: '3 × 10 each side (ab wheel from week 3)' } } },
+    { x: 'suitcase', s: 3, r: '20–30 m each side', rest: 60, n: CARRY_N },
+    { x: 'farmer', s: 3, r: '30 m', rest: 60, n: CARRY_N },
+    { x: 'hangknee', s: 2, r: '8–12', rest: 60, log: 'r' },
+    { x: 'bike', s: 1, r: '15–20 min zone 2', log: 'min' },
+  ] });
+day('g1_upB', { t: 'Upper B: press and pull-up', f: 'About 60 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'ohp', s: 3, r: '6–10', rest: 150, rpe: '7→8', main: true },
+    { x: 'pullup', s: 3, r: '5–8', rest: 150, n: 'Assisted machine or band until you own 3 × 5 bodyweight reps.' },
+    { x: 'bench', s: 3, r: '8', rest: 120, rpe: '7', n: 'Practice: about 90% of Monday’s weight.' },
+    { x: 'cablerow', s: 3, r: '10–12', rest: 90 },
+    { x: 'latraise', s: 3, r: '12–15', rest: 60 },
+    { x: 'rpd', s: 2, r: '15', rest: 60 },
+    { x: 'preacher', s: 3, r: '10–12', rest: 0, g: 'A' },
+    { x: 'ohext', s: 3, r: '12', rest: 60, g: 'A' },
+  ] });
+day('g1_lowB', { t: 'Lower B: hinge and single leg', f: 'About 65 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'rdl', s: 3, r: '8–10', rest: 150, rpe: '7→8', main: true, n: 'From the rack. Add 5 kg when all sets reach 10.' },
+    { x: 'backsquat', s: 2, r: '8', rest: 120, rpe: '6–7', n: 'Practice sets at about 85% of Tuesday’s weight.' },
+    { x: 'bss', s: 3, r: '8–10 each leg', rest: 90, n: 'Bodyweight in week 1, then dumbbells.' },
+    { x: 'hipthrust', s: 3, r: '10–12', rest: 90 },
+    { x: 'curl_lying', s: 2, r: '10–12', rest: 60 },
+    { x: 'nordic', s: 2, r: '3–5, band-assisted', rest: 120, log: 'r' },
+    { x: 'calf_seated', s: 3, r: '15', rest: 45 },
+    { x: 'sideplank', s: 2, r: '30–45 s each side', rest: 45, log: 't' },
+  ] });
+day('g1_sat', { t: 'Conditioning and pump', f: 'Optional, about 40 min', warm: 'gshort', cool: 'gen',
+  items: [
+    { x: 'bikesprint', s: 6, r: '20 s hard, 100 s easy', rest: 0 },
+    { x: 'clatraise', s: 3, r: '15 each side', rest: 0, g: 'A' },
+    { x: 'facepull', s: 3, r: '15', rest: 60, g: 'A' },
+    { x: 'hammer', s: 3, r: '12', rest: 0, g: 'B' },
+    { x: 'pushdown', s: 3, r: '15', rest: 60, g: 'B' },
+    { x: 'pushup', s: 3, r: '2 short of failure', rest: 60 },
+  ] });
+
+/* Block A: strength base */
+day('ga_cond', { t: 'Sprints, jumps and core', f: 'About 60 min', warm: 'gsprint', cool: false,
+  items: [
+    { x: 'sprint', s: 6, r: '10–15 s hill sprints, walk back', rest: 120, n: 'If you missed the Foundation sprint build-up: bike sprints (8 × 15 s) in weeks 1–2, hill sprints from week 3.', p: { 1: { s: 6, rx: '6 × 10 s hill sprints at 85–90%, walk back' } }, cy: { 2: { s: 8, n: null }, 5: { s: 8, r: '15–20 s hill sprints, walk back', n: null } } },
+    { x: 'broadjump', s: 3, r: '3 jumps, log your best', rest: 90, log: 'cm', cy: { 3: { r: '3 linked jumps (land and go straight into the next), log total distance' } } },
+    { x: 'pallof', s: 3, r: PALLOF_R, rest: 45, cy: EVEN({ x: 'chop', r: '8–10 each side' }) },
+    { x: 'suitcase', s: 3, r: '30 m each side, heavy', rest: 60, n: CARRY_N },
+    { x: 'hangknee', s: 3, r: '10–12', rest: 60, log: 'r', cy: HANG_G },
+    { x: 'copen', s: 2, r: '20 s each side', rest: 45, cy: { 3: { r: '30 s each side' }, 5: { r: '30–40 s each side, long lever (foot on the bench)' } } },
+    { x: 'bikeint', s: 1, r: '4 × 2 min hard (RPE 8), 2 min easy spin', log: 'min' },
+  ] });
+day('ga_upS', { t: 'Upper strength', f: 'About 75 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'bench', s: 4, r: '4–6', rest: 90, rpe: '7→9', main: true, g: 'A', n: SUPER_N + ' Add 2.5 kg when every set reaches 6.', cy: { 3: { x: 'incbb', n: 'Cycle 3: incline barbell press for one cycle, then back to the flat bench. ' + SUPER_N }, 4: {} } },
+    { x: 'pullup', s: 4, r: '4–6', rest: 90, main: true, g: 'A', n: 'Add weight with a belt once 3 × 8 bodyweight reps are easy. Assisted until then.', cy: EVEN({ x: 'chinup' }) },
+    { x: 'bbrow', s: 3, r: '6–8', rest: 150, cy: EVEN({ x: 'tbar' }) },
+    { x: 'ohp', s: 3, r: '5–8', rest: 150 },
+    { x: 'dips', s: 3, r: '6–10', rest: 120, n: 'Add weight with a belt once 3 × 10 is easy.' },
+    { x: 'latraise', s: 3, r: '12–15', rest: 0, g: 'B', cy: EVEN({ x: 'clatraise', r: '12–15 each side' }) },
+    { x: 'facepull', s: 3, r: '15', rest: 60, g: 'B' },
+    { x: 'ezcurl', s: 2, r: '8–10', rest: 0, g: 'C' },
+    { x: 'skull', s: 2, r: '8–10', rest: 60, g: 'C' },
+  ] });
+day('ga_lowS', { t: 'Lower strength', f: 'About 70 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'backsquat', s: 4, r: '4–6', rest: 210, rpe: '7→9', main: true, n: 'Add 2.5–5 kg when every set reaches 6.', cy: { 3: { x: 'frontsquat', n: 'Cycle 3: front squat for one cycle. It builds the upper back and trunk; the back squat returns in cycle 4.' }, 4: { n: 'Cycle 4: pause 2 s at the bottom of every rep. Use about 10% less weight.' }, 5: {} } },
+    { x: 'rdl', s: 3, r: '5–8', rest: 180, rpe: '7→8', main: true, n: 'From the rack. Add 5 kg when every set reaches 8.' },
+    { x: 'bss', s: 3, r: '6–8 each leg', rest: 120 },
+    { x: 'nordic', s: 3, r: '4–6', rest: 120, log: 'r', n: 'Band-assisted if needed, or heavy lying leg curls.', p: { 1: { s: 2, rx: '2 × 3–4, slow 4 s lowering, band-assisted if needed' } } },
+    { x: 'calf_stand', s: 4, r: '8–10', rest: 60, n: CALF_N },
+    { x: 'abwheel', s: 3, r: '6–10', rest: 60, log: 'r', cy: ROLL_G },
+  ] });
+day('ga_upH', { t: 'Upper hypertrophy', f: 'About 60 min', warm: 'gen', cool: 'gen',
   items: [
     { x: 'incdb', s: 3, r: '8–12', rest: 120 },
-    { x: 'chestpress', s: 2, r: '10–15', rest: 90 },
-    { x: 'pulldown_n', s: 2, r: '8–12', rest: 90 },
-    { x: 'csrow', s: 2, r: '10–15', rest: 90 },
-    { x: 'latraise', s: 2, r: '12–20', rest: 60 },
-    { x: 'pushdown', s: 2, r: '10–15', rest: 60 },
-    { x: 'dbcurl', s: 2, r: '10–15', rest: 60 },
-    { x: 'plank', s: 3, r: '20–40 s', rest: 45, log: 't' },
+    { x: 'pulldown', s: 3, r: '10–12', rest: 90, cy: EVEN({ x: 'pulldown_n' }) },
+    { x: 'cablerow', s: 3, r: '10–12', rest: 90, cy: EVEN({ x: 'dbrow', r: '10–12 each side' }) },
+    { x: 'cablefly', s: 3, r: '12–15', rest: 60, cy: EVEN({ x: 'pecdeck' }) },
+    { x: 'clatraise', s: 4, r: '12–15 each side', rest: 60, cy: EVEN({ x: 'latraise', r: '12–15' }) },
+    { x: 'rpd', s: 3, r: '15', rest: 60 },
+    { x: 'inccurl', s: 3, r: '10–12', rest: 0, g: 'A', cy: EVEN({ x: 'cablecurl' }) },
+    { x: 'pushdown', s: 3, r: '12–15', rest: 60, g: 'A' },
   ] });
-day('fit_lower_b', { t: 'Legs B: glutes, hamstrings and core', f: 'About 55–65 min', warm: 'fit', cool: false,
-  intro: 'Use steady repetitions and stop if a movement causes pain. Add load gradually as your reps improve.',
+day('ga_lowH', { t: 'Lower hypertrophy', f: 'About 65 min', warm: 'gen', cool: 'gen',
   items: [
-    { x: 'goblet', s: 3, r: '8–12', rest: 120 },
-    { x: 'bss', s: 2, r: '8–12 each leg', rest: 90 },
-    { x: 'curl_lying', s: 3, r: '10–15', rest: 75 },
-    { x: 'hipthrust', s: 3, r: '8–12', rest: 90 },
-    { x: 'calf_seated', s: 3, r: '10–15', rest: 60 },
-    { x: 'cablecrunch', s: 3, r: '10–15', rest: 60 },
+    { x: 'legpress', s: 3, r: '10–15', rest: 120, cy: EVEN({ x: 'hack', r: '8–12' }) },
+    { x: 'lunge', s: 3, r: '10 each leg', rest: 90 },
+    { x: 'hipthrust', s: 3, r: '8–12', rest: 120 },
+    { x: 'legext', s: 3, r: '12–15', rest: 60, n: 'Drop set on the last set.' },
+    { x: 'curl_seated', s: 3, r: '10–12', rest: 60, cy: EVEN({ x: 'curl_lying' }) },
+    { x: 'adduct', s: 2, r: '12–15', rest: 45 },
+    { x: 'calf_seated', s: 4, r: '15–20', rest: 45, n: CALF_N },
+    { x: 'cablecrunch', s: 3, r: '10–15', rest: 45 },
   ] });
-day('fit_rest', { t: 'Rest and recover', f: 'No lifting scheduled', warm: null, cool: false, rest: true,
-  intro: 'No workout is scheduled today. Rest, or take an easy walk if you feel like it.', items: [] });
+day('ga_arms', { t: 'Arms, delts and core', f: 'Optional, about 50 min', warm: 'gshort', cool: 'gen',
+  items: [
+    { x: 'latraise', s: 4, r: '15–20', rest: 45, n: 'Drop set on the last set.' },
+    { x: 'rpd', s: 3, r: '15–20', rest: 45 },
+    { x: 'cablecurl', s: 3, r: '12', rest: 0, g: 'A' },
+    { x: 'ohext', s: 3, r: '12', rest: 60, g: 'A' },
+    { x: 'hammer', s: 2, r: '12', rest: 0, g: 'B' },
+    { x: 'pushdown', s: 2, r: '15', rest: 60, g: 'B' },
+    { x: 'hangknee', s: 3, r: '10–15', rest: 60, log: 'r', cy: { 2: { x: 'hangleg', r: '8–12' } } },
+    { x: 'hollow', s: 3, r: '20–30 s', rest: 45, log: 't', cy: { 4: { r: '30–45 s' } } },
+    { x: 'bike', s: 1, r: '20 min zone 2 (optional)', log: 'min' },
+  ] });
+
+/* Block B: hypertrophy */
+day('gb_push', { t: 'Push', f: 'About 70 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'incbb', s: 4, r: '6–10', rest: 150, rpe: '8', cy: EVEN({ x: 'bench' }) },
+    { x: 'flatdb', s: 3, r: '8–12', rest: 120, rpe: '8', cy: EVEN({ x: 'incdb' }) },
+    { x: 'cablefly', s: 3, r: '12–15', rest: 60 },
+    { x: 'sdbpress', s: 3, r: '8–12', rest: 90, rpe: '8', cy: EVEN({ x: 'ohp', r: '6–10' }) },
+    { x: 'clatraise', s: 4, r: '12–20 each side', rest: 45, n: 'Drop set on the last set.', cy: { 4: { s: 5 } } },
+    { x: 'pushdown', s: 3, r: '10–15', rest: 60, n: 'Drop set on the last set.' },
+    { x: 'ohext', s: 2, r: '12–15', rest: 60 },
+  ] });
+day('gb_pull', { t: 'Pull', f: 'About 65 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'pullup', s: 4, r: '6–10', rest: 150, rpe: '8', cy: EVEN({ x: 'chinup' }) },
+    { x: 'tbar', s: 3, r: '8–12', rest: 120, rpe: '8', cy: EVEN({ x: 'bbrow' }) },
+    { x: 'dbrow', s: 3, r: '10–12 each side', rest: 90, rpe: '8' },
+    { x: 'sapd', s: 3, r: '12–15', rest: 60 },
+    { x: 'facepull', s: 3, r: '15–20', rest: 60, cy: { 4: { s: 4 } } },
+    { x: 'ezcurl', s: 3, r: '8–12', rest: 60 },
+    { x: 'hammer', s: 2, r: '10–12', rest: 60, n: 'Drop set on the last set.' },
+    { x: 'bike', s: 1, r: '15 min zone 2', log: 'min' },
+  ] });
+day('gb_legA', { t: 'Legs A: squat and quads', f: 'About 70 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'boxjump', s: 3, r: '3', rest: 60, n: 'Fresh, before squats. Knee-height box, step down every rep.' },
+    { x: 'backsquat', s: 4, r: '6–10', rest: 180, rpe: '8' },
+    { x: 'legpress', s: 3, r: '12–15', rest: 120, rpe: '8', n: 'Drop set on the last set.', cy: EVEN({ x: 'hack', r: '10–15' }) },
+    { x: 'lunge', s: 3, r: '12 each leg', rest: 90, rpe: '8' },
+    { x: 'legext', s: 3, r: '15', rest: 0, g: 'A' },
+    { x: 'curl_seated', s: 3, r: '12–15', rest: 60, g: 'A' },
+    { x: 'calf_stand', s: 4, r: '10–15', rest: 60, n: CALF_N },
+    { x: 'abwheel', s: 3, r: '8–12', rest: 60, log: 'r', cy: ROLL_G },
+    { x: 'pallof', s: 3, r: PALLOF_R, rest: 45, cy: EVEN({ x: 'chop', r: '10 each side' }) },
+  ] });
+day('gb_cb', { t: 'Sprints, then chest and back supersets', f: 'About 65 min', warm: 'gsprint', cool: false,
+  items: [
+    { x: 'sprint', s: 6, r: '10–15 s hill sprint (walk back) or 15 s bike sprint (spin easy)', rest: 120, n: 'Then one light warm-up set before superset A.', cy: { 2: { s: 8 } } },
+    { x: 'incdb', s: 3, r: '10–12', rest: 0, rpe: '8', g: 'A' },
+    { x: 'pulldown_n', s: 3, r: '10–12', rest: 90, rpe: '8', g: 'A' },
+    { x: 'chestpress', s: 3, r: '10–12', rest: 0, rpe: '8', g: 'B' },
+    { x: 'cablerow', s: 3, r: '10–12', rest: 90, rpe: '8', g: 'B' },
+    { x: 'pecdeck', s: 3, r: '15', rest: 0, g: 'C' },
+    { x: 'sapd', s: 3, r: '15', rest: 0, g: 'C' },
+    { x: 'latraise', s: 3, r: '15–20', rest: 90, g: 'C', cy: { 4: { s: 4 } } },
+  ] });
+day('gb_legB', { t: 'Legs B: hinge, glutes and core', f: 'About 70 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'rdl', s: 4, r: '8–10', rest: 150, rpe: '7–8' },
+    { x: 'hipthrust', s: 3, r: '8–12', rest: 120, rpe: '8' },
+    { x: 'bss', s: 3, r: '10 each leg', rest: 90, rpe: '8' },
+    { x: 'curl_lying', s: 2, r: '10–12', rest: 60, n: 'Drop set on the last set.' },
+    { x: 'nordic', s: 2, r: '4–6', rest: 120, log: 'r', n: 'Band-assisted if needed.' },
+    { x: 'abduct', s: 2, r: '15–20', rest: 45 },
+    { x: 'calf_seated', s: 3, r: '15–20', rest: 45 },
+    { x: 'hangknee', s: 3, r: '12–15', rest: 60, log: 'r', cy: { 2: { x: 'hangleg', r: '10–15' }, 4: HANG_G[4], 6: HANG_G[6] } },
+    { x: 'suitcase', s: 2, r: '30 m each side', rest: 60, n: CARRY_N },
+  ] });
+day('gb_arms', { t: 'Arms and delts', f: 'Optional, about 55 min', warm: 'gshort', cool: 'gen',
+  items: [
+    { x: 'ezcurl', s: 3, r: '10–12', rest: 0, g: 'A' },
+    { x: 'skull', s: 3, r: '10–12', rest: 60, g: 'A' },
+    { x: 'inccurl', s: 3, r: '10–12', rest: 0, g: 'B' },
+    { x: 'pushdown', s: 3, r: '12–15', rest: 60, g: 'B' },
+    { x: 'hammer', s: 3, r: '12', rest: 0, g: 'C' },
+    { x: 'ohext', s: 3, r: '12', rest: 60, g: 'C', n: 'Drop set both exercises on the last round.' },
+    { x: 'latraise', s: 4, r: '15–20', rest: 45, n: 'Drop set on the last set.' },
+    { x: 'rpd', s: 3, r: '15–20', rest: 45 },
+    { x: 'cablecrunch', s: 3, r: '12–15', rest: 45 },
+    { x: 'walk', s: 1, r: '15 min zone 2', log: 'min' },
+  ] });
+
+/* Block C: athletic power */
+const STEP_C = n => ({ 1: { rx: `${n} × 5 at RPE 7–8` }, 2: { rx: `${n} × 4 at RPE 8` }, 3: { rx: `${n} × 3 at RPE 8` }, 4: { rx: `${n} × 2–3 at RPE 8` } });
+day('gc_spr', { t: 'Sprints, bounds and rotational core', f: 'About 60 min', warm: 'gsprint', cool: false,
+  items: [
+    { x: 'sprint', s: 6, r: '20–40 m at 90–95%, walk back', rest: 150, p: { 1: { s: 6, rx: '6 × 20–30 m at 80–85%, walk back' } }, cy: { 3: { r: '30–60 m at 90–95%, walk back' }, 5: { s: 8, r: '30–60 m at 90–95%, walk back' } } },
+    { x: 'latbound', s: 3, r: '4 each side', rest: 60, log: 'r', cy: { 3: { r: '4 each side, continuous: land and bound straight back' }, 5: { s: 4, r: '4 each side, continuous: land and bound straight back' } } },
+    { x: 'mbrot', s: 3, r: '5 each side', rest: 60, cy: { 5: { s: 4 } } },
+    { x: 'chop', s: 3, r: '8 each side', rest: 45, cy: EVEN({ x: 'pallof', r: PALLOF_R }) },
+    { x: 'abwheel', s: 3, r: '8–10', rest: 60, log: 'r', cy: ROLL_G },
+    { x: 'copen', s: 2, r: '20–30 s each side', rest: 45, cy: { 5: { r: '30–40 s each side, long lever' } } },
+    { x: 'suitcase', s: 3, r: '30 m each side, heavy', rest: 60, n: CARRY_N, cy: { 5: { s: 2 } } },
+    { x: 'bike', s: 1, r: '10 min zone 2', log: 'min' },
+  ] });
+day('gc_upP', { t: 'Power upper', f: 'About 70–75 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'mbchest', s: 4, r: '5 explosive', rest: 60, cy: { 5: { s: 5 } } },
+    { x: 'plyopush', s: 3, r: '5', rest: 60 },
+    { x: 'bench', s: 5, r: '3–5', rest: 90, rpe: '8', main: true, g: 'A', n: SUPER_N, p: STEP_C(5) },
+    { x: 'pullup', s: 5, r: '3–5', rest: 90, rpe: '8', main: true, g: 'A', n: 'Add weight with a belt only once 3 × 8 bodyweight reps are easy; until then bodyweight or assisted, 5 × 3–5 at RPE 8.' },
+    { x: 'landmine', s: 3, r: '6–8 each side', rest: 90, cy: EVEN({ x: 'ohp', r: '5–6' }) },
+    { x: 'bbrow', s: 3, r: '6–8', rest: 0, g: 'B', cy: EVEN({ x: 'csrow', r: '8' }) },
+    { x: 'latraise', s: 3, r: '12–15', rest: 120, g: 'B' },
+    { x: 'farmer', s: 3, r: '30 m heavy', rest: 90, n: CARRY_N },
+  ] });
+day('gc_lowP', { t: 'Power lower', f: 'About 70 min', warm: 'gen', cool: 'gen',
+  items: [
+    { x: 'boxjump', s: 4, r: '3', rest: 90, n: 'Step down every rep.', cy: { 5: { r: '3 each leg, single-leg onto a low box', n: 'Step down every rep. Land softly in a half squat.' } } },
+    { x: 'sled', s: 3, r: '15–20 m', rest: 90, n: 'No sled? Push a loaded plate on grass, or do 4 × 10 s uphill sprints.', cy: { 3: { r: '15–20 m, heavier: add load while you can still drive with short, fast steps' } } },
+    { x: 'backsquat', s: 4, r: '3–5', rest: 180, rpe: '8', main: true, p: STEP_C(4) },
+    { x: 'rdl', s: 3, r: '5–6', rest: 150, rpe: '7–8' },
+    { x: 'hipthrust', s: 3, r: '6–8', rest: 120 },
+    { x: 'nordic', s: 2, r: '4–6', rest: 0, log: 'r', g: 'A', p: { 1: { s: 2, rx: '2 × 3–4, slow 4 s lowering, band-assisted if needed' } } },
+    { x: 'calf_stand', s: 2, r: '8–10', rest: 90, g: 'A', n: CALF_N },
+  ] });
+day('gc_test', { t: 'Benchmark tests', f: 'Deload week, about 60–70 min', warm: 'gsprint', cool: 'gen', test: true,
+  intro: 'Test day. Jump first while fresh. For the barbell tests, work up: bar, 50% × 5, 70% × 3, 85% × 1–2, then your test set, resting 3–4 min. Log the results here and in Progress, and log your best RDL × 8 and overhead press × 5 working sets from Block A as those benchmarks.',
+  items: [
+    { x: 'broadjump', s: 3, r: 'best of 3 jumps', log: 'cm', test: true },
+    { x: 'backsquat', s: 1, r: 'heaviest clean set of 5 (RPE 9)', test: true },
+    { x: 'bench', s: 1, r: 'heaviest clean set of 5 (RPE 9)', test: true },
+    { x: 'pullup', s: 1, r: 'max bodyweight reps', log: 'r', test: true },
+    { x: 'hangleg', s: 1, r: 'max strict reps', log: 'r', test: true },
+    { x: 'abwheel', s: 1, r: 'max full rollouts from the knees', log: 'r', test: true },
+    { x: 'sideplank', s: 2, r: 'max hold: right, then left', log: 't', test: true },
+    { x: 'suitcase', s: 2, r: 'heaviest clean 30 m, each side', test: true, n: CARRY_N },
+  ] });
 
 /* Calm phase: settle the irritated nerve at home, while strengthening back, hips, obliques, glutes, thighs and upper back */
 day('n_str', { t: 'Calm strength: back, hips, core and thighs', f: 'About 40 min, at home', warm: 'nerve', cool: false,
@@ -1888,7 +2245,7 @@ day('p1_core', { t: 'Core and zone 2', f: 'About 55 min', warm: 'care', cool: fa
     { x: 'ballrollout', s: 3, r: '6–10', rest: 60, log: 'r', p: { 1: { x: 'deadbug', rx: '3 × 8 each side (rollouts from week 3)' }, 2: { x: 'deadbug', rx: '3 × 8 each side (rollouts from week 3)' } } },
     { x: 'suitcase', s: 3, r: '20–30 m each side', rest: 60 },
     { x: 'farmer', s: 3, r: '30 m', rest: 60 },
-    { x: 'revcrunch', s: 2, r: '10–12', rest: 45, log: 'r' },
+    { x: 'hollow', s: 2, r: '20–30 s, knees bent', rest: 45 },
     { x: 'walk', s: 1, r: '25–35 min zone 2', log: 'min' },
   ] });
 day('p1_upB', { t: 'Upper B: shoulders, lats and arms', f: 'About 60 min', warm: 'p1',
@@ -1924,58 +2281,68 @@ day('p1_sat', { t: 'Conditioning and pump', f: 'Optional, about 45 min', warm: '
     { x: 'pallof', s: 2, r: '10 each side', rest: 45 },
   ] });
 
+/* Barbell squats, barbell RDLs and running sprints come in gradually and only after the barbell gate on the Back Care tab.
+   lock: what to do instead while the gate is still closed. No deadlifts from the floor, ever. */
+const SQ_LOCK = { x: 'hack', n: 'Barbell squats unlock when you pass the barbell gate on the Back Care tab. Until then: hack squat.' };
+const RDL_LOCK = { x: 'dbrdl', r: '8–10', rpe: '6–7', n: 'Barbell RDLs unlock when you pass the barbell gate on the Back Care tab. Until then: light dumbbell RDLs, 8–10 reps.' };
+const SPRINT_LOCK = { x: 'bikesprint', r: '15 s hard, 105 s easy, seated', rest: 0, n: 'Running sprints unlock with the barbell gate on the Back Care tab. Until then: seated bike sprints; warm up on the bike instead of the build-up runs. Amber back day: skip.' };
+const SQ_NOTE = 'High-bar. Heels raised 1.5–2.5 cm in weightlifting shoes or on a squat wedge (plates only for light warm-up sets). Feet a little wider than shoulders, toes out 15–30°. Safeties set just below your depth. Stop the set if pain passes 2/10.';
+const SQ_CAP = ' Top out at RPE 8 (2 good reps left); never grind a barbell squat.';
+
 /* Block A: strength base */
+day('a_cond', { t: 'Sprints and core', f: 'About 55 min', warm: 'sprint', cool: false,
+  items: [
+    { x: 'sprint', s: 6, r: '10–15 s hill sprints, walk back', rest: 120, n: 'Cycle 1: bike sprints (8 × 15 s) if you haven’t sprinted in a while. Amber back day: skip.', lock: SPRINT_LOCK, cy: { 2: { s: 8, n: 'Amber back day: skip.' }, 5: { s: 8, r: '15–20 s hill sprints, walk back', n: 'Amber back day: skip.' } } },
+    { x: 'pallof', s: 3, r: PALLOF_R, rest: 45 },
+    { x: 'suitcase', s: 3, r: '30 m each side, heavy', rest: 60, n: CARRY_N },
+    { x: 'hangknee', s: 3, r: '10–12', rest: 60, log: 'r', cy: { 2: { r: '10–12, 3 s lowering' }, 3: { x: 'hangleg', r: '8–12', n: 'Straight legs to hip height without curling the pelvis.' } } },
+    { x: 'copen', s: 2, r: '20 s each side', rest: 45, cy: { 3: { r: '30 s each side' }, 5: { r: '30–40 s each side, long lever (foot on the bench)' } } },
+    { x: 'walk', s: 1, r: '15 min zone 2', log: 'min', cy: { 2: { x: 'bikeint', r: '4 × 2 min hard (RPE 8), 2 min easy spin, sit upright' } } },
+  ] });
 day('a_upS', { t: 'Upper strength', f: 'About 70 min', warm: 'main',
   items: [
-    { x: 'incbb', s: 4, r: '5–6', rest: 180, rpe: '7→9', main: true, n: 'Week 1 at RPE 7, week 4 at RPE 9. Add 2.5 kg when every set hits 6.' },
-    { x: 'pullup', s: 4, r: '5–6', rest: 180, main: true, n: 'Assisted or heavy pulldown until you own 3 × 8 bodyweight.' },
-    { x: 'tbar', s: 3, r: '6–8', rest: 120 },
+    { x: 'incbb', s: 4, r: '5–6', rest: 90, rpe: '7→9', main: true, g: 'A', n: SUPER_N + ' Add 2.5 kg when every set hits 6.' },
+    { x: 'pullup', s: 4, r: '5–6', rest: 90, main: true, g: 'A', n: 'Assisted or heavy pulldown until you own 3 × 8 bodyweight.', cy: EVEN({ x: 'chinup' }) },
+    { x: 'tbar', s: 3, r: '6–8', rest: 120, cy: EVEN({ x: 'csrow', r: '8–10' }) },
     { x: 'sdbpress', s: 3, r: '6–8', rest: 120 },
     { x: 'dips', s: 3, r: '6–10', rest: 90 },
-    { x: 'facepull', s: 3, r: '15', rest: 60 },
-    { x: 'ezcurl', s: 2, r: '8–10', rest: 0, g: 'A' },
-    { x: 'skull', s: 2, r: '8–10', rest: 60, g: 'A' },
+    { x: 'latraise', s: 3, r: '12–15', rest: 0, g: 'B', cy: EVEN({ x: 'clatraise', r: '12–15 each side' }) },
+    { x: 'facepull', s: 3, r: '15', rest: 60, g: 'B' },
+    { x: 'ezcurl', s: 2, r: '8–10', rest: 0, g: 'C' },
+    { x: 'skull', s: 2, r: '8–10', rest: 60, g: 'C' },
   ] });
-day('a_lowS', { t: 'Lower strength', f: 'About 70 min', warm: 'main',
+day('a_lowS', { t: 'Lower strength', f: 'About 75 min', warm: 'main',
   items: [
-    { x: 'hack', s: 4, r: '5–6', rest: 180, rpe: '7→9', main: true },
-    { x: 'hipthrust', s: 4, r: '6–8', rest: 150, main: true },
-    { x: 'bss', s: 3, r: '6–8 each leg', rest: 120 },
-    { x: 'nordic', s: 3, r: '4–6', rest: 120, log: 'r', n: 'Band-assisted if needed, or heavy lying leg curls.' },
-    { x: 'bext_w', s: 3, r: '8–10', rest: 90, key: true, n: 'Add 2.5 kg when 3 × 10 feels like RPE 7 and pain-free.' },
-    { x: 'calf_stand', s: 4, r: '8–10', rest: 60 },
-    { x: 'abwheel', s: 3, r: '6–10', rest: 60, log: 'r' },
-  ] });
-day('a_cond', { t: 'Sprints and core', f: 'About 50 min', warm: 'sprint', cool: false,
-  items: [
-    { x: 'sprint', s: 6, r: '10–15 s hill sprints, walk back', rest: 0, n: 'Cycle 1: bike sprints (8 × 15 s) if you haven’t sprinted in a while. Amber back day: skip.' },
-    { x: 'pallof', s: 3, r: '10 each side, step-out', rest: 45 },
-    { x: 'suitcase', s: 3, r: '30 m each side, heavy', rest: 60 },
-    { x: 'hangknee', s: 3, r: '10–12', rest: 60, log: 'r' },
-    { x: 'copen', s: 2, r: '20 s each side', rest: 45 },
-    { x: 'walk', s: 1, r: '10–15 min easy', log: 'min' },
+    { x: 'hack', s: 4, r: '5–6', rest: 180, rpe: '7→9', main: true, cy: { 2: { x: 'backsquat', rpe: '7→8', n: SQ_NOTE + SQ_CAP, lock: Object.assign({}, SQ_LOCK, { rpe: '7→9' }) } } },
+    { x: 'hipthrust', s: 4, r: '6–8', rest: 120, main: true },
+    { x: 'dbrdl', s: 3, r: '8–10', rest: 120, rpe: '6–7', n: 'New: light dumbbell RDLs from standing. Hinge only to a strong hamstring stretch with a long spine. Pain above 2/10 ends the set.', cy: { 2: { x: 'rdl', r: '6–8', rpe: '7→8', n: 'From the rack, never from the floor. Add 2.5 kg when every set reaches 8 and your back stays green.', lock: RDL_LOCK } } },
+    { x: 'bss', s: 3, r: '6–8 each leg', rest: 90 },
+    { x: 'nordic', s: 2, r: '4–6', rest: 120, log: 'r', n: 'Band-assisted if needed, or heavy lying leg curls.', p: { 1: { s: 2, rx: '2 × 3–4, slow 4 s lowering, band-assisted if needed' } } },
+    { x: 'bext_w', s: 3, r: '8–10', rest: 90, key: true, n: 'Add 2.5 kg when 3 × 10 feels like RPE 7 and pain-free.', cy: { 2: { s: 2, n: 'Two sets now that RDLs load the same muscles. Keep adding weight slowly.' } } },
+    { x: 'calf_stand', s: 3, r: '8–10', rest: 0, g: 'A', n: CALF_N },
+    { x: 'abwheel', s: 3, r: '6–10', rest: 60, log: 'r', g: 'A', cy: ROLL_B },
   ] });
 day('a_upH', { t: 'Upper hypertrophy', f: 'About 60 min', warm: 'main',
   items: [
     { x: 'incdb', s: 3, r: '8–12', rest: 120 },
-    { x: 'pulldown', s: 3, r: '10–12', rest: 90 },
-    { x: 'cablerow', s: 3, r: '10–12', rest: 90 },
-    { x: 'cablefly', s: 3, r: '12–15', rest: 60 },
-    { x: 'clatraise', s: 4, r: '12–15 each side', rest: 60 },
+    { x: 'pulldown', s: 3, r: '10–12', rest: 90, cy: EVEN({ x: 'pulldown_n' }) },
+    { x: 'cablerow', s: 3, r: '10–12', rest: 90, cy: EVEN({ x: 'dbrow', r: '10–12 each side' }) },
+    { x: 'cablefly', s: 3, r: '12–15', rest: 60, cy: EVEN({ x: 'pecdeck' }) },
+    { x: 'clatraise', s: 4, r: '12–15 each side', rest: 60, cy: EVEN({ x: 'latraise', r: '12–15' }) },
     { x: 'rpd', s: 3, r: '15', rest: 60 },
-    { x: 'inccurl', s: 3, r: '10–12', rest: 0, g: 'A' },
+    { x: 'inccurl', s: 3, r: '10–12', rest: 0, g: 'A', cy: EVEN({ x: 'preacher' }) },
     { x: 'pushdown', s: 3, r: '12–15', rest: 60, g: 'A' },
   ] });
-day('a_lowH', { t: 'Lower hypertrophy', f: 'About 60 min', warm: 'main',
+day('a_lowH', { t: 'Lower hypertrophy', f: 'About 65 min', warm: 'main',
   items: [
     { x: 'legpress', s: 3, r: '10–15', rest: 120 },
-    { x: 'lunge', s: 3, r: '10 each leg', rest: 90 },
+    { x: 'lunge', s: 3, r: '10 each leg', rest: 90, cy: { 1: { x: 'goblet', r: '8–10', n: 'Barbell-gate practice: heels raised, one dumbbell held at your chest.' }, 2: {} } },
     { x: 'legext', s: 3, r: '12–15', rest: 60, n: 'Drop set on the last set.' },
-    { x: 'curl_seated', s: 3, r: '10–12', rest: 60 },
+    { x: 'curl_seated', s: 3, r: '10–12', rest: 60, cy: EVEN({ x: 'curl_lying' }) },
     { x: 'sext_w', s: 3, r: '10–12 each side', rest: 60, key: true, n: 'Add 2.5 kg when 3 × 12 each side is easy and pain-free.' },
     { x: 'pullthrough', s: 2, r: '15', rest: 60 },
     { x: 'adduct', s: 2, r: '12–15', rest: 45 },
-    { x: 'calf_seated', s: 3, r: '15–20', rest: 45 },
+    { x: 'calf_seated', s: 4, r: '15–20', rest: 45, n: CALF_N },
   ] });
 day('a_arms', { t: 'Arms, delts and core', f: 'Optional, about 50 min', warm: 'short',
   items: [
@@ -1985,58 +2352,56 @@ day('a_arms', { t: 'Arms, delts and core', f: 'Optional, about 50 min', warm: 's
     { x: 'ohext', s: 3, r: '12', rest: 60, g: 'A' },
     { x: 'hammer', s: 2, r: '12', rest: 0, g: 'B' },
     { x: 'pushdown', s: 2, r: '15', rest: 60, g: 'B' },
-    { x: 'cablecrunch', s: 3, r: '12–15', rest: 45 },
-    { x: 'sideplank', s: 2, r: '45 s each side', rest: 45, log: 't' },
+    { x: 'hollow', s: 3, r: '20–30 s, knees bent if your lower back lifts', rest: 45, cy: { 3: { x: 'cablecrunch', r: '10–12', rpe: '7', n: CRUNCH_N } } },
+    { x: 'sideplank', s: 2, r: '45 s each side', rest: 45, log: 't', cy: { 3: { r: '60 s each side' } } },
     { x: 'bike', s: 1, r: '20 min zone 2 (optional)', log: 'min' },
   ] });
 
 /* Block B: hypertrophy */
-day('b_push', { t: 'Push', f: 'About 65 min', warm: 'main',
+day('b_push', { t: 'Push', f: 'About 70 min', warm: 'main',
   items: [
-    { x: 'incbb', s: 4, r: '6–10', rest: 150 },
-    { x: 'flatdb', s: 3, r: '8–12', rest: 120 },
-    { x: 'cablefly', s: 3, r: '12–15', rest: 0, g: 'A' },
-    { x: 'pushup', s: 3, r: 'near failure', rest: 60, g: 'A' },
-    { x: 'sdbpress', s: 3, r: '8–12', rest: 90 },
-    { x: 'clatraise', s: 4, r: '12–20 each side', rest: 45, n: 'Drop set on the last set.' },
+    { x: 'incbb', s: 4, r: '6–10', rest: 150, rpe: '8', cy: EVEN({ x: 'bench' }) },
+    { x: 'flatdb', s: 3, r: '8–12', rest: 120, rpe: '8', cy: EVEN({ x: 'incdb' }) },
+    { x: 'cablefly', s: 3, r: '12–15', rest: 60 },
+    { x: 'sdbpress', s: 3, r: '8–12', rest: 90, rpe: '8' },
+    { x: 'clatraise', s: 4, r: '12–20 each side', rest: 45, n: 'Drop set on the last set.', cy: { 4: { s: 5 } } },
     { x: 'pushdown', s: 3, r: '10–15', rest: 60, n: 'Drop set on the last set.' },
     { x: 'ohext', s: 2, r: '12–15', rest: 60 },
-    { x: 'walk', s: 1, r: '15 min zone 2', log: 'min' },
   ] });
 day('b_pull', { t: 'Pull', f: 'About 65 min', warm: 'main',
   items: [
-    { x: 'pullup', s: 4, r: '6–10', rest: 150 },
-    { x: 'tbar', s: 3, r: '8–12', rest: 120 },
-    { x: 'dbrow', s: 3, r: '10–12 each side', rest: 90 },
+    { x: 'pullup', s: 4, r: '6–10', rest: 150, rpe: '8', cy: EVEN({ x: 'chinup' }) },
+    { x: 'tbar', s: 3, r: '8–12', rest: 120, rpe: '8', cy: EVEN({ x: 'csrow', r: '8–12' }) },
+    { x: 'dbrow', s: 3, r: '10–12 each side', rest: 90, rpe: '8' },
     { x: 'sapd', s: 3, r: '12–15', rest: 60 },
-    { x: 'facepull', s: 3, r: '15–20', rest: 60 },
+    { x: 'facepull', s: 3, r: '15–20', rest: 60, cy: { 4: { s: 4 } } },
     { x: 'ezcurl', s: 3, r: '8–12', rest: 60 },
     { x: 'hammer', s: 2, r: '10–12', rest: 60, n: 'Drop set on the last set.' },
     { x: 'bike', s: 1, r: '15 min zone 2', log: 'min' },
   ] });
 day('b_legA', { t: 'Legs A: quads and core', f: 'About 65 min', warm: 'main',
   items: [
-    { x: 'hack', s: 4, r: '8–12', rest: 150 },
-    { x: 'legpress', s: 3, r: '12–15', rest: 120, n: 'Drop set on the last set.' },
-    { x: 'lunge', s: 3, r: '12 each leg', rest: 90 },
+    { x: 'backsquat', s: 4, r: '6–10', rest: 180, rpe: '7–8', n: SQ_NOTE + SQ_CAP, lock: Object.assign({}, SQ_LOCK, { r: '8–12' }), cy: { 1: { s: 3, r: '8–10', rpe: '7', n: 'Your first barbell squats: 3 × 8–10 at RPE 7, well short of failure. ' + SQ_NOTE }, 2: {} } },
+    { x: 'legpress', s: 3, r: '12–15', rest: 120, rpe: '8', n: 'Stop before your tailbone lifts.' },
+    { x: 'lunge', s: 3, r: '12 each leg', rest: 90, rpe: '8' },
     { x: 'legext', s: 3, r: '15', rest: 0, g: 'A' },
     { x: 'curl_seated', s: 3, r: '12–15', rest: 60, g: 'A' },
-    { x: 'calf_stand', s: 4, r: '10–15', rest: 60 },
-    { x: 'abwheel', s: 3, r: '8–12', rest: 60, log: 'r' },
-    { x: 'pallof', s: 3, r: '10 each side', rest: 45 },
+    { x: 'calf_stand', s: 4, r: '10–15', rest: 60, n: CALF_N },
+    { x: 'abwheel', s: 3, r: '8–12', rest: 60, log: 'r', cy: ROLL_B },
+    { x: 'pallof', s: 3, r: PALLOF_R, rest: 45 },
   ] });
-day('b_cb', { t: 'Chest and back supersets, then sprints', f: 'About 60 min', warm: 'main',
+day('b_cb', { t: 'Sprints, then chest and back supersets', f: 'About 65 min', warm: 'sprint',
   items: [
-    { x: 'incdb', s: 3, r: '10–12', rest: 0, g: 'A' },
-    { x: 'pulldown_n', s: 3, r: '10–12', rest: 90, g: 'A' },
-    { x: 'chestpress', s: 3, r: '10–12', rest: 0, g: 'B' },
-    { x: 'cablerow', s: 3, r: '10–12', rest: 90, g: 'B' },
+    { x: 'sprint', s: 6, r: '10–15 s hill sprint (walk back) or 15 s seated bike sprint (spin easy)', rest: 120, n: 'Skip on amber back days. Then McGill curl-up and side plank 3-2-1 × 10 s and one light set before superset A.', lock: SPRINT_LOCK, cy: { 2: { s: 8 } } },
+    { x: 'incdb', s: 3, r: '10–12', rest: 0, rpe: '8', g: 'A' },
+    { x: 'pulldown_n', s: 3, r: '10–12', rest: 90, rpe: '8', g: 'A' },
+    { x: 'chestpress', s: 3, r: '10–12', rest: 0, rpe: '8', g: 'B' },
+    { x: 'cablerow', s: 3, r: '10–12', rest: 90, rpe: '8', g: 'B' },
     { x: 'pecdeck', s: 3, r: '15', rest: 0, g: 'C' },
     { x: 'sapd', s: 3, r: '15', rest: 0, g: 'C' },
-    { x: 'pushup', s: 3, r: 'near failure', rest: 90, g: 'C' },
-    { x: 'sprint', s: 6, r: '6–8 hill or bike sprints', rest: 0, n: 'Skip on amber back days.' },
+    { x: 'latraise', s: 3, r: '15–20', rest: 90, g: 'C', cy: { 4: { s: 4 } } },
   ] });
-day('b_arms', { t: 'Arms and delts', f: 'About 55 min', warm: 'short',
+day('b_arms', { t: 'Arms and delts', f: 'Optional, about 50 min', warm: 'short',
   items: [
     { x: 'ezcurl', s: 3, r: '10–12', rest: 0, g: 'A' },
     { x: 'skull', s: 3, r: '10–12', rest: 60, g: 'A' },
@@ -2046,61 +2411,67 @@ day('b_arms', { t: 'Arms and delts', f: 'About 55 min', warm: 'short',
     { x: 'ohext', s: 3, r: '12', rest: 60, g: 'C', n: 'Drop set both exercises on the last round.' },
     { x: 'latraise', s: 4, r: '15–20', rest: 45, n: 'Drop set on the last set.' },
     { x: 'rpd', s: 3, r: '15–20', rest: 45 },
-    { x: 'cablecrunch', s: 3, r: '12–15', rest: 45 },
+    { x: 'hollow', s: 3, r: '20–30 s, knees bent if your lower back lifts', rest: 45, cy: { 3: { x: 'cablecrunch', r: '10–12', rpe: '7', n: CRUNCH_N } } },
     { x: 'walk', s: 1, r: '15 min zone 2', log: 'min' },
   ] });
-day('b_legB', { t: 'Legs B: posterior chain and core', f: 'About 65 min', warm: 'main',
+day('b_legB', { t: 'Legs B: posterior chain and core', f: 'About 75 min', warm: 'main',
+  intro: 'Key day: this block’s RDLs and extension-ladder work. If you need a day off, skip Friday’s arms, not this.',
   items: [
-    { x: 'hipthrust', s: 4, r: '8–12', rest: 120 },
-    { x: 'bext_w', s: 3, r: '10–12', rest: 90, key: true },
-    { x: 'bss', s: 3, r: '10 each leg', rest: 90 },
-    { x: 'curl_lying', s: 3, r: '10–12', rest: 60, n: 'Drop set on the last set.' },
+    { x: 'hipthrust', s: 4, r: '8–12', rest: 120, rpe: '8' },
+    { x: 'rdl', s: 3, r: '8–10', rest: 150, rpe: '7', n: 'From the rack, never from the floor. Long spine, hinge to a strong hamstring stretch.', lock: RDL_LOCK },
+    { x: 'bext_w', s: 2, r: '10–12', rest: 90, key: true, cy: { 2: { x: 'bext_sl', s: 2, r: '8–10 each leg', n: 'Left (injured) side first. Bodyweight until 2 × 10 each leg is easy, then hold a light plate. Stop if the left side pulls.' } } },
+    { x: 'bss', s: 3, r: '10 each leg', rest: 90, rpe: '8' },
+    { x: 'curl_lying', s: 2, r: '10–12', rest: 60, n: 'Drop set on the last set.' },
+    { x: 'nordic', s: 2, r: '4–6', rest: 120, log: 'r', n: 'Band-assisted if needed.' },
     { x: 'sext_w', s: 3, r: '10–12 each side', rest: 60, key: true },
-    { x: 'abduct', s: 2, r: '15–20', rest: 45 },
     { x: 'calf_seated', s: 3, r: '15–20', rest: 45 },
-    { x: 'hangleg', s: 3, r: '10–15', rest: 60, log: 'r' },
-    { x: 'suitcase', s: 2, r: '30 m each side', rest: 60 },
+    { x: 'hangknee', s: 3, r: '10–15', rest: 60, log: 'r', n: 'Knees to hip height, pelvis level, lower in 3 s.', cy: { 2: { x: 'hangleg', r: '10–15', n: 'Straight legs to hip height without curling the pelvis, lower in 3 s. Knee raises on amber days.' } } },
+    { x: 'suitcase', s: 2, r: '30 m each side', rest: 60, n: CARRY_N },
   ] });
 
 /* Block C: athletic power */
-day('c_upP', { t: 'Power upper', f: 'About 65 min', warm: 'main',
+day('c_spr', { t: 'Sprints and rotational core', f: 'About 60 min', warm: 'sprint', cool: false,
   items: [
-    { x: 'mbchest', s: 4, r: '5 explosive', rest: 60 },
-    { x: 'plyopush', s: 3, r: '5', rest: 60 },
-    { x: 'bench', s: 5, r: '3–5', rest: 180, rpe: '8', main: true },
-    { x: 'pullup', s: 5, r: '3–5 weighted', rest: 180, rpe: '8', main: true },
-    { x: 'landmine', s: 3, r: '6–8 each side', rest: 90 },
-    { x: 'csrow', s: 3, r: '8', rest: 90 },
-    { x: 'farmer', s: 3, r: '30 m heavy', rest: 90 },
+    { x: 'sprint', s: 6, r: '20–30 m at 85–90%, walk back', rest: 150, lock: SPRINT_LOCK, cy: { 2: { r: '20–40 m at 90–95%, walk back' }, 3: { r: '30–60 m at 90–95%, walk back' }, 5: { s: 8, r: '30–60 m at 90–95%, walk back' } } },
+    { x: 'mbrot', s: 3, r: '5 each side', rest: 60, n: 'Only if pain-free for 4+ weeks; otherwise do Pallof presses.' },
+    { x: 'pallof', s: 3, r: PALLOF_R, rest: 45, cy: { 3: { r: '8–12 each side, split stance, 3 s hold' }, 5: { x: 'chop', r: '8 each side', rpe: '7', n: 'Light and slow: hips and ribs turn together, hands stop at the opposite hip, no bending forward. Pallof press instead on amber days.' } } },
+    { x: 'abwheel', s: 3, r: '8–10', rest: 60, log: 'r', cy: ROLL_B },
+    { x: 'copen', s: 2, r: '20–30 s each side', rest: 45, cy: { 5: { r: '30–40 s each side, long lever' } } },
+    { x: 'suitcase', s: 3, r: '30 m each side, heavy', rest: 60, n: CARRY_N },
+    { x: 'walk', s: 1, r: '10 min zone 2', log: 'min' },
   ] });
-day('c_lowP', { t: 'Power lower', f: 'About 65 min', warm: 'main',
+day('c_upP', { t: 'Power upper', f: 'About 70–75 min', warm: 'main',
+  items: [
+    { x: 'mbchest', s: 4, r: '5 explosive', rest: 60, cy: { 5: { s: 5 } } },
+    { x: 'plyopush', s: 3, r: '5', rest: 60 },
+    { x: 'bench', s: 5, r: '3–5', rest: 90, rpe: '8', main: true, g: 'A', n: SUPER_N },
+    { x: 'pullup', s: 5, r: '3–5', rest: 90, rpe: '8', main: true, g: 'A', n: 'Add weight with a belt only once 3 × 8 bodyweight reps are easy; until then bodyweight or assisted, 5 × 3–5 at RPE 8.' },
+    { x: 'landmine', s: 3, r: '6–8 each side', rest: 90, cy: EVEN({ x: 'sdbpress', r: '6–8' }) },
+    { x: 'csrow', s: 3, r: '8', rest: 0, g: 'B' },
+    { x: 'latraise', s: 3, r: '12–15', rest: 120, g: 'B' },
+    { x: 'farmer', s: 3, r: '30 m heavy', rest: 90, n: CARRY_N },
+  ] });
+day('c_lowP', { t: 'Power lower', f: 'About 70 min', warm: 'main',
   items: [
     { x: 'boxjump', s: 4, r: '3', rest: 90, n: 'Step down every rep.' },
-    { x: 'sled', s: 4, r: '15–20 m', rest: 90 },
-    { x: 'hack', s: 4, r: '4–6', rest: 180, rpe: '8', main: true },
-    { x: 'hipthrust', s: 4, r: '5–6', rest: 150, rpe: '8', main: true },
-    { x: 'nordic', s: 3, r: '4–6', rest: 120, log: 'r' },
+    { x: 'sled', s: 3, r: '15–20 m', rest: 90 },
+    { x: 'hack', s: 4, r: '4–6', rest: 180, rpe: '8', main: true, cy: { 2: { x: 'backsquat', n: SQ_NOTE, lock: SQ_LOCK } } },
+    { x: 'hipthrust', s: 4, r: '5–6', rest: 120, rpe: '8', main: true },
+    { x: 'nordic', s: 3, r: '4–6', rest: 0, log: 'r', g: 'A', p: { 1: { s: 2, rx: '2 × 3–4, slow 4 s lowering, band-assisted if needed' } } },
+    { x: 'calf_stand', s: 3, r: '8–10', rest: 90, g: 'A', n: CALF_N },
     { x: 'bext_w', s: 3, r: '8', rest: 90, key: true },
-    { x: 'calf_stand', s: 3, r: '8–10', rest: 60 },
   ] });
-day('c_spr', { t: 'Sprints and rotational core', f: 'About 50 min', warm: 'sprint', cool: false,
-  items: [
-    { x: 'sprint', s: 6, r: '30–60 m at 90–95%, walk back', rest: 0 },
-    { x: 'mbrot', s: 3, r: '5 each side', rest: 60, n: 'Only if pain-free for 4+ weeks; otherwise do Pallof presses.' },
-    { x: 'pallof', s: 3, r: '10 each side', rest: 45 },
-    { x: 'abwheel', s: 3, r: '8–10', rest: 60, log: 'r' },
-    { x: 'copen', s: 2, r: '20–30 s each side', rest: 45 },
-    { x: 'suitcase', s: 3, r: '30 m each side, heavy', rest: 60 },
-  ] });
-day('c_test', { t: 'Benchmark tests', f: 'Deload week, about 50 min', warm: 'main', test: true,
-  intro: 'Test day. Log your results here and in Progress, then compare with last cycle.',
+day('c_test', { t: 'Benchmark tests', f: 'Deload week, about 60 min', warm: 'main', test: true,
+  intro: 'Test day. Log your results here and in Progress, then compare with last cycle. Log your best RDL × 8 from Block A as that benchmark.',
   items: [
     { x: 'bext_iso', s: 1, r: 'max hold, stop at 120 s', log: 't', test: true },
     { x: 'sideplank', s: 2, r: 'max hold: right, then left', log: 't', test: true },
     { x: 'bext_w', s: 1, r: '10 reps at your best clean weight', test: true },
+    { x: 'backsquat', s: 1, r: 'heaviest clean set of 5 (RPE 8, never a grind)', test: true, lock: SQ_LOCK },
+    { x: 'hipthrust', s: 1, r: 'heaviest clean set of 8 (RPE 8)', test: true },
     { x: 'pullup', s: 1, r: 'max bodyweight reps', log: 'r', test: true },
-    { x: 'abwheel', s: 1, r: 'max full rollouts', log: 'r', test: true },
-    { x: 'suitcase', s: 2, r: 'heaviest clean 30 m, each side', test: true },
+    { x: 'abwheel', s: 1, r: 'max full rollouts from the knees; stop at the first rep where your lower back sags', log: 'r', test: true },
+    { x: 'suitcase', s: 2, r: 'heaviest clean 30 m, each side', test: true, n: CARRY_N },
   ] });
 
 /* ===== Phases and calendar ===== */
@@ -2119,20 +2490,20 @@ const PHASES = {
     days: ['p0_start', 'p0_gymA', 'p0_active', 'p0_gymB', 'p0_active', 'p0_gymA', 'p0_active', 'p0_gymB', 'p0_gymA_gate', 'p0_gate'] },
   p1: { id: 'p1', name: 'Rebuild', plate: 'green', weeks: 6, deload: [6],
     goal: 'Rebuild muscle and work capacity with spine-friendly lifts, and climb the back- and side-extension ladder from bodyweight to light plates.',
-    rules: ['Weeks 1–2 at RPE 7, weeks 3–5 at RPE 7–8, week 6 is a deload.', 'Rest 90–120 s on big lifts, 60 s on isolation work.', 'Tempo: 2 s down, controlled up. No bouncing.', 'Move up the extension ladder only after a green session.'],
+    rules: ['Weeks 1–2 at RPE 7, weeks 3–5 at RPE 7–8, week 6 is a deload.', 'Rest 90–120 s on big lifts, 60 s on isolation work.', 'Tempo: 2 s down, controlled up. No bouncing.', 'Move up the extension ladder only after a green session.', 'Double progression: stay at a weight until every set reaches the top of its rep range at the target RPE, then add the smallest step (2.5 kg on barbells, one dumbbell size on accessories).', 'If you fall short of the bottom of the range two sessions running, drop the weight 5–10% and build back up.', 'Drop set: after the last set, cut the weight by about 25–30% and keep going until 1–2 reps short of failure, once.'],
     week: ['p1_upA', 'p1_lowA', 'p1_core', 'p1_upB', 'p1_lowB', 'p1_sat', 'rest'] },
   A: { id: 'A', name: 'Strength base', plate: 'red', weeks: 5, deload: [5],
     goal: 'Heavier main lifts on back-friendly patterns. Weighted back and side extensions become regular strength work.',
-    rules: ['★ Main lifts: 4–6 reps, RPE 7 in week 1 rising to 9 by week 4.', 'Add 2.5 kg to a main lift when every set reaches the top of the range.', 'Accessories: 8–12 reps with 1–2 reps in reserve.', 'Week 5 is a deload: same exercises, about half the sets, RPE 6.'],
-    week: ['a_upS', 'a_lowS', 'a_cond', 'a_upH', 'a_lowH', 'a_arms', 'rest'] },
+    rules: ['★ Main lifts: 5–6 reps (hip thrust 6–8), RPE 7 in week 1 rising to 9 by week 4. Barbell back squat: RPE 8 at most.', 'Add 2.5 kg to a main lift when every set reaches the top of the range.', 'Accessories: 8–12 reps with 1–2 reps in reserve.', 'Week 1 of a block: pick a weight that matches this week’s RPE for the new rep range, usually about 10% below your best for those reps last cycle. Ignore grey numbers from a test or deload day.', 'Week 5 is a deload. Deload: same exercises, about a third fewer sets (already cut below), everything at RPE 6, no drop sets.'],
+    week: ['a_cond', 'a_upS', 'a_lowS', 'a_upH', 'a_lowH', 'a_arms', 'rest'] },
   B: { id: 'B', name: 'Hypertrophy', plate: 'blue', weeks: 6, deload: [6],
     goal: 'More volume for size with a V-taper focus: delts, lats and upper chest, plus a dedicated arm day.',
-    rules: ['8–15 reps. Take the last set of isolation moves close to failure (RPE 9).', 'Drop sets only where marked.', 'Rest 60–90 s, about 2 min on compound lifts.', 'Week 6 is a deload.'],
+    rules: ['6–15 reps. Compound lifts at RPE 8 (about 2 good reps left). Last set of isolation moves at RPE 9.', 'Drop sets only where marked.', 'Rest 60–90 s, about 2 min on compound lifts.', 'Week 1 of a block: pick a weight that matches this week’s RPE for the new rep range, usually about 10% below your best for those reps last cycle. Ignore grey numbers from a test or deload day.', 'Week 6 is a deload. Deload: same exercises, about a third fewer sets (already cut below), everything at RPE 6, no drop sets.'],
     week: ['b_push', 'b_pull', 'b_legA', 'b_cb', 'b_arms', 'b_legB', 'rest'] },
   C: { id: 'C', name: 'Athletic power', plate: 'yellow', weeks: 5, deload: [5],
     goal: 'Jumps, throws, sled and sprints for athleticism, low-rep strength, and benchmark tests in the final week.',
-    rules: ['Jumps, throws and sprints first, while fresh. End a set when speed drops.', 'Main lifts 3–5 reps at RPE 8. Never grind a rep.', 'Week 5 is a deload with benchmark tests on Saturday.', 'Rotational throws only once you’ve been pain-free for 4+ weeks.'],
-    week: ['c_upP', 'c_lowP', 'c_spr', 'a_upH', 'a_lowH', 'a_arms', 'rest'], test: { week: 5, wd: 5, day: 'c_test' } },
+    rules: ['Jumps, throws and sprints first, while fresh. End a set when speed drops.', 'Main lifts 3–5 reps at RPE 8. Never grind a rep.', 'Rotational throws only once you’ve been pain-free for 4+ weeks.', 'Sore hamstrings or calves: swap sprints for bike sprints that day.', 'Week 1 of a block: pick a weight that matches this week’s RPE for the new rep range, usually about 10% below your best for those reps last cycle. Ignore grey numbers from a test or deload day.', 'Week 5 is a deload with benchmark tests on Friday. Deload: same exercises, about a third fewer sets (already cut below), everything at RPE 6, no drop sets.'],
+    week: ['c_spr', 'c_upP', 'c_lowP', 'a_upH', 'a_lowH', 'a_arms', 'rest'], test: { week: 5, wd: 4, day: 'c_test' } },
 };
 const CYCLE = ['A', 'B', 'C'];
 PLATES.chrome = { kg: 2.5, c: '#c4ccd3', ink: '#1f2a33', edge: '#8e9aa4' };
@@ -2161,12 +2532,66 @@ function calmDay(date, calmStart, startDate) {
 }
 const CYCLE_WEEKS = 16;
 const CYCLES = [
-  { n: 1, bext: '5–10 kg × 10–12', sext: '2.5–5 kg × 10–12 each side', focus: 'Learn the three blocks. Squat pattern stays on machines: hack squat and leg press.' },
-  { n: 2, bext: '10–15 kg', sext: '5–7.5 kg', focus: 'Optional: swap the hack squat for a safety-bar or front squat in Block A if pain-free for 3 months. Add single-leg back extensions.' },
-  { n: 3, bext: '15–20 kg', sext: '7.5–10 kg', focus: 'Weighted pull-ups at +10 kg. Rotate accessories, for example incline dumbbell to incline machine, T-bar to seal row.' },
-  { n: 4, bext: '20–25 kg', sext: '10–12.5 kg', focus: 'Lean-bulk option: run Block B twice and skip C this cycle.' },
-  { n: 5, bext: '25 kg × 12', sext: '12.5–15 kg', focus: 'Athletic emphasis: more sprint volume and med-ball work.' },
-  { n: 6, bext: 'Hold 25 kg+', sext: '15 kg', focus: 'Your best version of every lift. Re-test everything, then plan year three.' },
+  { n: 1, bext: '5–10 kg × 10–12', sext: '2.5–5 kg × 10–12 each side', core: 'Ab wheel from the knees, knee raises, Pallof presses, Copenhagen 20 s, side plank 45 s, hollow holds',
+    focus: 'Learn the three blocks. Block A keeps squats on the hack squat and adds light dumbbell RDLs and goblet squats. Block B brings in barbell back squats and RDLs at RPE 7, once the barbell gate is passed; until then the app shows the hack squat and dumbbell RDL.' },
+  { n: 2, bext: '10–15 kg', sext: '5–7.5 kg', core: 'Leg raises on Legs B, slower knee raises in Block A',
+    focus: 'Barbell back squat becomes the main lift in Blocks A and C, if the barbell gate is passed (your first 6 barbell sessions are always the 3 × 8–10 intro). Barbell RDLs move into Block A (3 × 6–8) and stay in Block B. Back extensions drop to 2 sets; Block B switches to single-leg back extensions. New angles: chin-ups, chest-supported and dumbbell rows, neutral pulldowns, pec deck, dumbbell lateral raises, preacher curls, lying leg curls, flat bench in Block B, seated dumbbell press in Block C. 8 sprints instead of 6, and bike intervals on the sprint day.' },
+  { n: 3, bext: '15–20 kg', sext: '7.5–10 kg', core: 'Ab wheel 8–12 with a 3 s lowering, leg raises in Block A, Copenhagen 30 s, side plank 60 s, split-stance Pallof, cable crunches return at RPE 7',
+    focus: 'Weighted pull-ups at +10 kg. Accessories return to their cycle-1 versions. Sprints stretch to 30–60 m in Block C.' },
+  { n: 4, bext: '20–25 kg', sext: '10–12.5 kg', core: 'Keep cycle-3 targets; add weight to carries and Pallof presses',
+    focus: 'Size cycle: cycle-2 swaps return, and from now on one extra set of lateral raises and face pulls in Block B. Eat in a small surplus.' },
+  { n: 5, bext: '25 kg × 12', sext: '12.5–15 kg', core: 'Ab wheel with a pause at full reach, long-lever Copenhagen, light woodchops in Block C',
+    focus: 'Athletic emphasis: longer hill sprints in Block A, 8 flat sprints in Block C, an extra set of med-ball chest passes.' },
+  { n: 6, bext: 'Hold 25 kg+', sext: '15 kg', core: 'Keep cycle-5 core work; re-test everything',
+    focus: 'Your best version of every lift. Re-test everything, then plan year three.' },
+];
+
+/* ===== Build plan phases (general plan, no back care) ===== */
+PHASES.g0 = { id: 'g0', name: 'Start', plate: 'white', len: '1–2 weeks',
+  goal: 'Learn the main lifts with light weights, find your starting loads and record a baseline.',
+  rules: ['Start runs 1–2 weeks, depending on your start day, so that Foundation begins on a Monday.', 'Every weight is light: RPE 6, four or more good reps left in every set.', 'Start each barbell lift with the empty bar and add small jumps. Write down the weight where 8 reps feel easy: that is your starting load for Foundation.', 'Set the safety pins on every squat and bench set.', 'No deadlifts from the floor in this plan. RDLs and rows start from the rack.', 'Already lifting regularly? After your first upper and lower Start sessions, work up to one set of 8 at RPE 7 on each barbell lift; the rest of Start is optional.'],
+  week: ['g0_up', 'g0_low', 'g0_cond', 'g0_up', 'g0_low', 'g0_walk', 'grest'] };
+PHASES.g1 = { id: 'g1', name: 'Foundation', plate: 'green', weeks: 6, deload: [6],
+  goal: 'Build technique, muscle and work capacity on the main lifts before the heavier blocks begin.',
+  rules: ['Weeks 1–2 at RPE 7, weeks 3–5 at RPE 7–8, week 6 is a deload.', 'Double progression: when every set reaches the top of the rep range, add the smallest weight step next time.', 'Rest 2–3 min on ★ main lifts, 60–90 s on isolation work.', 'Tempo: 2 s down, controlled up. Every rep looks like the first.', 'Two practice exposures a week for the bench and squat: Thursday and Friday repeat them lighter.', 'Deload: same exercises, about a third fewer sets (already cut below), everything at RPE 6, no drop sets.'],
+  week: ['g1_upA', 'g1_lowA', 'g1_cond', 'g1_upB', 'g1_lowB', 'g1_sat', 'grest'] };
+PHASES.gA = { id: 'gA', name: 'Strength base', plate: 'red', weeks: 5, deload: [5],
+  goal: 'Heavy squat, bench, RDL, overhead press and pull-ups for real strength, plus sprints, jumps and loaded carries.',
+  rules: ['★ Main lifts: 4–6 reps, RPE 7 in week 1 rising to 9 by week 4 (the card shows this week’s target). Cycle 1: stop at RPE 8.', 'Add 2.5 kg to a main lift when every set reaches the top of the range.', 'Accessories: 6–12 reps with 1–2 reps in reserve.', 'Monday’s sprints come after Sunday’s rest, well away from the RDL and Nordic day.', 'Week 1 of a block: pick a weight that matches this week’s RPE for the new rep range, usually about 10% below your best for those reps last cycle. Ignore grey numbers from a test or deload day.', 'Week 5 is a deload. Deload: same exercises, about a third fewer sets (already cut below), everything at RPE 6, no drop sets.'],
+  week: ['ga_cond', 'ga_upS', 'ga_lowS', 'ga_upH', 'ga_lowH', 'ga_arms', 'grest'] };
+PHASES.gB = { id: 'gB', name: 'Hypertrophy', plate: 'blue', weeks: 6, deload: [6],
+  goal: 'More volume for size with a V-taper focus: delts, lats and upper chest, a squat day, a hinge day and a dedicated arm day.',
+  rules: ['6–15 reps. Compound lifts at RPE 8 (about 2 good reps left). Last set of isolation moves at RPE 9.', 'Drop sets only where marked.', 'Rest 60–90 s, about 2–3 min on compound lifts.', 'Week 1 of a block: pick a weight that matches this week’s RPE for the new rep range, usually about 10% below your best for those reps last cycle. Ignore grey numbers from a test or deload day.', 'Week 6 is a deload. Deload: same exercises, about a third fewer sets (already cut below), everything at RPE 6, no drop sets.'],
+  week: ['gb_push', 'gb_pull', 'gb_legA', 'gb_cb', 'gb_legB', 'gb_arms', 'grest'] };
+PHASES.gC = { id: 'gC', name: 'Athletic power', plate: 'yellow', weeks: 5, deload: [5],
+  goal: 'Jumps, throws, bounds, sled and sprints for athleticism, low-rep strength, and benchmark tests in the final week.',
+  rules: ['Jumps, throws and sprints first, while fresh. End a set when speed or distance drops.', 'Main lifts step down from 5 reps in week 1 to 2–3 reps in week 4 at RPE 8, so the weight climbs into the test. Never grind a rep.', 'Sore hamstrings or calves: swap sprints for bike sprints that day.', 'Week 1 of a block: pick a weight that matches this week’s RPE for the new rep range, usually about 10% below your best for those reps last cycle. Ignore grey numbers from a test or deload day.', 'Week 5 is a deload with benchmark tests on Friday. Deload: same exercises, about a third fewer sets (already cut below), everything at RPE 6, no drop sets.'],
+  week: ['gc_spr', 'gc_upP', 'gc_lowP', 'ga_upH', 'ga_lowH', 'ga_arms', 'grest'], test: { week: 5, wd: 4, day: 'gc_test' } };
+const CYCLES_G = [
+  { n: 1, rows: [['Main lifts', 'Back squat, bench press, RDL, pull-up (plus heavy overhead press)'], ['Core', 'Ab wheel from the knees, hanging knee raise, Pallof press, carries, hollow hold'], ['Athletic', '6 hill or bike sprints, box and broad jumps']],
+    focus: 'Learn the three blocks. Start conservatively: own the technique at moderate loads, and finish every block with reps in reserve. In cycle 1, wherever a main lift says RPE 9, stop at RPE 8.' },
+  { n: 2, rows: [['Rotations', 'Chin-ups, T-bar rows, neutral pulldowns, dumbbell rows, hack squats and pec deck swap in for their partners'], ['Core', 'Hanging leg raises replace knee raises; cable woodchops alternate with Pallof presses'], ['Athletic', '8 sprints instead of 6 in Blocks A and B; hanging leg raises from now on']],
+    focus: 'Same main lifts, new angles on the accessories so they keep progressing.' },
+  { n: 3, rows: [['Rotations', 'Front squat and incline barbell press lead Block A'], ['Core', 'Ab wheel with a 3 s lowering; Copenhagen planks to 30 s'], ['Athletic', 'Sprints stretch to 30–60 m; linked broad jumps, continuous lateral bounds, heavier sled; pogo hops forward and back']],
+    focus: 'Weighted pull-ups at about +10 kg for 5. The front squat builds your upper back and trunk.' },
+  { n: 4, rows: [['Rotations', 'Pause back squats in Block A (2 s at the bottom); cycle-2 accessory swaps return'], ['Core', 'Hollow holds to 30–45 s; hanging leg raises with a 3 s lowering and a pause']],
+    focus: 'Size cycle: from now on one extra set of lateral raises and face pulls in Block B, and eat in a small surplus.' },
+  { n: 5, rows: [['Core', 'Standing ab-wheel rollouts to a wall; long-lever Copenhagen planks'], ['Athletic', '8 sprints, longer hill sprints, single-leg box jumps, an extra set of med-ball throws and bounds, single-leg pogo hops']],
+    focus: 'Athletic emphasis: more sprint volume and med-ball work.' },
+  { n: 6, rows: [['Main lifts', 'Back to the base versions of every lift'], ['Core', 'Weighted hanging leg raises'], ['Test', 'Re-test everything in Block C week 5']],
+    focus: 'Your best version of every lift. Re-test everything, then plan year three.' },
+];
+const BENCH_G = [
+  { id: 'sq5', n: 'Back squat, best set of 5', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 1.25 / 2.5) * 2.5} kg` : '1.25 × body weight' },
+  { id: 'bp5', n: 'Bench press, best set of 5', unit: 'kg', tgt: bw => bw ? `${Math.round(bw / 2.5) * 2.5} kg` : '1 × body weight' },
+  { id: 'rdl8', n: 'Romanian deadlift, best set of 8', unit: 'kg', tgt: bw => bw ? `${Math.round(bw / 2.5) * 2.5} kg` : '1 × body weight' },
+  { id: 'ohp5', n: 'Overhead press, best set of 5', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 0.6 / 2.5) * 2.5} kg` : '0.6 × body weight' },
+  { id: 'pullups', n: 'Pull-ups, bodyweight', unit: 'reps', tgt: () => '12+' },
+  { id: 'broad', n: 'Broad jump', unit: 'cm', tgt: () => '240 cm' },
+  { id: 'abwheel', n: 'Ab-wheel rollouts from the knees, full', unit: 'reps', tgt: () => '15' },
+  { id: 'hangleg', n: 'Hanging leg raise, strict', unit: 'reps', tgt: () => '12' },
+  { id: 'sp', n: 'Side plank, weaker side', unit: 's', tgt: () => '90 s' },
+  { id: 'suitcase', n: 'Suitcase carry 30 m, per hand', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 0.5 / 2) * 2} kg` : '0.5 × body weight' },
 ];
 
 const PLAN_START = '2026-09-25';
@@ -2190,41 +2615,59 @@ function planDay(date, startDate) {
   if (w < 6) {
     return { phase: 'p1', week: w + 1, of: 6, wd, dayId: PHASES.p1.week[wd], deload: w + 1 === 6, start, weekStart: addDays(start, 10 + br + w * 7) };
   }
-  const cw = w - 6, cycle = Math.floor(cw / CYCLE_WEEKS) + 1, wc = cw % CYCLE_WEEKS;
+  return cycleDay(w - 6, wd, ['A', 'B', 'C'], { start, weekStart: addDays(start, 10 + br + w * 7) });
+}
+// Position inside the six 16-week cycles: ids are the three block phases, cw counts weeks since the first cycle began.
+function cycleDay(cw, wd, ids, extra) {
+  const cycle = Math.floor(cw / CYCLE_WEEKS) + 1, wc = cw % CYCLE_WEEKS;
   let block, bw;
-  if (wc < 5) { block = 'A'; bw = wc + 1; } else if (wc < 11) { block = 'B'; bw = wc - 4; } else { block = 'C'; bw = wc - 10; }
+  if (wc < 5) { block = ids[0]; bw = wc + 1; } else if (wc < 11) { block = ids[1]; bw = wc - 4; } else { block = ids[2]; bw = wc - 10; }
   const P = PHASES[block];
   let dayId = P.week[wd];
   if (P.test && bw === P.test.week && wd === P.test.wd) dayId = P.test.day;
-  return { phase: block, cycle, week: bw, of: P.weeks, wd, dayId, deload: P.deload.includes(bw), start, weekStart: addDays(start, 10 + br + w * 7) };
+  return Object.assign({ phase: block, cycle, week: bw, of: P.weeks, wd, dayId, deload: P.deload.includes(bw) }, extra);
+}
+function cycleRanges(base0, ids, out) {
+  for (let c = 0; c < 6; c++) {
+    const base = addDays(base0, c * CYCLE_WEEKS * 7);
+    out.push({ phase: ids[0], cycle: c + 1, from: base, to: addDays(base, 34) });
+    out.push({ phase: ids[1], cycle: c + 1, from: addDays(base, 35), to: addDays(base, 76) });
+    out.push({ phase: ids[2], cycle: c + 1, from: addDays(base, 77), to: addDays(base, 111) });
+  }
+  return out;
 }
 // Date ranges for the roadmap
 function planRanges(startDate) {
   const s = startDate || PLAN_START, br = bridgeDays(s);
-  const out = [{ phase: 'p0', from: s, to: addDays(s, 9 + br) }, { phase: 'p1', from: addDays(s, 10 + br), to: addDays(s, 51 + br) }];
-  for (let c = 0; c < 6; c++) {
-    const base = addDays(s, 52 + br + c * CYCLE_WEEKS * 7);
-    out.push({ phase: 'A', cycle: c + 1, from: base, to: addDays(base, 34) });
-    out.push({ phase: 'B', cycle: c + 1, from: addDays(base, 35), to: addDays(base, 76) });
-    out.push({ phase: 'C', cycle: c + 1, from: addDays(base, 77), to: addDays(base, 111) });
-  }
-  return out;
+  return cycleRanges(addDays(s, 52 + br), ['A', 'B', 'C'], [{ phase: 'p0', from: s, to: addDays(s, 9 + br) }, { phase: 'p1', from: addDays(s, 10 + br), to: addDays(s, 51 + br) }]);
 }
 
-const STRENGTH_WEEK = ['fit_push', 'fit_pull', 'fit_lower_a', 'fit_upper', 'fit_lower_b', 'fit_rest', 'fit_rest'];
-function strengthDay(date, startDate) {
-  const start = validYmd(startDate) ? startDate : localToday(), elapsed = diffDays(date, start);
-  if (elapsed < 0) return { before: true, start, days: -elapsed, phase: 'strength' };
-  const dayIdx = elapsed % 7, week = Math.floor(elapsed / 7) + 1;
-  return { phase: 'strength', week, dayIdx, dayNo: dayIdx + 1, trainingDay: dayIdx < 5 ? dayIdx + 1 : null,
-    rest: dayIdx >= 5, dayId: STRENGTH_WEEK[dayIdx], start, weekStart: addDays(date, -dayIdx) };
+// Build plan calendar: Start runs 7–13 days (weekday sessions) so that Foundation begins on a Monday, 6 weeks of Foundation, then the cycles.
+function startLen(start) { return 7 + (7 - weekdayIdx(addDays(start, 7))) % 7; }
+function buildDay(date, startDate) {
+  const start = validYmd(startDate) ? startDate : localToday(), d = diffDays(date, start);
+  if (d < 0) return { before: true, start, days: -d };
+  const L = startLen(start);
+  if (d < L) return { phase: 'g0', dayIdx: d, dayNo: d + 1, of: L, dayId: PHASES.g0.week[weekdayIdx(date)], wd: weekdayIdx(date), start };
+  const e = d - L, wd = e % 7, w = Math.floor(e / 7), weekStart = addDays(start, L + w * 7);
+  if (w < 6) return { phase: 'g1', week: w + 1, of: 6, wd, dayId: PHASES.g1.week[wd], deload: w + 1 === 6, start, weekStart };
+  return cycleDay(w - 6, wd, ['gA', 'gB', 'gC'], { start, weekStart });
 }
+function buildRanges(startDate) {
+  const s = validYmd(startDate) ? startDate : localToday(), f = startLen(s);
+  return cycleRanges(addDays(s, f + 42), ['gA', 'gB', 'gC'], [{ phase: 'g0', from: s, to: addDays(s, f - 1) }, { phase: 'g1', from: addDays(s, f), to: addDays(s, f + 41) }]);
+}
+// What each mode shows: phase picker order, block ids, cycle notes and benchmarks.
+const MODES = {
+  back: { phases: ['p0', 'p1', 'A', 'B', 'C'], blocks: ['A', 'B', 'C'], cycles: () => CYCLES, bench: () => BENCH, ranges: s => planRanges(s), legend: ['p0', 'p1', 'C', 'B', 'A'] },
+  strength: { phases: ['g0', 'g1', 'gA', 'gB', 'gC'], blocks: ['gA', 'gB', 'gC'], cycles: () => CYCLES_G, bench: () => BENCH_G, ranges: s => buildRanges(s), legend: ['g0', 'g1', 'gC', 'gB', 'gA'] },
+};
 
 /* ===== Back care guidance ===== */
 const LIGHTS = [
   { k: 'green', t: 'Green: train as written', when: 'Pain 0–2/10 during training, back to normal by the next morning.', do: 'Follow the session. If your last session was green too, you may move up one step on the extension ladder.' },
-  { k: 'amber', t: 'Amber: train, but hold', when: 'Pain 3–4/10, or the next morning is stiffer but settles within 24 hours.', do: 'Keep back- and side-extension loads where they were, cut one set from hinges, skip sprints and jumps.' },
-  { k: 'red', t: 'Red: back off today', when: 'Pain 5/10 or more, sharp or catching pain, or the next morning is clearly worse.', do: 'No loaded back work. Do the Back Care routine and an easy walk. If it stays red for three days or more, see your physio.' },
+  { k: 'amber', t: 'Amber: train, but hold', when: 'Pain 3–4/10, or the next morning is stiffer but settles within 24 hours, or some pain or tingling in your leg.', do: 'Keep back- and side-extension loads where they were, swap barbell squats and RDLs for the hack squat and dumbbell RDL, cut one set from hinges, skip sprints and jumps.' },
+  { k: 'red', t: 'Red: back off today', when: 'Pain 5/10 or more, sharp or catching pain, the next morning is clearly worse, or leg symptoms spreading, more numbness, or any leg weakness.', do: 'No loaded back work. Do the Back Care routine and an easy walk. If it stays red for three days or more, see your physio. New leg weakness: follow the medical-help box on the Back Care tab today.' },
 ];
 const REDFLAGS = 'Get same-day emergency care for numbness around the groin, genitals, buttocks or inner thighs, new trouble passing urine or controlling your bladder or bowels, symptoms in both legs, or new weakness such as your foot catching or your knee giving way. See your doctor soon if the numbness spreads below the knee or gets worse, if it isn’t clearly fading within 4–6 weeks, or if you have a fever or unexplained weight loss.';
 const LADDERS = {
@@ -2245,16 +2688,26 @@ const GATE = [
   'Side plank from knees: 30 s each side, left within about 10 s of right.',
   'Bodyweight box squat × 10 without pain.',
 ];
+const BAR_GATE = [
+  'At least 8 weeks with no leg pain and no new or spreading numbness (a small, stable or fading patch is OK if your physio agrees). The app tracks this from your daily leg check.',
+  'Back pain 0–2/10 on most days for the last 4 weeks, with no morning-after flare-ups.',
+  'Weighted 45° back extension: 3 × 10 with 10 kg or more, pain-free.',
+  'Heel-elevated goblet squat 3 × 10 holding one 20 kg+ dumbbell (or the load your physio sets), and dumbbell RDL 3 × 10 with 12 kg+ in each hand, pain-free.',
+  'Heel-walk and toe-walk 10 steps: both legs feel equally strong.',
+  'Your physio has watched you squat and hinge and is happy for you to add barbell loading.',
+];
 const FAQ = [
   { q: 'Will the pain go away if I keep doing my physio exercises?', a: 'Very likely, yes, but probably not from those exercises alone. Your current routine is good for calming the area and re-learning control. A strain that still aches at 2–3/10 after six weeks usually hasn’t been loaded enough yet: muscle finishes healing when it is gradually given more work. So this plan keeps your physio drills as the warm-up and adds a step-by-step back-extension and side-extension ladder that loads exactly the muscles you strained. With a nerve involved as well, most people still improve a lot within about 6–12 weeks without surgery, and numbness is usually the last thing to fade. Get re-assessed if the numbness isn’t clearly fading within 4–6 weeks, or straight away if a red-flag symptom appears.' },
   { q: 'Why is there a Calm phase before Restart?', a: 'Because the pain now travels into your thigh with some numbness, a nerve is irritated as well as the muscle, and gym loading too early can stir it up. The Calm phase strengthens your back, hips, obliques, glutes, thighs and upper back in positions that keep the nerve quiet, and the Calm gate tells you when you are ready for the gym. Your physio’s advice comes first.' },
   { q: 'Why no deadlifts at all?', a: 'With long femurs, a pull from the floor puts your torso close to horizontal, which is the position that strained your erectors. You’ll build the same posterior chain with 45° back extensions, hip thrusts, cable pull-throughs and Nordic curls, without that long lever on your lower back.' },
-  { q: 'Why these squat choices?', a: 'Long femurs force a big forward lean in a barbell back squat. Hack squats, leg press, split squats and heel-elevated goblet squats let you train your legs hard with a more upright torso. A safety-bar or front squat is an option from cycle 2 if you’re pain-free.' },
+  { q: 'When do barbell squats and RDLs start?', a: 'Light dumbbell RDLs and goblet squats start in Block A of cycle 1. Barbell back squats and barbell RDLs come in during Block B of cycle 1, but only once you pass the barbell gate on this tab; until then the app shows the hack squat and dumbbell RDL automatically. Your first 6 barbell sessions after passing the gate are always 3 × 8–10 at RPE 7, whatever block you are in. From cycle 2 the squat becomes a main lift in Blocks A and C, never above RPE 8; RDLs stay a regular 3 × 6–8 in Block A and 3 × 8–10 in Block B. Running sprints unlock at the same gate. With long femurs, squat high-bar with your heels raised so your torso stays more upright, and keep the RDL to the range where your spine stays long. RDLs start standing, from the rack, so they are never a deadlift.' },
+  { q: 'Why these squat choices?', a: 'Long femurs force a big forward lean in a barbell back squat. Hack squats, leg press, split squats and heel-elevated goblet squats let you train your legs hard with a more upright torso while your back recovers. Barbell back squats join them once the barbell gate is passed.' },
   { q: 'What happens to my physio exercises?', a: 'They stay. The Back Care routine keeps the best of them (breathing, cat–camel, glute bridge, clamshells) and adds McGill’s big three: curl-up, side plank and bird dog. Keep your other drills on rest days if you like them.' },
   { q: 'I’m travelling again. What now?', a: 'Do the Back Care routine daily, walk, and add bodyweight squats, push-ups and side planks in the hotel. If you need to move the calendar, enter the new Restart date in Settings, then make your first week back a little lighter.' },
-  { q: 'What if I miss a day?', a: 'Don’t double up. Do today’s session. If you missed a lower-body day, move it into the next rest or optional day.' },
+  { q: 'What if I miss a day?', a: 'Don’t double up, and never train seven days in a row. If you miss a lower-body day, do it in place of the next lower-body session that week, never on the day right before or after another lower-body day. Lower strength takes priority over lower hypertrophy. In Block B, keep Saturday’s posterior-chain day and just skip a missed Wednesday. Missed an upper or arms day? Skip it and carry on.' },
 ];
-const RECOVERY = ['Sleep 7–8 hours.', 'Protein about 1.6–2 g per kg of body weight daily; your vegetarian protein list from Phase 2 still works.', '8–10k steps on most days.', '3–4 litres of water.'];
+const RECOVERY = ['Sleep 7–8 hours.', 'Protein about 1.6–2.2 g per kg of body weight daily (about 130–175 g at 80 kg), in 3–4 meals of 30–40 g. On a vegetarian diet, aim for the top of the range.', 'Vegetarian protein: Greek yogurt or skyr (~10 g per 100 g), paneer (~18 g per 100 g), firm tofu or tempeh (12–19 g per 100 g), soya chunks (~50 g per 100 g dry), lentils and chickpeas (~8–9 g per 100 g cooked, also carb-heavy), milk (~3.5 g per 100 ml), eggs if you eat them, whey or soy/pea protein (20–25 g per scoop).', 'During Calm, Restart and Rebuild, eat at about maintenance: no big deficit while your back heals.', '8–10k steps on most days.', '3–4 litres of water.'];
+const EAT = ['Find your maintenance: weigh yourself most mornings and compare weekly averages. If the average stays flat for 2 weeks, that intake is maintenance.', 'Building: eat about 200–300 kcal a day above maintenance and gain about 0.5–1% of body weight a month. If your waist at the navel grows more than about 1 cm a month, eat 100–200 kcal less.', 'Losing fat: eat 300–500 kcal below maintenance, lose about 0.5–1% of body weight a week, keep protein at the top of the range and keep the main lifts heavy.', 'When: if your waist is more than half your height, lose fat first (Foundation or Rebuild plus cycle 1). Otherwise build through cycles 1–4 (cycle 4 is the size cycle). For a leaner look, run one 8–12-week fat-loss phase in cycle 5, then eat at maintenance for the cycle-6 re-test. Check weight, waist and photos in every Block C test week.', 'Visible abs come mostly from low body fat, about 10–15% for most men. The training builds the muscle underneath.'];
 
 const BENCH = [
   { id: 'bext_hold', n: 'Back-extension hold', unit: 's', tgt: () => '90 s', how: '45° bench, straight line; stop when form breaks or pain passes 2/10.' },
@@ -2263,9 +2716,29 @@ const BENCH = [
   { id: 'bext_10', n: 'Weighted back extension × 10', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 0.3 / 2.5) * 2.5} kg` : '0.3 × body weight' },
   { id: 'sext_10', n: 'Weighted side extension × 10, left', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 0.18 / 2.5) * 2.5} kg` : '0.18 × body weight' },
   { id: 'pullups', n: 'Pull-ups, bodyweight', unit: 'reps', tgt: () => '12+' },
+  { id: 'sq5', n: 'Back squat, best set of 5', unit: 'kg', tgt: bw => bw ? `${Math.round(bw / 2.5) * 2.5} kg` : '1 × body weight' },
+  { id: 'rdl8', n: 'Romanian deadlift, best set of 8', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 0.8 / 2.5) * 2.5} kg` : '0.8 × body weight' },
   { id: 'hipthrust_8', n: 'Hip thrust × 8', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 1.5 / 5) * 5} kg` : '1.5 × body weight' },
-  { id: 'abwheel', n: 'Ab-wheel rollouts, full', unit: 'reps', tgt: () => '12' },
+  { id: 'abwheel', n: 'Ab-wheel rollouts from the knees, full', unit: 'reps', tgt: () => '12' },
   { id: 'suitcase', n: 'Suitcase carry 30 m, per hand', unit: 'kg', tgt: bw => bw ? `${Math.round(bw * 0.4 / 2) * 2} kg` : '0.4 × body weight' },
+];
+
+/* ===== Build plan guide ===== */
+const GUIDE_G = [
+  { h: 'How hard to push: RPE', p: 'Each set has a target effort from 1 to 10. RPE 10 means you could not do another rep, RPE 9 means one more was possible, RPE 8 two more, RPE 7 three more, RPE 6 four or more. Most sets in this plan sit at RPE 7–9, so you finish hard but with clean reps.' },
+  { h: 'How to progress', li: ['Double progression: stay at a weight until every set reaches the top of its rep range at the target RPE, then add the smallest step: 2.5 kg on upper-body lifts, 2.5–5 kg on squats and RDLs, one dumbbell size on accessories.', 'If you fall short of the bottom of the range two sessions running, drop the weight 5–10% and build back up.', 'Log every set. The grey numbers in each box are what you lifted last time: beat them by a rep or a little weight.'] },
+  { h: 'Each session', li: ['Warm up for about 10 minutes, then do 3–4 ramp-up sets of your first lift (empty bar, then about 40%, 60% and 80% of your working weight).', 'Exercises marked A, B or C are supersets: do them back to back and rest after the pair.', 'Rest 2–3 min on ★ main lifts and 60–90 s on isolation moves. The rest timer starts when you tick a set.', 'Saturday is optional. Skip it when you feel run down; never train more than six days a week.', 'Drop set: after the last set, cut the weight by about 25–30% and keep going until 1–2 reps short of failure, once.', 'Deload weeks: same exercises, about a third fewer sets (already cut on the Today tab), everything at RPE 6, no drop sets.'] },
+  { h: 'How the two years are built', li: ['Start (1–2 weeks, until the next Monday): learn the lifts with light weights and record a baseline.', 'Foundation (6 weeks): technique, muscle and work capacity, with a sprint and jump on-ramp.', 'Then six 16-week cycles of Strength base (5 weeks), Hypertrophy (6 weeks) and Athletic power (5 weeks). Every block ends with a lighter deload week, and Block C ends with benchmark tests on Friday.', 'Accessories rotate between cycles so they keep progressing. The ★ main lifts stay the same apart from planned one-cycle variants: front squat and incline press in cycle 3, pause squats in cycle 4, chin-ups in Blocks A and B of even cycles.'] },
+  { h: 'Eat and recover for it', li: ['Protein about 1.6–2.2 g per kg of body weight every day, in 3–5 meals of about 30–40 g.'].concat(EAT, ['Sleep 7–9 hours. Walk 7–10k steps on most days. 3–4 litres of water.']) },
+];
+const FAQ_G = [
+  { q: 'Why are there no deadlifts?', a: 'Pulling a heavy bar from the floor is where most lifting back injuries happen, and you don’t need it for a strong posterior chain. This plan builds the same muscles with Romanian deadlifts from the rack, hip thrusts, barbell rows from the hang, Nordic curls, sled pushes and heavy carries.' },
+  { q: 'How heavy should I start?', a: 'Lighter than you think. Use the Start week to find a weight you could lift for 8 reps with 3–4 reps left, and begin Foundation there. Starting light costs you a week or two; starting heavy costs you months.' },
+  { q: 'I can only train four days a week.', a: 'Skip the optional Saturday. Blocks A and C: also skip Monday’s sprint day, but start Friday’s Lower hypertrophy with its sprints and jumps (use the sprint warm-up, about 15 min; skip adductors that day) and add its suitcase carry to the end of Thursday’s Upper hypertrophy. Block B: keep both leg days and skip Thursday’s chest-and-back superset day; do its 6 hill sprints at the start of Monday’s Push. Sessions run about 75–80 min. Progress will be a little slower but still steady.' },
+  { q: 'My gym doesn’t have a sled, hill or certain machine.', a: 'Tap any exercise to see swaps. Sled pushes become uphill sprints or bike sprints; hack squats become leg presses; a Copenhagen plank can be done on any bench.' },
+  { q: 'What if I miss a session?', a: 'Don’t double up. If you missed the lower-strength day, do it in place of Friday’s lower-hypertrophy session. Missed anything else? Skip it and carry on.' },
+  { q: 'I missed a week or more.', a: 'Move the plan start date in Settings forward by the weeks you missed, and train your first week back at RPE 7 with one set fewer per exercise.' },
+  { q: 'Something hurts.', a: 'Muscle soreness is normal. Sharp pain, pain that changes how you move, or pain that lasts more than a few days is not: stop that exercise, use a swap, and get it checked if it doesn’t settle within a week.' },
 ];
 
 /* ===== App ===== */
@@ -2299,7 +2772,7 @@ const BENCH = [
 
   /* ---------- state ---------- */
   const LS = 'rebuild-build.v2', LS_OLD = 'rebuild-build.v1';
-  const defP = (mode = 'back') => ({ bw: null, calm: true, calmStart: null, calmGate: {}, startDate: mode === 'strength' ? todayStr() : PLAN_START, auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, gate: {}, bench: {}, u: 0 });
+  const defP = (mode = 'back') => ({ bw: null, calm: true, calmStart: null, calmGate: {}, startDate: mode === 'strength' ? todayStr() : PLAN_START, auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, gate: {}, barGate: {}, bench: {}, u: 0 });
   const emptyMode = mode => ({ profile: defP(mode), days: {} });
   const S = { profile: defP('back'), days: {}, modes: { back: emptyMode('back'), strength: emptyMode('strength') }, mode: 'back', tab: 'today', date: todayStr(), planSel: null, libCat: 'all', libQ: '', status: 'local', resetArm: false };
   function activateMode(mode) {
@@ -2452,19 +2925,62 @@ const BENCH = [
 
   /* ---------- plan helpers ---------- */
   const pday = date => {
-    if (S.mode === 'strength') return strengthDay(date, S.profile.startDate);
+    if (S.mode === 'strength') return buildDay(date, S.profile.startDate);
     const pd = planDay(date, S.profile.startDate);
     if (pd.before && S.profile.calm !== false && validYmd(S.profile.calmStart)) return calmDay(date, S.profile.calmStart, S.profile.startDate) || pd;
     return pd;
   };
-  function resolveItem(it, week, deload) {
+  // Last day with leg symptoms: the daily leg check after Calm, or numbness 2/10+ or spreading symptoms during Calm.
+  function legLast() {
+    let last = null;
+    const t = todayStr();
+    for (const d in S.days) { const r = S.days[d]; if (d <= t && r && (r.lg === 'some' || r.lg === 'worse' || r.cz === 'worse' || (r.nb != null && r.nb >= 2)) && (!last || d > last)) last = d; }
+    return last;
+  }
+  const gateTicked = () => BAR_GATE.every((_, i) => (S.profile.barGate || {})[i]);
+  // The gate re-locks itself for 8 weeks after any leg symptoms.
+  const barOpen = () => { const l = legLast(); return gateTicked() && (!l || diffDays(todayStr(), l) >= 56); };
+  const BAR_INTRO = ['backsquat', 'rdl'];
+  // Barbell sessions logged since the gate (re)opened; the first 6 are always the gentle intro dose.
+  function barIntroN(x, date) {
+    const l = legLast(), a = S.profile.barGateAt || '0000-01-01', b = l ? addDays(l, 56) : a, from = a > b ? a : b;
+    return Object.keys(S.days).filter(d => d >= from && d < date && Object.entries(S.days[d].sets || {}).some(([k, arr]) => k.split(':')[1] === x && (arr || []).some(q => q && (q[0] || q[1])))).length;
+  }
+  // '7→9' becomes this week's target: 7, 7–8, 8, 9 across the loaded weeks of a block.
+  function rampRpe(r, wk, n) {
+    const m = /^(\d+)→(\d+)$/.exec(r || '');
+    if (!m || !wk || !n) return r;
+    const v = +m[1] + (+m[2] - +m[1]) * Math.min(1, (wk - 1) / Math.max(1, n - 1)), f = Math.floor(v * 2) / 2;
+    return f % 1 ? `${Math.floor(f)}–${Math.ceil(f)}` : String(f);
+  }
+  // Which version of an item applies this cycle: the highest cy key at or below the cycle wins ({} = the base item).
+  function cycleItem(it, cycle) {
+    if (!it.cy || !cycle) return it;
+    const k = Object.keys(it.cy).map(Number).filter(n => n <= cycle).sort((a, b) => b - a)[0];
+    return k ? Object.assign({}, it, it.cy[k]) : it;
+  }
+  function resolveItem(it, week, deload, cycle, of, date) {
+    it = cycleItem(it, cycle);
+    let locked = false;
+    if (it.lock && S.mode === 'back' && !barOpen()) {
+      const keep = { s: it.s, rest: it.rest, rpe: it.rpe };
+      it = Object.assign({}, it, keep, it.lock, { main: it.lock.main != null ? it.lock.main : it.main });
+      locked = true;
+    }
+    if (S.mode === 'back' && !locked && date && BAR_INTRO.includes(it.x)) {
+      const n = barIntroN(it.x, date);
+      if (n < 6) it = Object.assign({}, it, { s: 3, r: '8–10', rpe: '7', main: false, test: false, p: null,
+        n: `Barbell intro, session ${n + 1} of 6: 3 × 8–10 at RPE 7. ` + (it.x === 'backsquat' ? 'Start with the empty bar and add at most 5 kg a session, only after a green morning. ' + SQ_NOTE : 'Start at the combined weight of your two dumbbells and add at most 2.5 kg a session, only after a green morning. From the rack, never from the floor.') });
+    }
     const ov = it.p && week ? it.p[week] : null;
     const x = (ov && ov.x) || it.x;
     const log = (ov && ov.log) || it.log || (EX[x] && EX[x].log) || 'wr';
     let s = (ov && ov.s) || it.s || 1;
-    if (deload && s > 2 && !(ov && ov.rx)) s = it.main ? 3 : 2;
-    return Object.assign({}, it, { x, log, s, rx: (ov && ov.rx) || it.rx || null, stepWeek: ov ? week : null });
+    if (deload && !it.test && s > 2 && !(ov && ov.rx)) s = it.main ? 3 : 2;
+    const rpe = deload && it.rpe && !it.test ? '6' : rampRpe(it.rpe, week, of ? of - 1 : 0);
+    return Object.assign({}, it, { x, log, s, rpe, rx: (ov && ov.rx) || it.rx || null, stepWeek: ov ? week : null, locked });
   }
+  const resolveFor = (it, pd, date) => resolveItem(it, pd.week, pd.deload, pd.cycle, pd.of, date || S.date);
   const rxText = it => it.rx ? it.rx : (it.s > 1 ? `${it.s} × ${it.r}` : it.r);
   const restText = s => s >= 120 ? `${s / 60} min rest` : `${s} s rest`;
   function plateHTML(P, sm) {
@@ -2474,9 +2990,11 @@ const BENCH = [
   function phaseLine(pd) {
     const P = PHASES[pd.phase];
     if (pd.phase === 'n0') return `Calm, week ${pd.week}, day ${pd.dayNo}`;
-    if (pd.bridge) return `Restart, bridge day ${pd.bridge}: Rebuild starts Monday`;
+    if (pd.bridge && pd.phase === 'p0') return `Restart, bridge day ${pd.bridge}: Rebuild starts Monday`;
     if (pd.phase === 'p0') return `Restart, day ${pd.dayNo} of 10`;
     if (pd.phase === 'p1') return `Rebuild, week ${pd.week} of 6`;
+    if (pd.phase === 'g0') return `Start, day ${pd.dayNo} of ${pd.of}`;
+    if (pd.phase === 'g1') return `Foundation, week ${pd.week} of 6`;
     return `${P.name}, week ${pd.week} of ${pd.of}, cycle ${pd.cycle}`;
   }
   const TH = {};
@@ -2494,7 +3012,7 @@ const BENCH = [
     return null;
   }
   function logSummary(log, sets) {
-    const u = { wr: ['kg', ''], r: ['', ''], t: ['s', ''], wd: ['kg', 'm'], min: ['min', ''] }[log] || ['', ''];
+    const u = { wr: ['kg', ''], r: ['', ''], t: ['s', ''], wd: ['kg', 'm'], min: ['min', ''], cm: ['cm', ''] }[log] || ['', ''];
     const parts = sets.filter(s => s && (s[0] || s[1])).map(s => {
       if (log === 'wr') return `${s[0] || 'BW'}${s[0] ? ' kg' : ''} × ${s[1] || '?'}`;
       if (log === 'wd') return `${s[0] || '?'} kg, ${s[1] || '?'} m`;
@@ -2505,10 +3023,10 @@ const BENCH = [
   function lightFor(date) {
     const r = rec(date);
     if (!r) return null;
-    const pb = r.pb, mc = r.mc;
-    if (pb == null && !mc) return null;
-    if ((pb != null && pb >= 5) || mc === 'worse') return 'red';
-    if ((pb != null && pb >= 3) || mc === 'stiffer') return 'amber';
+    const pb = r.pb, mc = r.mc, lg = r.lg, cz = r.cz;
+    if (pb == null && !mc && !lg && !cz) return null;
+    if ((pb != null && pb >= 5) || mc === 'worse' || lg === 'worse' || cz === 'worse') return 'red';
+    if ((pb != null && pb >= 3) || mc === 'stiffer' || lg === 'some') return 'amber';
     return 'green';
   }
   const trained = r => r && (r.done || Object.values(r.sets || {}).some(a => (a || []).some(s => s && (s[2] || s[0] || s[1]))));
@@ -2522,37 +3040,17 @@ const BENCH = [
   }
   const checkBtn = (attr, on, label) => `<button type="button" class="check" ${attr} aria-pressed="${!!on}" aria-label="${esc(label || 'Mark done')}">${I.check}</button>`;
 
-  function vStrengthToday() {
-    const date = S.date, today = todayStr(), pd = pday(date), T = D[pd.dayId], r = rec(date) || {};
-    let h = `<div class="col"><div class="datebar"><button class="iconbtn" data-nav="-1" aria-label="Previous day">${I.prev}</button><div class="d">${fmtLong(date)}</div><button class="iconbtn" data-nav="1" aria-label="Next day">${I.next}</button></div>`;
-    if (date !== today) h += `<div style="text-align:center;margin:-6px 0 12px"><button class="btn sm ghost" data-nav="0">Back to today, ${esc(fmtMed(today))}</button></div>`;
-    if (pd.before) return h + `<div class="card stack"><h2>Your five-day plan starts ${esc(fmtLong(pd.start))}</h2><p class="muted">That’s ${pd.days} day${pd.days === 1 ? '' : 's'} away. You can change the exact start date in Settings.</p><button class="btn primary" data-go="${pd.start}">See day 1</button></div></div>`;
-    const label = pd.rest ? 'Rest day' : `Week ${pd.week} · Day ${pd.trainingDay} of 5`;
-    h += `<section class="hero"><div class="plate"><span>${pd.rest ? 'REST' : `D${pd.trainingDay}`}</span></div><div><div class="phase">${label}</div><h1>${esc(T.t)}</h1><div class="muted small">${esc(T.f)}</div></div></section>`;
-    if (T.intro) h += `<p class="muted" style="margin:14px 0 0">${esc(T.intro)}</p>`;
-    if (T.rest) return h + `<section class="card sec stack"><h2>Recovery day</h2><p class="muted">No lifting is scheduled. Rest or take an easy walk if you like.</p></section></div>`;
-    h += block('Warm-up', WARM.fit, date, 'fwarm', 'About 8–10 min, before the first lift');
-    h += `<div class="banner sec"><b>Progress gradually.</b> Start with a load that leaves 2–3 good reps in reserve. When every set reaches the top of its rep range with controlled form, add a small amount of weight next time.</div>`;
-    const items = T.items.map(it => resolveItem(it, pd.week, false));
-    h += `<div class="stack sec">${items.map((it, i) => exCard(it, i, date, null, pd)).join('')}</div>`;
-    h += finishStrength(date);
-    const tomorrow = addDays(date, 1), next = pday(tomorrow);
-    h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tomorrow}">${esc(D[next.dayId].t)}</button></p>`;
-    return h + '</div>';
-  }
-
   function vToday() {
-    if (S.mode === 'strength') return vStrengthToday();
-    const date = S.date, t = todayStr();
+    const date = S.date, t = todayStr(), back = S.mode === 'back';
     const pd = pday(date);
     let h = `<div class="col"><div class="datebar">
       <button class="iconbtn" data-nav="-1" aria-label="Previous day">${I.prev}</button>
       <div class="d">${fmtLong(date)}${date === t ? '' : ''}</div>
       <button class="iconbtn" data-nav="1" aria-label="Next day">${I.next}</button></div>`;
     if (date !== t) h += `<div style="text-align:center;margin:-6px 0 12px"><button class="btn sm ghost" data-nav="0">Back to today, ${esc(fmtMed(t))}</button></div>`;
-    if (pd.before && S.profile.calm !== false && validYmd(S.profile.calmStart) && date < S.profile.calmStart) return h + `<div class="card stack"><h2>Your Calm phase starts ${esc(fmtLong(S.profile.calmStart))}</h2><p class="muted">Keep walking and doing your physio routine until then.</p><button class="btn primary" data-go="${S.profile.calmStart}">See Calm day 1</button></div></div>`;
+    if (back && pd.before && S.profile.calm !== false && validYmd(S.profile.calmStart) && date < S.profile.calmStart) return h + `<div class="card stack"><h2>Your Calm phase starts ${esc(fmtLong(S.profile.calmStart))}</h2><p class="muted">Keep walking and doing your physio routine until then.</p><button class="btn primary" data-go="${S.profile.calmStart}">See Calm day 1</button></div></div>`;
     if (pd.before) {
-      return h + `<div class="card stack"><h2>Your plan starts ${esc(fmtLong(pd.start))}</h2><p class="muted">That’s ${pd.days} day${pd.days === 1 ? '' : 's'} away. Until then, keep doing your physio routine and walking.</p><button class="btn primary" data-go="${pd.start}">See day 1</button></div></div>`;
+      return h + `<div class="card stack"><h2>Your plan starts ${esc(fmtLong(pd.start))}</h2><p class="muted">That’s ${pd.days} day${pd.days === 1 ? '' : 's'} away. ${back ? 'Until then, keep doing your physio routine and walking.' : 'You can change the start date in Settings.'}</p><button class="btn primary" data-go="${pd.start}">See day 1</button></div></div>`;
     }
     const P = PHASES[pd.phase], T = D[pd.dayId], r = rec(date) || {};
     h += `<section class="hero">${plateHTML(P)}<div><div class="phase">${esc(phaseLine(pd))}</div><h1>${esc(T.t)}</h1><div class="muted small">${esc(T.f)}</div></div></section>`;
@@ -2560,14 +3058,16 @@ const BENCH = [
     if (T.test) h += `<div class="banner test" style="margin-top:14px"><b>Benchmark day.</b> Warm up well, test once, and log the results in Progress too.</div>`;
     if (T.intro) h += `<p class="muted" style="margin:14px 0 0">${esc(T.intro)}</p>`;
     if (pd.phase === 'n0') h += `<div class="banner calm" style="margin-top:14px"><b>Calm phase, no gym yet.</b> Restart is set for ${esc(fmtLong(pd.restart))}${pd.toGo === 1 ? ' (tomorrow)' : ` (in ${pd.toGo} days)`}. The Calm gate on the Back Care tab moves it.</div>`;
-    h += readiness(date);
+    if (back) h += readiness(date);
     if (pd.phase === 'n0') h += nerveCheck(date);
-    const light = lightFor(date);
-    if (T.warm) h += block(T.warm === 'care' ? 'Back Care routine' : T.warm === 'nerve' ? 'Nerve care' : 'Warm-up', WARM[T.warm], date, 'w', T.warm === 'care' ? 'About 15 min' : T.warm === 'nerve' ? 'Extension sequence plus one nerve glide, about 8 min. Repeat the sequence 3–5 times a day.' : 'About 8 min');
-    const items = T.items.map(it => resolveItem(it, pd.week, pd.deload));
+    const light = back ? lightFor(date) : null;
+    if (T.warm) h += block(T.warm === 'care' ? 'Back Care routine' : T.warm === 'nerve' ? 'Nerve care' : 'Warm-up', WARM[T.warm], date, 'w', T.warm === 'care' ? 'About 15 min' : T.warm === 'nerve' ? 'Extension sequence plus one nerve glide, about 8 min. Repeat the sequence 3–5 times a day.' : T.warm === 'gen' ? 'About 10 min, ending with ramp-up sets' : 'About 8 min');
+    if (back && light === 'red' && !T.rest) h += `<div class="banner sec" style="border-left-color:var(--red)"><b>Red: Back Care routine and an easy walk today.</b> No loaded back or leg work.</div>`;
+    if (!T.rest && ['g0', 'g1', 'p0', 'p1'].includes(pd.phase)) h += `<div class="banner sec"><b>How hard?</b> RPE 7 means about 3 good reps left in the set, RPE 8 two, RPE 9 one. When every set reaches the top of its rep range with clean form, add the smallest weight step next time.</div>`;
+    const items = T.items.map(it => resolveFor(it, pd));
     h += `<div class="stack sec">${items.map((it, i) => exCard(it, i, date, light, pd)).join('')}</div>`;
-    if (T.cool) h += block('Cool-down', COOL, date, 'c', 'About 3 min');
-    h += finish(date);
+    if (T.cool) h += block('Cool-down', T.cool === true ? COOL : COOLS[T.cool], date, 'c', 'About 3–5 min');
+    h += back ? finish(date) : finishStrength(date);
     const tm = addDays(date, 1), pn = pday(tm);
     if (!pn.before) h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tm}">${esc(D[pn.dayId].t)}</button></p>`;
     return h + '</div>';
@@ -2591,6 +3091,10 @@ const BENCH = [
       h += `<div style="margin-top:14px"><div class="small" style="margin-bottom:6px">This morning, compared with before yesterday’s session:</div><div class="seg" role="group" aria-label="Morning check">` +
         [['same', 'Same or better'], ['stiffer', 'Stiffer, settling'], ['worse', 'Clearly worse']].map(([k, l]) => `<button type="button" data-mc="${k}" aria-pressed="${r.mc === k}">${l}</button>`).join('') + '</div></div>';
     }
+    if (pday(date).phase !== 'n0') {
+      h += `<div style="margin-top:14px"><div class="small" style="margin-bottom:6px">Leg symptoms today</div><div class="seg" role="group" aria-label="Leg symptoms today">` +
+        [['none', 'None, or my usual small patch'], ['some', 'Some pain or tingling in the leg'], ['worse', 'Spreading, more numb, or the leg feels weak']].map(([k, l]) => `<button type="button" data-lg="${k}" aria-pressed="${r.lg === k}">${l}</button>`).join('') + '</div></div>';
+    }
     const L = lightFor(date);
     if (L) {
       const o = LIGHTS.find(l => l.k === L);
@@ -2605,7 +3109,8 @@ const BENCH = [
       list.map((b, i) => `<div class="mini">${b.x ? `<button type="button" class="figbox fig-s" data-ex="${b.x}" aria-label="Show ${esc(EX[b.x].n)}">${thumb(b.x)}</button>` : '<div></div>'}<div><div class="nm">${esc(b.x ? EX[b.x].n : b.t)}</div><div class="rx">${esc(b.rx)}</div></div>${checkBtn(`data-chk="${pfx}${i}"`, chk[pfx + i], (b.x ? EX[b.x].n : b.t) + ' done')}</div>`).join('') +
       `</div></details>`;
   }
-  const RISKY = ['sprint', 'boxjump', 'mbrot', 'plyopush', 'sled', 'bikesprint'];
+  const RISKY = ['sprint', 'boxjump', 'mbrot', 'plyopush', 'sled', 'bikesprint', 'broadjump', 'latbound'];
+  const BARBELL = ['backsquat', 'frontsquat', 'rdl', 'bbrow', 'ohp'];
   function exCard(it, i, date, light, pd) {
     const E = EX[it.x], key = `${i}:${it.x}`, r = rec(date) || {}, logged = (r.sets && r.sets[key]) || [];
     const last = lastLog(it.x, date);
@@ -2615,11 +3120,13 @@ const BENCH = [
     if (it.main) chips.push(`<span class="chip star">★ Main lift</span>`);
     if (it.test) chips.push(`<span class="chip star">Test</span>`);
     let warn = '';
-    if ((light === 'amber' || light === 'red') && (it.key || RISKY.includes(it.x) || /^bext|^sext/.test(it.x))) {
-      warn = light === 'red'
-        ? `<div class="warnline red">Red today: skip this and do an easy walk instead.</div>`
-        : `<div class="warnline amber">Amber today: ${RISKY.includes(it.x) ? 'skip it, or swap for 10 min of easy bike.' : 'keep last session’s load and range, no progression.'}</div>`;
+    const flagged = it.key || RISKY.includes(it.x) || BARBELL.includes(it.x) || it.x === 'dbrdl' || /^bext|^sext/.test(it.x);
+    const easy = it.x === 'walk' || it.x === 'bike';
+    if (light === 'red' && !easy && (flagged || ['legs', 'core', 'spine', 'athletic'].includes(E.c))) warn = `<div class="warnline red">Red today: skip this and do an easy walk instead.</div>`;
+    else if (light === 'amber' && !easy && (flagged || E.c === 'legs' || E.c === 'core')) {
+      warn = `<div class="warnline amber">Amber today: ${RISKY.includes(it.x) ? 'skip it, or swap for 10 min of easy bike.' : BARBELL.includes(it.x) ? 'do the machine or dumbbell version instead (hack squat, dumbbell RDL, chest-supported row, seated dumbbell press) at last session’s load.' : 'keep last session’s load and range, no progression.'}</div>`;
     }
+    if (it.locked) warn += `<div class="stepline">Easier version until the barbell gate is passed. <button class="btn sm ghost" data-tab="care" style="min-height:28px;padding:0 6px">See the gate</button></div>`;
     const step = it.stepWeek && it.key ? `<div class="stepline">Ladder step for week ${it.stepWeek}. <button class="btn sm ghost" data-tab="care" style="min-height:28px;padding:0 6px">See the ladder</button></div>` : '';
     return `<article class="card ex" data-card="${key}">
       <div class="ex-top">
@@ -2638,7 +3145,7 @@ const BENCH = [
     if (L === 'x') {
       return `<div class="sets"><div class="ticks">${range(it.s).map(j => checkBtn(`data-tick="${key}|${j}"`, logged[j] && logged[j][2], `Round ${j + 1} done`)).join('')}</div></div>`;
     }
-    const units = { wr: ['kg', 'reps'], r: ['reps'], t: ['s'], wd: ['kg', 'm'], min: ['min'] }[L] || ['kg', 'reps'];
+    const units = { wr: ['kg', 'reps'], r: ['reps'], t: ['s'], wd: ['kg', 'm'], min: ['min'], cm: ['cm'] }[L] || ['kg', 'reps'];
     const n = L === 'min' ? 1 : it.s;
     let h = '<div class="sets">';
     for (const j of range(n)) {
@@ -2675,58 +3182,81 @@ const BENCH = [
   }
 
   /* plan */
-  function currentPhaseId() { const pd = pday(todayStr()); return pd.before ? 'p0' : pd.phase; }
+  function currentPhaseId() { const pd = pday(todayStr()); return pd.before ? MODES[S.mode].phases[0] : pd.phase; }
   function vPlan() {
-    if (S.mode === 'strength') return vStrengthPlan();
-    const sel = S.planSel || currentPhaseId();
-    const opts = (S.profile.calm !== false && validYmd(S.profile.calmStart) ? ['n0'] : []).concat(['p0', 'p1', 'A', 'B', 'C']);
+    const M = MODES[S.mode], build = S.mode === 'strength';
+    const opts = (!build && S.profile.calm !== false && validYmd(S.profile.calmStart) ? ['n0'] : []).concat(M.phases);
+    let sel = S.planSel || currentPhaseId();
+    if (sel !== 'road' && sel !== 'guide' && !opts.includes(sel)) sel = opts[0];
     let h = `<div class="col"><div class="phasepick" role="group" aria-label="Choose a phase">` + opts.map(id => `<button type="button" data-plan="${id}" aria-pressed="${sel === id}">${plateHTML(PHASES[id], true)}${esc(PHASES[id].name)}</button>`).join('') +
-      `<button type="button" data-plan="road" aria-pressed="${sel === 'road'}" style="padding-left:14px">Two-year roadmap</button></div>`;
-    h += sel === 'road' ? vRoad() : vPhase(sel);
+      `<button type="button" data-plan="road" aria-pressed="${sel === 'road'}" style="padding-left:14px">Two-year roadmap</button>` +
+      (build ? `<button type="button" data-plan="guide" aria-pressed="${sel === 'guide'}" style="padding-left:14px">How to use this plan</button>` : '') + `</div>`;
+    h += sel === 'road' ? vRoad() : sel === 'guide' ? vGuide() : vPhase(sel);
     return h + '</div>';
   }
-  function vStrengthPlan() {
-    const start = S.profile.startDate, today = todayStr();
-    const firstWeek = STRENGTH_WEEK.slice(0, 5);
-    let h = `<div class="col"><div class="phasehead"><div class="plate" style="--pc:var(--accent);--pi:#fff" aria-hidden="true"><span>5</span></div><div><h2>Five-day strength plan</h2><div class="muted small">Day 1 starts ${esc(fmtLong(start))}</div></div></div>`;
-    h += `<p>Build muscle and core strength with five gym sessions across the first five days, followed by two recovery days. This is a general plan for a healthy adult; adjust exercises to your equipment and experience.</p>`;
-    h += `<div class="card sec"><h3 style="margin-bottom:8px">Weekly schedule</h3><div class="week">` + STRENGTH_WEEK.map((id, i) => `<div class="wrow${i >= 5 ? ' rest' : ''}"><div class="wd">${WDN[i]}</div><div class="t">${esc(D[id].t)}</div><div class="tiny">${esc(D[id].f.replace(/^About /, ''))}</div></div>`).join('') + `</div></div>`;
-    h += `<div class="banner sec"><b>Progression:</b> choose a load that leaves about 2–3 good reps in reserve. When all sets reach the top of the rep range with steady form, add a small amount of weight. Keep at least one rest day after the fifth session.</div>`;
-    h += `<div class="stack sec">${firstWeek.map(id => sessionDetails(D[id], 'strength')).join('')}</div>`;
-    h += `<p class="tiny sec">Every gym session starts with an easy bike warm-up, comfortable dynamic movement, and lighter ramp-up sets. The workout log is kept separately from the Back-safe plan in this browser.</p>`;
-    if (today < start) h += `<p class="tiny">The plan has not started yet. You can change its exact start date in Settings.</p>`;
-    return h + '</div>';
+  function vGuide() {
+    let h = `<h2 style="margin-top:6px">How to use this plan</h2><p class="muted">Two years of training for any healthy adult: muscle, strength, a strong core and real athleticism, with no deadlifts.</p>`;
+    h += `<div class="stack sec">${GUIDE_G.map(g => `<div class="card"><h3 style="margin-bottom:6px">${esc(g.h)}</h3>${g.p ? `<p class="small" style="margin:0">${esc(g.p)}</p>` : ''}${g.li ? `<ul class="rules">${g.li.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`).join('')}</div>`;
+    h += `<div class="card sec faq"><h2 style="margin-bottom:4px">Questions</h2>${FAQ_G.map(f => `<details><summary><span>${esc(f.q)}</span>${I.caret}</summary><p>${esc(f.a)}</p></details>`).join('')}</div>`;
+    h += `<p class="tiny sec">General guidance for healthy adults, not medical advice. If you have an injury, a heart condition or are new to exercise after a long break, check with a doctor or physio first.</p>`;
+    return h;
   }
   function vPhase(id) {
-    const P = PHASES[id], R = planRanges(S.profile.startDate).filter(r => r.phase === id);
+    const P = PHASES[id], R = MODES[S.mode].ranges(S.profile.startDate).filter(r => r.phase === id);
     let dates;
-    if (id === 'n0') dates = `From ${fmtMed(S.profile.calmStart || todayStr())} until you pass the Calm gate. Restart is set for ${fmtMed(S.profile.startDate)}.`;
+    if (id === 'g0') dates = `${fmtMed(R[0].from)} to ${fmtYear(R[0].to)}, ${startLen(R[0].from)} days`;
+    else if (id === 'g1') dates = `${fmtMed(R[0].from)} to ${fmtYear(R[0].to)}, 6 weeks`;
+    else if (id === 'n0') dates = `From ${fmtMed(S.profile.calmStart || todayStr())} until you pass the Calm gate. Restart is set for ${fmtMed(S.profile.startDate)}.`;
     else if (id === 'p0' || id === 'p1') dates = `${fmtMed(R[0].from)} to ${fmtYear(R[0].to)}${id === 'p1' ? ', 6 weeks' : bridgeDays(R[0].from) ? `, 10 days plus ${bridgeDays(R[0].from)} bridge day${bridgeDays(R[0].from) > 1 ? 's' : ''}` : ', 10 days'}`;
     else dates = `${P.weeks} weeks, repeated in each of the six 16-week cycles`;
     let h = `<div class="phasehead">${plateHTML(P)}<div><h2>${esc(P.name)}</h2><div class="muted small">${esc(dates)}</div></div></div>`;
     h += `<p>${esc(P.goal)}</p><ul class="rules">${P.rules.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
     if (R.length > 1) h += `<div class="sec"><h3 style="margin-bottom:8px">When it runs</h3><div class="ranges">${R.map(r => `<button class="chip" data-go="${r.from}">Cycle ${r.cycle}: ${esc(fmtShort(r.from))} to ${esc(fmtYear(r.to))}</button>`).join('')}</div></div>`;
     let ids;
-    if (id === 'p0') {
-      h += `<div class="card sec"><h3 style="margin-bottom:6px">Day by day</h3><div class="week daylist">` + P.days.concat(Array(bridgeDays(R[0].from)).fill('p0_bridge')).map((d, i) => {
+    if (id === 'p0' || id === 'g0') {
+      const list = id === 'p0' ? P.days.concat(Array(bridgeDays(R[0].from)).fill('p0_bridge')) : range(startLen(R[0].from)).map(i => P.week[weekdayIdx(addDays(R[0].from, i))]);
+      h += `<div class="card sec"><h3 style="margin-bottom:6px">Day by day</h3><div class="week daylist">` + list.map((d, i) => {
         const date = addDays(R[0].from, i);
         return `<div class="wrow"><div class="wd">${esc(fmtMed(date))}</div><div class="t">${esc(D[d].t)}</div><button class="btn sm ghost" data-go="${date}">Open</button></div>`;
       }).join('') + '</div></div>';
-      ids = [...new Set(P.days)];
+      ids = [...new Set(P.days || P.week)];
     } else {
-      h += `<div class="card sec"><h3 style="margin-bottom:6px">Weekly schedule</h3><div class="week">` + P.week.map((d, i) => `<div class="wrow${d === 'rest' ? ' rest' : ''}"><div class="wd">${WDN[i]}</div><div class="t">${esc(D[d].t)}</div><div class="tiny">${esc(D[d].f.replace(/^About /, ''))}</div></div>`).join('') + '</div>' +
-        (P.test ? `<p class="tiny" style="margin:8px 0 0">Week ${P.test.week} Saturday is benchmark day instead.</p>` : '') + '</div>';
+      h += `<div class="card sec"><h3 style="margin-bottom:6px">Weekly schedule</h3><div class="week">` + P.week.map((d, i) => `<div class="wrow${D[d].rest ? ' rest' : ''}"><div class="wd">${WDN[i]}</div><div class="t">${esc(D[d].t)}</div><div class="tiny">${esc(D[d].f.replace(/^About /, ''))}</div></div>`).join('') + '</div>' +
+        (P.test ? `<p class="tiny" style="margin:8px 0 0">In week ${P.test.week}, ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][P.test.wd]} is benchmark day instead.</p>` : '') + '</div>';
       ids = [...new Set(P.week)];
       if (P.test) ids.push(P.test.day);
     }
-    h += `<div class="stack sec">` + ids.filter(d => d !== 'rest').map(d => sessionDetails(D[d], id)).join('') + '</div>';
-    h += id === 'n0' ? `<p class="tiny sec">Every Calm day starts with nerve care: the extension sequence and the one nerve glide your physio picked.</p>` : `<p class="tiny sec">Every gym session starts with the warm-up (bike plus the back-care “big three”) and ends with the hip-flexor stretch and child’s pose.</p>`;
+    h += `<div class="stack sec">` + ids.filter(d => !D[d].rest).map(d => sessionDetails(D[d], id)).join('') + '</div>';
+    h += id === 'n0' ? `<p class="tiny sec">Every Calm day starts with nerve care: the extension sequence and the one nerve glide your physio picked.</p>`
+      : S.mode === 'strength' ? `<p class="tiny sec">Every gym session starts with a 10-minute warm-up and ramp-up sets, and ends with a hip-flexor stretch and an easy walk. Exercise swaps between cycles happen automatically on the Today tab.</p>`
+      : `<p class="tiny sec">Every gym session starts with the warm-up (bike plus the back-care “big three”) and ends with the hip-flexor stretch and child’s pose.</p>`;
     return h;
+  }
+  // "Cycles 2, 4, 6: Chin-up" style summary of an item's cycle changes
+  function cycleLines(it) {
+    const groups = {};
+    Object.keys(it.cy).map(Number).sort((a, b) => a - b).forEach(k => {
+      const o = it.cy[k], keys = Object.keys(o).filter(q => q !== 'n' && q !== 'lock');
+      let txt;
+      if (!keys.length && !o.n) txt = `back to ${EX[it.x].n}`;
+      else {
+        const parts = [];
+        if (o.x && o.x !== it.x) parts.push(EX[o.x].n);
+        if (o.s && o.s !== it.s) parts.push(`${o.s} sets`);
+        if (o.r && o.r !== it.r) parts.push(o.r);
+        if (!parts.length) parts.push(o.n ? o.n.replace(/^Cycle \d+: /, '') : 'same exercise');
+        txt = parts.join(', ');
+      }
+      (groups[txt] = groups[txt] || []).push(k);
+    });
+    return Object.keys(groups).map(t => `${groups[t].length > 1 ? 'Cycles ' + groups[t].join(', ') : 'Cycle ' + groups[t][0]}${groups[t].length === 1 && !Object.keys(it.cy).some(k => +k > groups[t][0]) ? ' on' : ''}: ${t}`);
   }
   function sessionDetails(T, pid) {
     const rows = T.items.map(it => {
       let prog = '';
       if (it.p) prog = `<div class="tiny" style="margin-top:3px">${Object.keys(it.p).map(w => `Week ${w}: ${esc(it.p[w].rx || '')}${it.p[w].x && it.p[w].x !== it.x ? ` (${esc(EX[it.p[w].x].n)})` : ''}`).join('<br>')}</div>`;
+      if (it.cy) prog += `<div class="tiny" style="margin-top:3px">${cycleLines(it).map(esc).join('<br>')}</div>`;
+      if (it.lock) prog += `<div class="tiny" style="margin-top:3px">${esc(`Until the barbell gate is passed: ${EX[it.lock.x].n}${it.lock.r ? ', ' + it.lock.r : ''}`)}</div>`;
       const rx = it.r === 'see week' ? 'Progresses weekly' : rxText(Object.assign({}, it, { s: it.s || 1 })) + (it.p ? ', then' : '');
       return `<div class="prow" data-ex="${it.x}" role="button" tabindex="0"><div class="figbox">${thumb(it.x)}</div><div><div class="nm">${it.g ? `<span class="grp" style="margin-right:6px">${esc(it.g)}</span>` : ''}${esc(EX[it.x].n)}${it.main ? ' ★' : ''}</div><div class="rx">${esc(rx)}${it.rest ? ', ' + restText(it.rest) : ''}${it.rpe ? ', RPE ' + esc(it.rpe) : ''}</div>${it.n ? `<div class="tiny">${esc(it.n)}</div>` : ''}${prog}</div></div>`;
     }).join('');
@@ -2748,22 +3278,28 @@ const BENCH = [
       const tx = M + diffDays(t, first) * scale;
       svg += `<path d="M${tx.toFixed(1)} 8V${H - 34}" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="3 3"/><text x="${(tx + 4).toFixed(1)}" y="16" class="ch-txt" style="font-size:15px;font-weight:700;fill:var(--ink)">Today</text>`;
     }
-    ['2027-01-01', '2028-01-01'].forEach(y => { const yx = M + diffDays(y, first) * scale; svg += `<path d="M${yx.toFixed(1)} ${H - 30}v8" stroke="var(--ink3)" stroke-width="1.4"/><text x="${yx.toFixed(1)}" y="${H - 6}" text-anchor="middle" class="ch-txt" style="font-size:15px">${y.slice(0, 4)}</text>`; });
-    svg += `<text x="${W + M}" y="${H - 6}" text-anchor="end" class="ch-txt" style="font-size:15px">Sep 2028</text></svg>`;
+    for (let y = +first.slice(0, 4) + 1; y <= +last.slice(0, 4); y++) {
+      const yx = M + diffDays(`${y}-01-01`, first) * scale;
+      if (yx > W + M - 90) continue;
+      svg += `<path d="M${yx.toFixed(1)} ${H - 30}v8" stroke="var(--ink3)" stroke-width="1.4"/><text x="${yx.toFixed(1)}" y="${H - 6}" text-anchor="middle" class="ch-txt" style="font-size:15px">${y}</text>`;
+    }
+    svg += `<text x="${W + M}" y="${H - 6}" text-anchor="end" class="ch-txt" style="font-size:15px">${esc(fmt(last, { month: 'short', year: 'numeric' }))}</text></svg>`;
     return svg;
   }
   function vRoad() {
-    const t = todayStr(), calmOn = S.profile.calm !== false && validYmd(S.profile.calmStart) && S.profile.calmStart < S.profile.startDate;
-    const R = (calmOn ? [{ phase: 'n0', from: S.profile.calmStart, to: addDays(S.profile.startDate, -1) }] : []).concat(planRanges(S.profile.startDate));
+    const M = MODES[S.mode], back = S.mode === 'back', t = todayStr();
+    const calmOn = back && S.profile.calm !== false && validYmd(S.profile.calmStart) && S.profile.calmStart < S.profile.startDate;
+    const R = (calmOn ? [{ phase: 'n0', from: S.profile.calmStart, to: addDays(S.profile.startDate, -1) }] : []).concat(M.ranges(S.profile.startDate));
     let h = `<h2 style="margin-top:6px">Two years, loaded like a bar</h2><p class="muted">Each block is colour-coded like competition plates: the heavier the plate, the heavier the training. Width shows how long each block lasts. Tap a plate to open it.</p>`;
-    h += `<div class="card sleeve">${plateBar(R, t)}</div><div class="legend">` + (calmOn ? ['n0'] : []).concat(['p0', 'p1', 'C', 'B', 'A']).map(id => `<span>${plateHTML(PHASES[id], true)} ${esc(PHASES[id].name)}</span>`).join('') + '</div>';
-    h += `<div class="sec"><h3 style="margin-bottom:8px">What changes each cycle</h3><div class="stack">` + CYCLES.map(c => {
-      const a0 = R.find(r => r.phase === 'A' && r.cycle === c.n), z = R.find(r => r.phase === 'C' && r.cycle === c.n);
+    h += `<div class="card sleeve">${plateBar(R, t)}</div><div class="legend">` + (calmOn ? ['n0'] : []).concat(M.legend).map(id => `<span>${plateHTML(PHASES[id], true)} ${esc(PHASES[id].name)}</span>`).join('') + '</div>';
+    h += `<div class="sec"><h3 style="margin-bottom:8px">What changes each cycle</h3><div class="stack">` + M.cycles().map(c => {
+      const a0 = R.find(r => r.phase === M.blocks[0] && r.cycle === c.n), z = R.find(r => r.phase === M.blocks[2] && r.cycle === c.n);
       const now = t >= a0.from && t <= z.to;
+      const rows = back ? [['Back extension', c.bext], ['Side extension', c.sext]].concat(c.core ? [['Core', c.core]] : []) : c.rows;
       return `<div class="card cyc${now ? ' now' : ''}"><div class="sec-h" style="margin-bottom:6px"><h3>Cycle ${c.n}</h3><span class="tiny">${esc(fmtShort(a0.from))} ${a0.from.slice(0, 4)} to ${esc(fmtShort(z.to))} ${z.to.slice(0, 4)}${now ? ', you are here' : ''}</span></div>
-        <dl class="kv" style="margin-top:0"><dt>Back extension</dt><dd>${esc(c.bext)}</dd><dt>Side extension</dt><dd>${esc(c.sext)}</dd><dt>Focus</dt><dd>${esc(c.focus)}</dd></dl></div>`;
-    }).join('') + `</div><p class="tiny" style="margin:10px 0 0">Extension targets assume about 80 kg of body weight; scale to yours. Keep the main lifts the same all cycle and swap one or two accessories when a new cycle starts.</p></div>`;
-    h += `<div class="card sec tblwrap"><h3 style="margin-bottom:6px">Benchmarks to work toward</h3><table class="tbl"><thead><tr><th>Test</th><th>Target</th></tr></thead><tbody>${BENCH.map(b => `<tr><td>${esc(b.n)}</td><td>${esc(b.tgt(S.profile.bw))}</td></tr>`).join('')}</tbody></table><p class="tiny" style="margin:8px 0 0">Tested in the last week of every Athletic power block. Log results under Progress.</p></div>`;
+        <dl class="kv" style="margin-top:0">${rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}<dt>Focus</dt><dd>${esc(c.focus)}</dd></dl></div>`;
+    }).join('') + `</div><p class="tiny" style="margin:10px 0 0">${back ? 'Extension targets assume about 80 kg of body weight; scale to yours. The ★ main lifts stay the same through a cycle, and the accessory swaps listed here happen automatically on the Today tab.' : 'The ★ main lifts stay the same through a cycle. The accessory swaps listed here happen automatically on the Today tab.'}</p></div>`;
+    h += `<div class="card sec tblwrap"><h3 style="margin-bottom:6px">Benchmarks to work toward</h3><table class="tbl"><thead><tr><th>Test</th><th>Target</th></tr></thead><tbody>${M.bench().map(b => `<tr><td>${esc(b.n)}</td><td>${esc(b.tgt(S.profile.bw))}</td></tr>`).join('')}</tbody></table><p class="tiny" style="margin:8px 0 0">Tested in the last week of every Athletic power block. Log results under Progress.${back ? '' : ' Targets suit an average-build adult after about two years of steady training; scale them to your own starting point.'}</p></div>`;
     return h;
   }
 
@@ -2788,9 +3324,14 @@ const BENCH = [
     }
     h += `<div class="card sec gate"><h2 style="margin-bottom:4px">Gate test: Restart to Rebuild</h2><p class="muted small">Check these on ${esc(fmtMed(addDays(S.profile.startDate || PLAN_START, 9)))}. All five means Rebuild starts the next day. If any are missing, move the Restart date in Settings one week later.</p><ul>` +
       GATE.map((g, i) => `<li>${checkBtn(`data-gate="${i}"`, S.profile.gate[i], g)}<span>${esc(g)}</span></li>`).join('') + `</ul></div>`;
+    const bg = S.profile.barGate || {}, bOpen = barOpen(), ll = legLast(), wks = ll ? Math.floor(diffDays(t, ll) / 7) : null;
+    const relocked = gateTicked() && !bOpen;
+    h += `<div class="card sec gate"><h2 style="margin-bottom:4px">Barbell gate: squats, RDLs and sprints</h2><p class="muted small">${bOpen ? 'Passed. Barbell back squats, barbell RDLs and running sprints now appear in your sessions. On an amber day, the app tells you to use the machine or dumbbell version instead.' : relocked ? `Paused: leg symptoms were logged ${wks === 0 ? 'this week' : wks + ' week' + (wks === 1 ? '' : 's') + ' ago'}. The gate reopens 8 weeks after the last one, and your barbell intro starts again.` : 'When every box is ticked, barbell back squats, barbell RDLs and running sprints replace the hack squat, dumbbell RDL and bike sprints in your sessions. Check them before Block B of cycle 1. Until then, the app shows the easier versions automatically.'} Your first 6 barbell sessions after passing the gate are always 3 × 8–10 at RPE 7, whatever block you are in.</p><ul>` +
+      BAR_GATE.map((g, i) => `<li>${checkBtn(`data-bgate="${i}"`, bg[i], g)}<span>${esc(g)}${i === 0 && ll ? `<span class="tiny" style="display:block">Last leg symptoms logged ${esc(fmtShort(ll))}${wks != null ? `, ${wks} week${wks === 1 ? '' : 's'} ago` : ''}.</span>` : ''}</span></li>`).join('') + `</ul></div>`;
     h += `<div class="flag sec" role="note"><h3 style="margin-bottom:6px">When to get medical help</h3><p class="small" style="margin:0">${esc(REDFLAGS)}</p></div>`;
     h += `<div class="card sec faq"><h2 style="margin-bottom:4px">Questions</h2>${FAQ.map(f => `<details><summary><span>${esc(f.q)}</span>${I.caret}</summary><p>${esc(f.a)}</p></details>`).join('')}</div>`;
     h += `<div class="card sec"><h3 style="margin-bottom:6px">Recovery basics</h3><ul class="rules">${RECOVERY.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p class="tiny" style="margin:8px 0 0">This plan is general guidance, not a medical assessment. Your physio knows your back best; show them this plan.</p></div>`;
+    h += `<div class="card sec"><h3 style="margin-bottom:6px">Eating for the goal</h3><ul class="rules">${EAT.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
     return h + '</div>';
   }
 
@@ -2827,16 +3368,21 @@ const BENCH = [
     // extension charts
     h += extChart('Back extension progress', ['bext', 'bext_w', 'bext_sl'], 'bext_iso');
     h += extChart('Side extension progress', ['sext', 'sext_w'], 'sext_iso');
+    h += extChart('Barbell squat progress', ['backsquat']);
+    h += extChart('Barbell RDL progress', ['rdl']);
     // weekly sessions
     h += `<section class="card sec chart"><h3 style="margin-bottom:8px">Sessions per week</h3>${weekBars(t)}</section>`;
     // benchmarks
-    h += `<section class="card sec"><div class="sec-h"><h3>Benchmarks</h3><span class="tiny">Targets use ${S.profile.bw ? S.profile.bw + ' kg' : 'about 80 kg'}</span></div>` + BENCH.map(b => {
+    h += benchCard() + '</div>';
+    return h;
+  }
+  function benchCard() {
+    return `<section class="card sec"><div class="sec-h"><h3>Benchmarks</h3><span class="tiny">${S.profile.bw ? `Targets use ${S.profile.bw} kg` : 'Add your body weight in Settings for exact targets'}</span></div>` + MODES[S.mode].bench().map(b => {
       const hist = S.profile.bench[b.id] || [], lastB = hist[hist.length - 1];
       return `<div class="benchrow"><div><div style="font-weight:600;line-height:1.25">${esc(b.n)}</div><div class="tiny">Target ${esc(b.tgt(S.profile.bw))}${lastB ? `, last ${esc(lastB[1])} ${esc(b.unit)} on ${esc(fmtShort(lastB[0]))}` : ''}</div></div>
         <label class="fld"><input type="text" inputmode="decimal" data-bench="${b.id}" placeholder="${lastB ? esc(lastB[1]) : ''}" aria-label="${esc(b.n)} result"><span>${esc(b.unit)}</span></label>
         <button class="btn sm" data-benchsave="${b.id}">Save</button></div>`;
-    }).join('') + '</section></div>';
-    return h;
+    }).join('') + '</section>';
   }
   function vStrengthProgress() {
     const t = todayStr(), days = Object.keys(S.days).sort();
@@ -2845,7 +3391,13 @@ const BENCH = [
     const thisWeek = done.filter(d => d >= wkStart && d <= t).length;
     const since = pdT.before ? 0 : diffDays(t, pdT.start) + 1;
     let h = `<div class="col"><div class="stats"><div class="stat"><div class="v">${done.length}</div><div class="k">Workouts completed</div></div><div class="stat"><div class="v">${thisWeek}/5</div><div class="k">This week</div></div><div class="stat"><div class="v">${since}</div><div class="k">Days into the plan</div></div></div>`;
-    h += `<section class="card sec chart"><h3 style="margin-bottom:8px">Workouts per week</h3><p class="tiny" style="margin:0 0 8px">A five-workout target is shown against your recent 12 weeks.</p>${weekBars(t)}</section>`;
+    h += `<section class="card sec chart"><h3 style="margin-bottom:8px">Workouts per week</h3><p class="tiny" style="margin:0 0 8px">Aim for five a week, six with the optional Saturday.</p>${weekBars(t)}</section>`;
+    h += extChart('Squat progress', ['backsquat', 'frontsquat']);
+    h += extChart('Bench press progress', ['bench', 'incbb']);
+    h += extChart('Romanian deadlift progress', ['rdl']);
+    h += extChart('Overhead press progress', ['ohp']);
+    h += extChart('Pull-up progress', ['pullup', 'chinup']);
+    h += benchCard();
     const recent = done.slice().reverse().slice(0, 10);
     h += `<section class="card sec"><h3 style="margin-bottom:8px">Recent workouts</h3>` + (recent.length
       ? `<div class="week">${recent.map(d => { const pd = pday(d), title = D[pd.dayId] ? D[pd.dayId].t : 'Workout'; return `<div class="wrow"><div class="wd">${esc(fmtShort(d))}</div><div class="t">${esc(title)}</div><div class="tiny">${Object.values(S.days[d].sets || {}).reduce((n, a) => n + (a || []).filter(s => s && s[2]).length, 0)} sets ticked</div></div>`; }).join('')}</div>`
@@ -2882,7 +3434,7 @@ const BENCH = [
     else if (reps.length) { pts = reps; sub = 'Best bodyweight set, reps'; }
     else if (hold.length) { pts = hold; sub = 'Longest hold, seconds'; }
     let h = `<section class="card sec chart"><h3>${esc(title)}</h3>`;
-    if (!pts) return h + `<div class="empty">Log your first ${esc(title.toLowerCase().replace(' progress', ''))} and it appears here.</div></section>`;
+    if (!pts) return h + `<div class="empty">Log your first set and your trend appears here.</div></section>`;
     h += `<div class="tiny" style="margin:2px 0 10px">${esc(sub)}</div>`;
     const W = 320, H = 130, l = 26, r = 8, tp = 10, b = 20, max = Math.max(10, ...pts.map(p => p.v)) * 1.15, n = pts.length;
     const X = i => n === 1 ? (l + W - r) / 2 : l + (W - l - r) * i / (n - 1), Y = v => tp + (H - tp - b) * (1 - v / max);
@@ -2920,7 +3472,7 @@ const BENCH = [
     document.body.style.overflow = '';
   }
   function openEx(id) {
-    const E = EX[id], last = lastLog(id, '9999-12-31');
+    const E = S.mode === 'strength' && GEN_EX[id] ? Object.assign({}, EX[id], GEN_EX[id]) : EX[id], last = lastLog(id, '9999-12-31');
     const catName = (CATS.find(c => c[0] === E.c) || [])[1];
     let h = `<div class="sheet-h"><h2>${esc(E.n)}</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.close}</button></div>
       <div class="bigfig"><div class="live" data-live="${id}"></div></div>
@@ -2935,10 +3487,10 @@ const BENCH = [
     const P = S.profile, start = P.startDate;
     const sw = (k, l, d) => `<div class="setrow2"><div><div style="font-weight:600">${esc(l)}</div>${d ? `<div class="tiny">${esc(d)}</div>` : ''}</div><button class="switch" role="switch" aria-checked="${!!P[k]}" data-sw="${k}" aria-label="${esc(l)}"></button></div>`;
     let h = `<div class="sheet-h"><h2>Settings</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.close}</button></div>
-      <div class="setrow2"><div><div style="font-weight:600">Workout plan</div><div class="tiny">Each plan has its own settings and workout log on this browser.</div></div><div class="seg" role="group" aria-label="Choose workout plan"><button type="button" data-mode="back" aria-pressed="${S.mode === 'back'}">Back-safe</button><button type="button" data-mode="strength" aria-pressed="${S.mode === 'strength'}">5-day strength</button></div></div>
-      <div class="setrow2"><div><div style="font-weight:600">${S.mode === 'back' ? 'Restart starts (Day 1)' : 'Plan start date'}</div><div class="tiny">${S.mode === 'back' ? `Day 1 of Restart is ${esc(fmtLong(start))}. The Calm gate on the Back Care tab can set this for you.` : `Day 1 starts ${esc(fmtLong(start))}. Choose any date.`}</div></div><label class="fld" style="width:160px"><input type="date" data-start-date value="${esc(start)}" aria-label="${S.mode === 'back' ? 'Restart start date' : 'Plan start date'}"></label></div>
+      <div class="setrow2"><div><div style="font-weight:600">Workout plan</div><div class="tiny">Each plan has its own settings and workout log on this browser.</div></div><div class="seg" role="group" aria-label="Choose workout plan"><button type="button" data-mode="back" aria-pressed="${S.mode === 'back'}">Back-safe</button><button type="button" data-mode="strength" aria-pressed="${S.mode === 'strength'}">Build (2-year)</button></div></div>
+      <div class="setrow2"><div><div style="font-weight:600">${S.mode === 'back' ? 'Restart starts (Day 1)' : 'Plan start date'}</div><div class="tiny">${S.mode === 'back' ? `Day 1 of Restart is ${esc(fmtLong(start))}. The Calm gate on the Back Care tab can set this for you.` : `Day 1 of the Start week is ${esc(fmtLong(start))}. Foundation begins on the following Monday.`}</div></div><label class="fld" style="width:160px"><input type="date" data-start-date value="${esc(start)}" aria-label="${S.mode === 'back' ? 'Restart start date' : 'Plan start date'}"></label></div>
       ${S.mode === 'back' ? sw('calm', 'Include the Calm phase', 'Nerve-friendly home routine before Restart') + (P.calm !== false ? `<div class="setrow2"><div><div style="font-weight:600">Calm phase starts</div><div class="tiny">It runs until the day before Restart.</div></div><label class="fld" style="width:160px"><input type="date" data-calm-start value="${esc(P.calmStart || '')}" aria-label="Calm phase start date"></label></div>` : '') : ''}
-      ${S.mode === 'back' ? `<div class="setrow2"><div><div style="font-weight:600">Body weight</div><div class="tiny">Used for benchmark targets</div></div><label class="fld" style="width:120px"><input type="text" inputmode="decimal" data-bw value="${esc(P.bw || '')}" placeholder="80" aria-label="Body weight in kg"><span>kg</span></label></div>` : ''}
+      <div class="setrow2"><div><div style="font-weight:600">Body weight</div><div class="tiny">Used for benchmark targets</div></div><label class="fld" style="width:120px"><input type="text" inputmode="decimal" data-bw value="${esc(P.bw || '')}" placeholder="80" aria-label="Body weight in kg"><span>kg</span></label></div>
       ${sw('auto', 'Start rest timer when I tick a set')}${sw('sound', 'Beep and vibrate when rest ends')}${sw('anim', 'Animate exercise figures', 'Turn off to save battery')}
       <div class="setrow2"><div style="font-weight:600">Appearance</div><div class="seg">${[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button type="button" data-themeset="${k}" aria-pressed="${P.theme === k}">${l}</button>`).join('')}</div></div>
       <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${S.status === 'local' ? 'In this browser on this device. The two workout plans keep separate logs.' : 'In your connected account, with a copy on this device. The two workout plans keep separate logs.'}</div></div></div>
@@ -3031,6 +3583,7 @@ const BENCH = [
     if (d.ex && !t.closest('#sheet')) return openEx(d.ex);
     if (d.pb != null || d.pa != null) { const r = rec(S.date, true); if (d.pb != null) r.pb = r.pb === +d.pb ? null : +d.pb; else r.pa = r.pa === +d.pa ? null : +d.pa; touch(S.date); return render(true); }
     if (d.mc) { const r = rec(S.date, true); r.mc = r.mc === d.mc ? null : d.mc; touch(S.date); return render(true); }
+    if (d.lg) { const r = rec(S.date, true); r.lg = r.lg === d.lg ? null : d.lg; touch(S.date); return render(true); }
     if (d.nb != null) { const r = rec(S.date, true); r.nb = r.nb === +d.nb ? null : +d.nb; touch(S.date); return render(true); }
     if (d.cz) { const r = rec(S.date, true); r.cz = r.cz === d.cz ? null : d.cz; touch(S.date); return render(true); }
     if (d.cgate != null) { S.profile.calmGate = S.profile.calmGate || {}; S.profile.calmGate[d.cgate] = !S.profile.calmGate[d.cgate]; touchProf(); return render(true); }
@@ -3052,7 +3605,7 @@ const BENCH = [
       touch(S.date);
       if (on) {
         const pd = pday(S.date), T = D[pd.dayId], idx = +key.split(':')[0];
-        const it = T && T.items[idx] ? resolveItem(T.items[idx], pd.week, pd.deload) : null;
+        const it = T && T.items[idx] ? resolveFor(T.items[idx], pd) : null;
         if (it && it.rest && S.profile.auto) Timer.start(it.rest, `${EX[it.x].n}, set ${j + 1} done`);
       }
       return;
@@ -3075,6 +3628,11 @@ const BENCH = [
     if (d.sw) { S.profile[d.sw] = !S.profile[d.sw]; touchProf(); if (d.sw === 'anim') FIG.setEnabled(S.profile.anim); if (d.sw === 'anim' || d.sw === 'calm') render(true); return openSettings(); }
     if (d.themeset) { S.profile.theme = d.themeset; touchProf(); applyTheme(); return openSettings(); }
     if (d.ladder) { const [k, dv] = d.ladder.split('|'); const n = LADDERS[k].steps.length; S.profile.ladder[k] = Math.max(0, Math.min(n - 1, (S.profile.ladder[k] || 0) + +dv)); touchProf(); return render(true); }
+    if (d.bgate != null) {
+      S.profile.barGate = S.profile.barGate || {}; S.profile.barGate[d.bgate] = !S.profile.barGate[d.bgate];
+      if (gateTicked()) { if (!S.profile.barGateAt) S.profile.barGateAt = todayStr(); } else delete S.profile.barGateAt;
+      touchProf(); return render(true);
+    }
     if (d.gate != null) { S.profile.gate[d.gate] = !S.profile.gate[d.gate]; touchProf(); t.setAttribute('aria-pressed', !!S.profile.gate[d.gate]); return; }
     if (d.benchsave) {
       const inp = $(`[data-bench="${d.benchsave}"]`); const v = inp && inp.value.trim();
