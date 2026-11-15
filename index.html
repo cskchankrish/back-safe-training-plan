@@ -331,6 +331,12 @@ svg.fig{pointer-events:none}
 body.timer-on main{padding-bottom:calc(190px + env(safe-area-inset-bottom,0px))}
 @media (min-width:900px){body.timer-on main{padding-bottom:110px}}
 .banner.calm{border-left:5px solid #8e9aa4}
+.syncrow>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.synccode{font-family:var(--disp);font-weight:700;font-size:1.3rem;letter-spacing:.06em;font-variant-numeric:tabular-nums;user-select:all;-webkit-user-select:all;word-break:break-all;color:var(--ink)}
+.syncbtns{display:flex;flex-wrap:wrap;gap:8px}
+.syncin{display:flex;gap:8px;align-items:center}
+.syncin .fld{flex:1;min-width:0}
+.syncin .fld input{padding-right:12px;text-transform:uppercase;letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -2935,10 +2941,10 @@ const FAQ_NECK = [
   function touch(date, soon) {
     const r = rec(date, true); r.u = Date.now();
     clearTimeout(touchT);
-    const go = () => { saveLocal(); Cloud.markDay(date); };
+    const m = S.mode, go = () => { saveLocal(); Cloud.markDay(date); Sync.markDay(m, date); };
     if (soon) touchT = setTimeout(go, 500); else go();
   }
-  function touchProf() { S.profile.u = Date.now(); saveLocal(); Cloud.markProf(); }
+  function touchProf() { S.profile.u = Date.now(); saveLocal(); Cloud.markProf(); Sync.markProf(S.mode); }
 
   /* ---------- account sync (db capability) ---------- */
   const Cloud = {
@@ -3033,8 +3039,218 @@ const FAQ_NECK = [
     const el = $('#sync');
     if (!el) return;
     el.dataset.s = s;
-    el.textContent = { local: 'Saved on this device', synced: 'Saved to your account', saving: 'Saving', error: 'Sync paused, saved on this device' }[s] || '';
+    const sy = Sync.enabled();
+    el.textContent = { local: 'Saved on this device', synced: sy ? 'Synced across devices' : 'Saved to your account', saving: sy ? 'Syncing' : 'Saving', error: 'Sync paused, saved on this device' }[s] || '';
   }
+
+  /* ---------- device sync by sync code (/api/sync, no login) ---------- */
+  // The code lives only in its own localStorage key and is sent only as the x-sync-code header to this
+  // site's /api/sync. Merge rule as in Cloud: newer `u` wins per day record and per profile, all three modes.
+  const SYNC_LS = 'rebuild-build.sync', SYNC_A = 'ABCDEFGHJKMNPQRSTVWXYZ23456789', SYNC_MODES = ['back', 'strength', 'neck'];
+  const Sync = {
+    st: null, dirty: new Set(), dirtyProf: new Set(), pendReset: {}, remote: {}, t: null, iv: null, busy: false, tries: 0, fails: 0, until: 0, reconciled: false, draft: '', msg: '', pend: null, pendFrom: null, pick: false,
+    norm: s => String(s || '').toUpperCase().replace(/[\s-]/g, ''),
+    valid: s => typeof s === 'string' && s.length === 20 && [...s].every(c => SYNC_A.includes(c)),
+    fmt: c => (c || '').match(/.{1,5}/g).join('-'),
+    link() { return location.origin + location.pathname + '#sync=' + this.st.code; },
+    gen() { // rejection sampling: accept bytes < 240 (= 30 * 8), so byte % 30 is unbiased
+      let c = ''; const b = new Uint8Array(32);
+      while (c.length < 20) { crypto.getRandomValues(b); for (const x of b) if (x < 240 && c.length < 20) c += SYNC_A[x % 30]; }
+      return c;
+    },
+    load() { try { const o = JSON.parse(localStorage.getItem(SYNC_LS) || 'null'); if (o && this.valid(o.code)) this.st = { code: o.code, v: +o.v || 0, resetSeen: o.resetSeen && typeof o.resetSeen === 'object' ? o.resetSeen : {}, last: +o.last || 0 }; if (this.st && o.fresh) this.st.fresh = true; } catch (e) { /* storage unavailable */ } },
+    save() { try { if (this.st) localStorage.setItem(SYNC_LS, JSON.stringify(this.st)); else localStorage.removeItem(SYNC_LS); } catch (e) { /* ignore */ } },
+    enabled() { return !!(this.st && this.st.code); },
+    markDay(m, d) { if (!this.enabled()) return; this.dirty.add(m + '|' + d); this.schedule(); },
+    markProf(m) { if (!this.enabled()) return; this.dirtyProf.add(m); this.schedule(); },
+    async req(method, body, v) {
+      const r = await fetch('/api/sync' + (method === 'GET' ? '?v=' + encodeURIComponent(v) : ''), { method, cache: 'no-store', headers: Object.assign({ 'x-sync-code': this.st.code }, body ? { 'Content-Type': 'application/json' } : {}), body: body ? JSON.stringify(body) : undefined });
+      let j = null; try { j = await r.json(); } catch (e) { /* not JSON */ }
+      if (!r.ok || !j) { const e = new Error((j && j.error) || 'http_' + r.status); e.status = r.status; e.code = j && j.error; throw e; }
+      return j;
+    },
+    // Start (boot, after pairing): full pull, then mark every local record newer than the remote as dirty.
+    start() {
+      if (!this.enabled()) return;
+      clearInterval(this.iv); this.iv = setInterval(() => { if (!document.hidden) this.sync(); }, 60000);
+      this.reconciled = false; this.until = 0; setStatus('saving'); this.sync();
+    },
+    stop() { clearInterval(this.iv); clearTimeout(this.t); this.iv = this.t = null; this.dirty.clear(); this.dirtyProf.clear(); this.pendReset = {}; this.remote = {}; this.reconciled = false; this.pick = false; },
+    wake() { if (this.enabled()) { this.until = 0; this.sync(); } },
+    async sync() {
+      if (!this.enabled() || Date.now() < this.until) return;
+      const full = !this.reconciled, ok = await this.pull(full);
+      if (ok) {
+        if (full) { this.reconciled = true; this.reconcile(); }
+        if (this.dirty.size || this.dirtyProf.size || Object.keys(this.pendReset).length) this.schedule(); else setStatus('synced');
+      }
+      this.refreshSheet();
+    },
+    async pull(full) {
+      const code = this.st.code;
+      try {
+        const j = await this.req('GET', null, full ? 0 : this.st.v);
+        if (!this.st || this.st.code !== code) return false;
+        if (!j.unchanged) {
+          if (j.exists) this.merge(j); else this.remote = {};
+          this.st.v = +j.v || 0;
+          delete this.st.fresh; // first pull with this code is done: later resets do delete older local days
+          const pick = this.pick; this.pick = false;
+          if (pick && j.exists) this.adoptMode();
+        }
+        this.ok(); return true;
+      } catch (e) { if (this.st && this.st.code === code) this.fail(e, false); return false; }
+    },
+    merge(j) {
+      // First pull after pairing: adopt the server's reset times without deleting anything. Those resets
+      // happened before this device joined, so its own older days are kept (the server just won't take them).
+      let changed = false; const rem = this.remote = {}, seen = this.st.resetSeen, fresh = !!this.st.fresh;
+      SYNC_MODES.forEach(m => {
+        const R = (j.modes || {})[m] || {}, rd = R.days || {}, M = S.modes[m] || (S.modes[m] = emptyMode(m)), ru = rem[m] = { prof: (R.profile && R.profile.u) || 0, days: {} };
+        const rt = +((j.reset || {})[m]) || 0;
+        if (rt > (+seen[m] || 0)) { if (!fresh) for (const k in M.days) if ((M.days[k].u || 0) < rt) { delete M.days[k]; this.dirty.delete(m + '|' + k); changed = true; } seen[m] = rt; }
+        const floor = +seen[m] || 0;
+        for (const k in rd) {
+          const r = rd[k]; if (!r || typeof r !== 'object') continue;
+          ru.days[k] = r.u || 0;
+          const l = M.days[k];
+          if ((r.u || 0) >= floor && (!l || (r.u || 0) > (l.u || 0))) { M.days[k] = r; changed = true; }
+        }
+        if (R.profile && (R.profile.u || 0) > (M.profile.u || 0)) { M.profile = Object.assign(defP(m), R.profile); changed = true; }
+      });
+      this.save();
+      if (changed) { activateMode(S.mode); saveLocal(); applyTheme(); FIG.setEnabled(S.profile.anim); softRender(); }
+    },
+    reconcile() {
+      SYNC_MODES.forEach(m => {
+        const M = S.modes[m], ru = this.remote[m] || { prof: 0, days: {} }, floor = +this.st.resetSeen[m] || 0;
+        if (!M) return;
+        // Days not newer than the mode's reset are kept locally but never sent: the server would drop them.
+        for (const k in M.days) { const u = M.days[k].u || 0; if (u > floor && u > (ru.days[k] || 0)) this.dirty.add(m + '|' + k); }
+        if ((M.profile.u || 0) > ru.prof) this.dirtyProf.add(m);
+      });
+    },
+    schedule(ms) {
+      clearTimeout(this.t);
+      if (!this.enabled() || !(this.dirty.size || this.dirtyProf.size || Object.keys(this.pendReset).length)) return;
+      if (Date.now() >= this.until) setStatus('saving'); // while backing off, keep showing "Sync paused"
+      this.t = setTimeout(() => this.flush(), Math.max(ms || 1500, this.until - Date.now()));
+    },
+    async flush() {
+      if (!this.enabled()) return;
+      if (this.busy) { this.schedule(); return; }
+      this.busy = true;
+      const code = this.st.code, body = { modes: {} }, days = [], profs = [...this.dirtyProf], reset = Object.assign({}, this.pendReset);
+      let size = 0;
+      for (const x of this.dirty) { // stay well under the server limits (400 records, 512 KB)
+        const i = x.indexOf('|'), m = x.slice(0, i), k = x.slice(i + 1), r = S.modes[m] && S.modes[m].days[k];
+        if (!r) { this.dirty.delete(x); continue; }
+        size += JSON.stringify(r).length + 20;
+        if (days.length >= 380 || (days.length && size > 400000)) break;
+        days.push(x); const B = body.modes[m] = body.modes[m] || {}; (B.days = B.days || {})[k] = r;
+      }
+      profs.forEach(m => { (body.modes[m] = body.modes[m] || {}).profile = S.modes[m].profile; });
+      if (Object.keys(reset).length) body.reset = reset;
+      days.forEach(x => this.dirty.delete(x)); profs.forEach(m => this.dirtyProf.delete(m)); Object.keys(reset).forEach(m => delete this.pendReset[m]);
+      const v0 = this.st.v;
+      let again = false;
+      try {
+        const j = await this.req('POST', body);
+        if (!this.st || this.st.code !== code) { this.busy = false; return; }
+        days.forEach(x => { const i = x.indexOf('|'), m = x.slice(0, i), k = x.slice(i + 1), r = body.modes[m].days[k]; (this.remote[m] = this.remote[m] || { prof: 0, days: {} }).days[k] = r.u || 0; });
+        // Only advance v when nobody else wrote in between, so their changes still arrive on the next pull.
+        if (+j.v === v0 + (j.written ? 1 : 0)) this.st.v = +j.v;
+        this.tries = 0; this.ok();
+        again = !!(this.dirty.size || this.dirtyProf.size || Object.keys(this.pendReset).length);
+        if (!again) setStatus('synced');
+      } catch (e) {
+        if (this.st && this.st.code === code) {
+          days.forEach(x => this.dirty.add(x)); profs.forEach(m => this.dirtyProf.add(m));
+          for (const m in reset) if (!this.pendReset[m]) this.pendReset[m] = reset[m];
+          this.fail(e, true);
+        }
+      }
+      this.busy = false;
+      if (again) this.schedule(300);
+      this.refreshSheet();
+    },
+    // Settings sheet open: redraw it so "Last synced" and the plan buttons are current. Never while the
+    // user is typing in it; keep its scroll position and, where possible, the focused control.
+    refreshSheet() {
+      if (S.sheet !== 'settings') return;
+      const sh = $('#sheet'), a = document.activeElement;
+      if (!sh) return;
+      if (a && sh.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT' || a.isContentEditable)) return;
+      const y = sh.scrollTop, btns = () => [...sh.querySelectorAll('button')], fi = a && sh.contains(a) && a.tagName === 'BUTTON' ? btns().indexOf(a) : -1;
+      openSettings();
+      sh.scrollTop = y;
+      if (fi >= 0) { const b = btns()[fi]; if (b) b.focus({ preventScroll: true }); }
+    },
+    // Any logged or trained day in any plan on this device?
+    hasLogs() {
+      const filled = r => !!r && typeof r === 'object' && !!(r.done || Object.values(r.sets || {}).some(a => (a || []).some(x => x && (x[0] || x[1] || x[2])))
+        || Object.values(r.chk || {}).some(Boolean) || ['pb', 'pa', 'nb', 'mc', 'lg', 'cz'].some(k => r[k] != null) || (r.notes && String(r.notes).trim()));
+      return SYNC_MODES.some(m => { const M = S.modes[m]; return !!M && Object.values(M.days || {}).some(filled); });
+    },
+    // After joining from a device with no logs: open the plan the synced log was used for most recently.
+    adoptMode() {
+      let best = null, bu = 0;
+      SYNC_MODES.forEach(m => {
+        const M = S.modes[m]; if (!M) return;
+        let u = (M.profile && M.profile.u) || 0;
+        for (const k in M.days) u = Math.max(u, (M.days[k] && M.days[k].u) || 0);
+        if (u > bu) { bu = u; best = m; }
+      });
+      if (!best) return;
+      activateMode(best); saveLocal();
+      S.tab = 'today'; S.date = todayStr(); S.planSel = null;
+      applyTheme(); FIG.setEnabled(S.profile.anim); render(false);
+    },
+    ok() { this.fails = 0; this.until = 0; this.st.last = Date.now(); this.save(); },
+    fail(e, retry) {
+      const st = e && e.status, transient = !st || st === 429 || st >= 500 && e.code !== 'sync_not_configured';
+      setStatus('error');
+      clearTimeout(this.t);
+      if (retry && transient && (this.tries = this.tries + 1) <= 3) { this.t = setTimeout(() => this.flush(), 1500 * 2 ** this.tries + Math.random() * 1000); return; }
+      this.tries = 0; this.fails++;
+      this.until = Date.now() + Math.min(600000, 30000 * 2 ** Math.min(this.fails, 5)); // wait for a later trigger
+    },
+    // Reset this plan: tell the other devices, and drop any unsent days of that mode.
+    reset(m) {
+      if (!this.enabled()) return;
+      const ts = Date.now();
+      [...this.dirty].forEach(x => { if (x.startsWith(m + '|')) this.dirty.delete(x); });
+      this.pendReset[m] = ts; this.st.resetSeen[m] = ts; this.save();
+      this.dirtyProf.add(m); this.until = 0; this.schedule();
+    },
+    join(code) {
+      const empty = !this.hasLogs(); // captured before anything is merged
+      this.stop(); this.st = { code, v: 0, resetSeen: {}, last: 0, fresh: true }; this.pick = empty; this.draft = ''; this.msg = ''; this.save(); this.start();
+    },
+    off() { this.stop(); this.st = null; this.save(); setStatus(Cloud.db ? 'synced' : 'local'); },
+    ask(raw, from) {
+      const code = this.norm(raw);
+      if (!this.valid(code)) { this.msg = 'That code does not look right. It has 20 letters and numbers.'; return openSettings(); }
+      if (this.st && this.st.code === code) { this.msg = 'This device already uses that code.'; return openSettings(); }
+      this.pend = code; this.pendFrom = from; this.msg = '';
+      openSheet(`<div class="sheet-h"><h2>Connect this device?</h2><button class="iconbtn" data-act="sync-cancel" aria-label="Close">${I.close}</button></div>
+        <p>This device will join the synced log for code <span class="synccode">${esc(this.fmt(code))}</span>.</p>
+        <p class="tiny">Logs are merged day by day, and the most recently edited version of each day is kept.${this.enabled() ? ' This device will stop using its current sync code.' : ''}</p>
+        <div class="syncbtns"><button class="btn primary" data-act="sync-confirm">Connect</button><button class="btn" data-act="sync-cancel">Cancel</button></div>`, 'sync-confirm');
+    },
+    lastText() {
+      const t = this.st && this.st.last; if (!t) return 'Not synced yet.';
+      const d = new Date(t), ds = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`, tm = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      return 'Last synced ' + (ds === todayStr() ? 'today at ' + tm : fmtShort(ds) + ' at ' + tm) + '.';
+    },
+    async copy(btn) {
+      const link = this.link(), done = () => { const o = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => { if (btn.isConnected) btn.textContent = o; }, 1600); };
+      try { await navigator.clipboard.writeText(link); return done(); } catch (e) { /* fall through */ }
+      try { const ta = document.createElement('textarea'); ta.value = link; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;opacity:0;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); if (ok) return done(); } catch (e) { /* fall through */ }
+      const el = $('[data-sync-show]'); if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+      btn.textContent = 'Copy the code';
+    },
+  };
 
   /* ---------- plan helpers ---------- */
   const pday = date => {
@@ -3661,7 +3877,16 @@ const FAQ_NECK = [
       <div class="setrow2"><div><div style="font-weight:600">Body weight</div><div class="tiny">Used for benchmark targets</div></div><label class="fld" style="width:120px"><input type="text" inputmode="decimal" data-bw value="${esc(P.bw || '')}" placeholder="80" aria-label="Body weight in kg"><span>kg</span></label></div>
       ${sw('auto', 'Start rest timer when I tick a set')}${sw('sound', 'Beep and vibrate when rest ends')}${sw('anim', 'Animate exercise figures', 'Turn off to save battery')}
       <div class="setrow2"><div style="font-weight:600">Appearance</div><div class="seg">${[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button type="button" data-themeset="${k}" aria-pressed="${P.theme === k}">${l}</button>`).join('')}</div></div>
-      <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${S.status === 'local' ? 'In this browser on this device. Each workout plan keeps its own log.' : 'In your connected account, with a copy on this device. Each workout plan keeps its own log.'}</div></div></div>
+      <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${esc(Sync.enabled() ? `Synced across the devices that use your sync code, with a copy in this browser${Cloud.db ? ' and in your connected account' : ''}. Each workout plan keeps its own log.` : Cloud.db ? 'In your connected account, with a copy on this device. Each workout plan keeps its own log.' : 'In this browser on this device. Each workout plan keeps its own log.')}</div></div></div>
+      ${Sync.enabled() ? `<div class="setrow2 syncrow"><div><div style="font-weight:600">Sync across devices</div><div class="tiny">On. Open the link on your other device, or enter this code there:</div>
+        <div class="synccode" data-sync-show>${esc(Sync.fmt(Sync.st.code))}</div>
+        <div class="syncbtns"><button class="btn sm" data-act="sync-copy">Copy link</button>${navigator.share ? '<button class="btn sm" data-act="sync-share">Share</button>' : ''}<button class="btn sm" data-act="sync-off">Stop syncing on this device</button></div>
+        <div class="tiny">Anyone with this code or link can see and change this log. Share it only with your own devices.</div>
+        <div class="tiny">${esc(Sync.lastText())}${S.status === 'error' ? ' Sync is paused; your log is still saved on this device.' : ''}</div></div></div>`
+      : `<div class="setrow2"><div><div style="font-weight:600">Sync across devices</div><div class="tiny">Use one log on your phone and computer. No account needed.</div></div><button class="btn sm" data-act="sync-on">Turn on sync</button></div>
+      <div class="setrow2 syncrow"><div><div style="font-weight:600">Have a code from another device?</div>
+        <div class="syncin"><label class="fld"><input type="text" data-sync-code value="${esc(Sync.draft)}" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Sync code"></label><button class="btn sm" data-act="sync-connect">Connect</button></div></div></div>`}
+      ${Sync.msg ? `<p class="tiny" role="alert">${esc(Sync.msg)}</p>` : ''}
       ${Cloud.dl ? `<div class="setrow2"><div style="font-weight:600">Export your log</div><button class="btn sm" data-act="csv">Download CSV</button></div>` : ''}
       <div class="setrow2"><div><div style="font-weight:600">Reset this plan</div><div class="tiny">Deletes only this plan’s logs and settings. The other plans stay saved.</div></div><button class="btn sm" data-act="reset">${S.resetArm ? 'Tap again to delete' : 'Reset'}</button></div>`;
     openSheet(h, 'settings');
@@ -3779,12 +4004,13 @@ const FAQ_NECK = [
       return;
     }
     if (d.act === 'done' || d.act === 'undone') { const r = rec(S.date, true); r.done = d.act === 'done'; r.doneAt = r.done ? Date.now() : null; touch(S.date); return render(true); }
-    if (d.act === 'settings') { S.resetArm = false; return openSettings(); }
+    if (d.act === 'settings') { S.resetArm = false; Sync.msg = ''; return openSettings(); }
     if (d.act === 'close') { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } return; }
     if (d.act === 'reset') {
       if (!S.resetArm) { S.resetArm = true; return openSettings(); }
       S.resetArm = false; S.days = {}; S.profile = normalizeMode(S.mode, { profile: defP(S.mode), days: {} }).profile; S.modes[S.mode] = { profile: S.profile, days: S.days }; touchProf();
       if (Cloud.db && S.mode === 'back') { Cloud.dirty.clear(); Cloud.remoteU = {}; Cloud.exists.forEach(m => Cloud.months.doc(m).set({ days: {} }).catch(() => {})); }
+      Sync.reset(S.mode);
       saveLocal(); closeSheet(); applyTheme(); return render(false);
     }
     if (d.mode) {
@@ -3793,6 +4019,13 @@ const FAQ_NECK = [
       applyTheme(); FIG.setEnabled(S.profile.anim); closeSheet(); render(false); return openSettings();
     }
     if (d.act === 'csv') { exportCSV(); return; }
+    if (d.act === 'sync-on') { Sync.join(Sync.gen()); return openSettings(); }
+    if (d.act === 'sync-connect') { const inp = $('[data-sync-code]'); return Sync.ask(inp ? inp.value : Sync.draft, 'settings'); }
+    if (d.act === 'sync-confirm') { const c = Sync.pend, from = Sync.pendFrom; Sync.pend = null; closeSheet(); if (c) Sync.join(c); if (from === 'settings') openSettings(); else if (pendingSoft) { pendingSoft = false; render(true); } return; }
+    if (d.act === 'sync-cancel') { const from = Sync.pendFrom; Sync.pend = null; closeSheet(); if (from === 'settings') openSettings(); else if (pendingSoft) { pendingSoft = false; render(true); } return; }
+    if (d.act === 'sync-copy') { if (Sync.enabled()) Sync.copy(t); return; }
+    if (d.act === 'sync-share') { if (Sync.enabled() && navigator.share) navigator.share({ title: 'Rebuild & Build sync link', url: Sync.link() }).catch(() => {}); return; }
+    if (d.act === 'sync-off') { Sync.off(); return openSettings(); }
     if (d.sw) { S.profile[d.sw] = !S.profile[d.sw]; touchProf(); if (d.sw === 'anim') FIG.setEnabled(S.profile.anim); if (d.sw === 'anim' || d.sw === 'calm') render(true); return openSettings(); }
     if (d.themeset) { S.profile.theme = d.themeset; touchProf(); applyTheme(); return openSettings(); }
     if (d.ladder) { const [k, dv] = d.ladder.split('|'); const n = LADDERS[k].steps.length; S.profile.ladder[k] = Math.max(0, Math.min(n - 1, (S.profile.ladder[k] || 0) + +dv)); touchProf(); return render(true); }
@@ -3812,6 +4045,7 @@ const FAQ_NECK = [
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && S.sheet) closeSheet();
+    if (e.key === 'Enter' && e.target.matches('[data-sync-code]')) { e.preventDefault(); Sync.ask(e.target.value, 'settings'); return; }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-ex]')) { e.preventDefault(); openEx(e.target.dataset.ex); }
   });
   document.addEventListener('input', e => {
@@ -3820,6 +4054,7 @@ const FAQ_NECK = [
     if (d.notes != null) { const r = rec(S.date, true); r.notes = t.value; touch(S.date, true); return; }
     if (d.q != null) { S.libQ = t.value; const pos = t.selectionStart; render(true); const n = $('[data-q]'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
     if (d.bw != null) { const v = parseFloat(t.value); S.profile.bw = isFinite(v) && v > 20 && v < 300 ? v : null; touchProf(); return; }
+    if (d.syncCode != null) { Sync.draft = t.value; return; } // keep the typed code; never re-render while typing
   });
   document.addEventListener('change', e => {
     const t = e.target;
@@ -3833,7 +4068,7 @@ const FAQ_NECK = [
   });
   document.addEventListener('focusout', () => { setTimeout(() => { if (pendingSoft && !S.sheet) { const a = document.activeElement; if (!a || !(a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) { pendingSoft = false; render(true); } } }, 50); });
   $('#scrim').addEventListener('click', () => { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && S.tab === 'today') { const t = todayStr(); if (S.lastSeenDay && S.lastSeenDay !== t && S.date === S.lastSeenDay) { S.date = t; render(false); } S.lastSeenDay = t; } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) Sync.wake(); if (!document.hidden && S.tab === 'today') { const t = todayStr(); if (S.lastSeenDay && S.lastSeenDay !== t && S.date === S.lastSeenDay) { S.date = t; render(false); } S.lastSeenDay = t; } });
 
   async function exportCSV() {
     const rows = [['date', 'phase', 'session', 'exercise', 'set', 'value_1', 'value_2', 'done', 'pain_before', 'pain_after', 'numbness', 'session_complete']];
@@ -3854,10 +4089,16 @@ const FAQ_NECK = [
     S.lastSeenDay = todayStr();
     $('.top-in').innerHTML = `<div class="brand"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#d7263d"/><circle cx="12" cy="12" r="7.2" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1.2"/><circle cx="12" cy="12" r="2.4" fill="var(--bg)"/></svg>Rebuild &amp; Build</div><div class="sync" id="sync" role="status"></div><button class="iconbtn" data-act="settings" aria-label="Settings">${I.gear}</button>`;
     $('.tabs').innerHTML = [['today', 'Today', I.today], ['plan', 'Plan', I.plan], ['care', 'Back care', I.care], ['lib', 'Exercises', I.lib], ['prog', 'Progress', I.prog]].map(([k, l, ic]) => `<button type="button" data-tab="${k}">${ic}<span>${l}</span></button>`).join('');
+    Sync.load();
+    // Pairing link: #sync=CODE. The fragment never reaches the server; drop it from the address bar at once.
+    const hm = /(?:^#|&)sync=([^&]*)/.exec(location.hash || ''); let linked = null;
+    if (hm) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignore */ } const c = Sync.norm(decodeURIComponent(hm[1])); if (Sync.valid(c) && !(Sync.st && Sync.st.code === c)) linked = c; }
     setStatus('local');
     FIG.setEnabled(S.profile.anim);
     render(false);
     Cloud.init();
+    Sync.start();
+    if (linked) Sync.ask(linked, 'link');
   }
   boot();
 })();
