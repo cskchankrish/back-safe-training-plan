@@ -331,6 +331,12 @@ svg.fig{pointer-events:none}
 body.timer-on main{padding-bottom:calc(190px + env(safe-area-inset-bottom,0px))}
 @media (min-width:900px){body.timer-on main{padding-bottom:110px}}
 .banner.calm{border-left:5px solid #8e9aa4}
+.syncrow>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.synccode{font-family:var(--disp);font-weight:700;font-size:1.3rem;letter-spacing:.06em;font-variant-numeric:tabular-nums;user-select:all;-webkit-user-select:all;word-break:break-all;color:var(--ink)}
+.syncbtns{display:flex;flex-wrap:wrap;gap:8px}
+.syncin{display:flex;gap:8px;align-items:center}
+.syncin .fld{flex:1;min-width:0}
+.syncin .fld input{padding-right:12px;text-transform:uppercase;letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -585,6 +591,10 @@ const FIG = (() => {
       else if (g === 'biceps') { G(segOff(J.s1, J.e1, 2), 8); if (v === 'front') G(segOff(J.s2, J.e2, -2), 8); }
       else if (g === 'triceps') { G(segOff(J.s1, J.e1, -2), 8); if (v === 'front') G(segOff(J.s2, J.e2, 2), 8); }
       else if (g === 'traps') G(pathLine([J.sh, J.neck]), 11);
+      else if (g === 'neckpain') {
+        out.push({ t: 'circle', a: { cx: J.neck[0], cy: J.neck[1], r: 7 }, c: 'fg-injury-ring' });
+        out.push({ t: 'ellipse', a: { cx: J.neck[0], cy: J.neck[1], rx: 4, ry: 5.5 }, c: 'fg-injury' });
+      }
       else if (g === 'injury') {
         const p = add(quad(J.hip, J.ctrl, J.sh, 0.2), quadTan(J.hip, J.ctrl, J.sh, 0.2) + 90, 4.5);
         out.push({ t: 'circle', a: { cx: p[0], cy: p[1], r: 8 }, c: 'fg-injury-ring' });
@@ -1422,13 +1432,24 @@ const FIGS = (() => {
     p1: { t: 90, a1: { r: [-150, 60] }, a2: { r: [-146, 64] }, l1: [0, -90, 0], l2: [-1, -91, 0], anchor: { j: 'an1', at: [39, 4] } },
     still: false, props: [{ k: 'line', a: [-14, 0], b: [-14, 176], w: 4 }], hl: ['quads1'],
   });
+  /* ---------- neck care ---------- */
+  S('chintuck', { p0: { h: 64 }, p1: { h: 92 }, hl: ['traps'] });
+  S('neckiso', { p0: { h: 88, a1: { ik: { j: 'head', d: [11, 3] }, bend: -1 } }, still: true, hl: ['traps'] });
+  V('neckrom', { p0: { h: 112 }, p1: { h: 68 }, hl: ['traps'] });
+  V('trapstretch', { p0: { h: 90 }, p1: { h: 60, a2: { ik: { j: 'head', d: [-3, 10] }, bend: 1 } }, hl: ['traps'] });
+  S('levstretch', { p0: { h: 90 }, p1: { h: 48, a1: { ik: { j: 'head', d: [-7, 7] }, bend: 1 } }, hl: ['traps'] });
+  const dnfLie = { hip: [60, 7], t: 180, a1: [-4, 4], a2: [-2, 2], l1: { ik: [93, 4], bend: 1, ft: 0 }, l2: { ik: [90, 4], bend: 1, ft: 0 } };
+  S('dnf', { p0: X(dnfLie, { h: 180 }), p1: X(dnfLie, { h: 167 }), hl: ['traps'] });
+  V('wallangel', { p0: { a1: [205, 95], a2: [-25, 85] }, p1: { a1: [125, 95], a2: [55, 85] }, hl: ['upperback', 'delts'] });
+  V('doorpec', { p0: { a1: [180, 90], a2: [0, 90] }, still: true, props: [{ k: 'line', a: [-47, 0], b: [-47, 185], w: 4 }, { k: 'line', a: [47, 0], b: [47, 185], w: 4 }], hl: ['chest'] });
+  V('neckview', { crop: 40, p0: { a1: [-106, -100], a2: [-74, -80] }, still: true, hl: ['neckpain'] });
   V('backview', { crop: 40, p0: { a1: [-106, -100], a2: [-74, -80] }, still: true, hl: ['injury'] });
   return F;
 })();
 
 /* ===== Exercise library ===== */
 const CATS = [
-  ['care', 'Back care'], ['spine', 'Back & side extensions'], ['core', 'Core'], ['legs', 'Legs & glutes'],
+  ['neck', 'Neck care'], ['care', 'Back care'], ['spine', 'Back & side extensions'], ['core', 'Core'], ['legs', 'Legs & glutes'],
   ['push', 'Chest & push'], ['pull', 'Back & pull'], ['arms', 'Shoulders & arms'], ['athletic', 'Athletic & cardio'],
 ];
 const EX = {
@@ -1728,6 +1749,31 @@ Object.assign(EX, {
   sideabd: { n: 'Side-lying leg raise', c: 'legs', m: 'Glute medius, hip abductors', eq: 'Floor or mat',
     cues: ['Lie on your side, bottom knee slightly bent for balance, top leg straight in line with your body.', 'Lift the top leg 30–40 cm with your toes pointing forward, pause 2 s, then lower slowly.', 'Lying on your right side works the left leg; do that side first.'],
     avoid: 'Rolling backwards or swinging the leg forward.' },
+  chintuck: { n: 'Chin tuck', c: 'neck', m: 'Deep neck flexors, posture', eq: 'None', log: 'x',
+    cues: ['Sit or stand tall, eyes level.', 'Slide your head straight back, as if making a double chin. Your nose stays level; you are not nodding.', 'Hold 5 s, feeling the back of your neck lengthen, then relax.'],
+    avoid: 'Tilting your head up or down, or forcing the end of the range.' },
+  dnf: { n: 'Lying chin-tuck nod', c: 'neck', m: 'Deep neck flexors', eq: 'Floor or mat', log: 'x',
+    cues: ['Lie on your back, knees bent, head on the floor or a thin folded towel.', 'Nod your chin gently toward your throat, as if saying a small “yes”, and hold 10 s. The big muscles at the front of your neck stay soft.', 'Head-lift step: keep the tuck and lift your head 2 cm off the floor. Lower when the chin starts to poke up.'],
+    avoid: 'Lifting your head by jutting the chin forward. If the tuck is lost, the set is over.' },
+  neckiso: { n: 'Neck isometric hold', c: 'neck', m: 'Neck flexors, extensors and side muscles', eq: 'Your hand, later a light band', log: 'x',
+    cues: ['Sit tall with a gentle chin tuck. Put your palm on your forehead.', 'Press head and hand into each other at about half effort without letting your head move. Hold 10 s, breathing normally.', 'Repeat with the hand on the back of your head, then on each side.', 'Band steps: loop a light band around your head, anchored at head height, and hold the same four positions against it.'],
+    avoid: 'Pushing to full effort, holding your breath, or letting your head move.',
+    spine: 'It should feel like muscle effort. Pinching, or anything travelling into your arm, means back off a step.' },
+  neckrom: { n: 'Neck range of motion', c: 'neck', m: 'Neck mobility', eq: 'None', log: 'x',
+    cues: ['Sit tall, shoulders relaxed.', 'Turn slowly to look over one shoulder, then the other. Then tip one ear toward its shoulder, and the other.', 'Go only as far as is comfortable and pause 2 s at each end.'],
+    avoid: 'Rolling your head in full circles or tipping it all the way back.' },
+  trapstretch: { n: 'Upper-trap stretch', c: 'neck', m: 'Upper trapezius', eq: 'Chair',
+    cues: ['Sit tall and hold the seat of the chair with one hand.', 'Tip your other ear toward its shoulder; rest that hand on your head for weight only.', 'Breathe slowly for 20–30 s, then swap sides.'],
+    avoid: 'Pulling on your head. The stretch should be mild.' },
+  levstretch: { n: 'Levator stretch', c: 'neck', m: 'Levator scapulae', eq: 'Chair',
+    cues: ['Sit tall. Turn your head about 45° to one side.', 'Look down toward that armpit and rest the same-side hand on the back of your head.', 'Hold 20–30 s with slow breaths, then swap sides.'],
+    avoid: 'Pulling hard, or letting your shoulders round forward.' },
+  wallangel: { n: 'Wall angel', c: 'neck', m: 'Lower traps, rear shoulder, mid-back mobility', eq: 'Wall', log: 'x',
+    cues: ['Stand with your back, head and hips against a wall, feet a step forward.', 'Arms against the wall in a W. Slide them up toward a Y, keeping ribs down and chin gently tucked.', 'Slide back down slowly, squeezing your shoulder blades down and together.'],
+    avoid: 'Arching your lower back or letting your head come off the wall to reach higher.' },
+  doorpec: { n: 'Doorway chest stretch', c: 'neck', m: 'Chest, front of the shoulders', eq: 'Doorway',
+    cues: ['Forearms on the door frame, elbows at shoulder height.', 'Step one foot through and lean gently until you feel the front of your chest open.', 'Chin tucked, 30 s of slow breathing.'],
+    avoid: 'Poking your head forward as you lean.' },
   proneY: { n: 'Prone Y raise', c: 'care', m: 'Upper back, lower traps, thoracic extensors', eq: 'Floor or mat', log: 'r',
     cues: ['Lie face down with your arms overhead in a Y, thumbs up, forehead on a folded towel.', 'Lift both arms a few centimetres by drawing your shoulder blades down and back. Hold 3 s.', 'Lower slowly. The effort belongs in your upper back, not your neck.'],
     avoid: 'Lifting your head or arching your lower back to get higher.' },
@@ -2738,7 +2784,80 @@ const FAQ_G = [
   { q: 'My gym doesn’t have a sled, hill or certain machine.', a: 'Tap any exercise to see swaps. Sled pushes become uphill sprints or bike sprints; hack squats become leg presses; a Copenhagen plank can be done on any bench.' },
   { q: 'What if I miss a session?', a: 'Don’t double up. If you missed the lower-strength day, do it in place of Friday’s lower-hypertrophy session. Missed anything else? Skip it and carry on.' },
   { q: 'I missed a week or more.', a: 'Move the plan start date in Settings forward by the weeks you missed, and train your first week back at RPE 7 with one set fewer per exercise.' },
+  { q: 'Can women follow this plan?', a: 'Yes, exactly as written. Muscle responds to training the same way in women and men, so the exercises, sets, reps and RPE targets don’t change, and RPE scales every load to you automatically. Three practical notes: use the smallest weight jumps you can find (1.25 kg plates on presses), start pull-ups on the assisted machine or with a band, and read the benchmark targets as roughly 70–80% of the listed numbers for squats and RDLs, 50–65% for the bench and overhead press, and 3–6 pull-ups. If you are pregnant or have recently had a baby, ask your doctor or a pelvic-health physio before you start.' },
   { q: 'Something hurts.', a: 'Muscle soreness is normal. Sharp pain, pain that changes how you move, or pain that lasts more than a few days is not: stop that exercise, use a swap, and get it checked if it doesn’t settle within a week.' },
+];
+
+/* ===== Build + Neck care: the Build plan with a daily neck routine, a neck check-in and neck-friendly lifting ===== */
+MODES.neck = MODES.strength;
+const NECKCARE = [
+  { x: 'chintuck', rx: '10 × 5 s holds' },
+  { x: 'neckrom', rx: '5 slow turns and 5 slow side tilts each way' },
+  { ladder: true },
+  { x: 'tspine', rx: '8–10 slow reps (or lean back over a chair)' },
+  { x: 'wallangel', rx: '10 slow reps' },
+  { x: 'trapstretch', rx: '2 × 20–30 s each side' },
+  { x: 'levstretch', rx: '2 × 20–30 s each side' },
+  { x: 'doorpec', rx: '2 × 30 s' },
+];
+LADDERS.neck = { t: 'Neck strength ladder', steps: [
+  ['Nod', 'Lying chin-tuck nod, 10 × 10 s holds'], ['Head-lift hold', 'Chin tucked, head 2 cm off the floor, 5 × 10 s'],
+  ['Hand isometrics', 'Press into your hand: front, back, left, right, 5 × 10 s each at half effort'],
+  ['Band isometrics', 'Light band around your head: step out and hold, 3 × 20 s each direction'],
+  ['Band reps', 'Slow band-resisted nods, side bends and extensions, 2 × 12–15 each direction'],
+  ['Strong', 'Head lifts off the end of a bench, face up, face down and each side, 2 × 12–15; later hold a 1.25–2.5 kg plate'],
+] };
+const NECK_LADDER_RULE = 'Move up one step after a week of green days at your current step. Drop back one step after an amber morning. Neck work should feel like muscle effort: never pinching, and never anything travelling into your arm.';
+const NECK_LIGHTS = [
+  { k: 'green', t: 'Green: train as written', when: 'Neck pain 0–2/10, no arm symptoms, and no worse the next morning.', do: 'Follow the session and the setup cues on each card. After a week of green days you may move up one step on the neck ladder.' },
+  { k: 'amber', t: 'Amber: train, with the swaps', when: 'Pain 3–4/10, or a stiffer neck the next morning that settles within 24 hours, or some ache or tingling into the shoulder blade or arm.', do: 'Use the amber swap shown on each card: machines instead of a bar on your back, supported pressing instead of the barbell overhead press, no hanging, sprints or jumps. Stay on your current neck-ladder step.' },
+  { k: 'red', t: 'Red: back off today', when: 'Pain 5/10 or more, sharp or catching pain, a clearly worse morning, or arm symptoms that are spreading, numb, or weakening your grip.', do: 'No loaded training today. Do the gentle part of the Neck Care routine (chin tucks, range of motion and stretches, all pain-free) and take an easy walk. Red for three days or more: see a physio or doctor. New numbness or weakness: follow the medical-help box on the Neck Care tab today.' },
+];
+const NECK_REDFLAGS = 'Get same-day emergency care for neck pain after a fall, crash or blow to the head; a sudden severe headache or neck pain unlike any you have had; a fever with a stiff neck and headache; dizziness, double vision, slurred speech, trouble swallowing or fainting; numbness or weakness in both arms or in your legs, clumsy hands or unsteady walking; or new trouble controlling your bladder or bowels. See your doctor soon for arm numbness, tingling or weakness that is spreading or not fading, pain that wakes you at night or never eases whatever position you are in, unexplained weight loss, or neck pain that has not improved after 6 weeks of this routine.';
+// Setup cues shown on the exercise cards in the neck plan
+const NECK_TIPS = (() => {
+  const T = {}, set = (ids, t) => ids.forEach(id => { T[id] = t; });
+  set(['backsquat'], 'Rest the bar on the muscle shelf of your upper back, never on the bony bump at the base of your neck. Look at the floor about 2 m ahead; don’t look up.');
+  set(['frontsquat'], 'Keep your chin level and breathe behind the bar. Don’t crane your head back.');
+  set(['ohp'], 'Pull your chin straight back to let the bar pass, then bring your head through. Don’t poke your chin forward or look up at the bar.');
+  set(['sdbpress'], 'Head resting lightly on the pad, chin level. End the set when your shoulders start to shrug toward your ears.');
+  set(['bench', 'incbb', 'flatdb', 'incdb', 'chestpress', 'skull'], 'Head stays down and relaxed on the bench. Don’t press it into the pad or lift it to watch the weight.');
+  set(['pullup', 'chinup', 'apullup'], 'Finish with your chest toward the bar. Don’t reach your chin over it.');
+  set(['pulldown', 'pulldown_n'], 'Pull to your upper chest, never behind your neck. Chin level.');
+  set(['bbrow', 'dbrow', 'csrow', 'tbar', 'cablerow'], 'Look at the floor a metre or two ahead so your neck stays in line with your back.');
+  set(['rdl', 'dbrdl'], 'Your head follows your spine: at the bottom, look at the floor in front of you, not at the mirror.');
+  set(['plank', 'sideplank', 'pushup', 'copen', 'abwheel'], 'Neck long, eyes on the floor. Don’t let your head hang or look forward.');
+  set(['hangknee', 'hangleg'], 'Keep your shoulders pulled down, away from your ears, for the whole set.');
+  set(['cablecrunch'], 'Hold the rope beside your head and move from your ribs. Never pull on your head or neck.');
+  set(['hollow'], 'Chin gently tucked. If your neck tires before your abs, rest your head on the floor and keep the legs working.');
+  set(['latraise', 'clatraise'], 'Shoulders stay down and relaxed. Stop at shoulder height.');
+  set(['farmer', 'suitcase'], 'Stand tall, shoulders level, chin tucked. Don’t let the weight pull your head forward.');
+  set(['facepull', 'rpd'], 'This builds the muscles that take load off your neck. Pull with your shoulder blades, chin level.');
+  set(['hipthrust'], 'Chin tucked, eyes toward your knees at the top. Don’t throw your head back over the bench.');
+  set(['legpress', 'hack'], 'Rest your head on the pad. Don’t push it back as you strain.');
+  set(['sprint'], 'Relax your jaw and shoulders. Sharp neck pain or tingling in an arm: stop for the day.');
+  return T;
+})();
+// What to do instead on an amber neck day
+const NECK_AMBER = (() => {
+  const A = {}, set = (ids, t) => ids.forEach(id => { A[id] = t; });
+  set(['backsquat', 'frontsquat'], 'use the hack squat or leg press instead, so no bar sits on your shoulders.');
+  set(['ohp'], 'do the seated dumbbell press against a back pad, or the half-kneeling landmine press, at RPE 6–7.');
+  set(['pullup', 'chinup', 'apullup'], 'swap for neutral-grip pulldowns.');
+  set(['hangknee', 'hangleg', 'cablecrunch', 'hollow'], 'swap for dead bugs, head resting on the floor.');
+  set(['farmer', 'suitcase'], 'halve the weight, or do Pallof presses instead.');
+  set(['sprint', 'boxjump', 'broadjump', 'latbound', 'plyopush', 'mbrot'], 'skip it, or swap for 10 min of easy bike.');
+  return A;
+})();
+const NECK_SETUP = ['backsquat', 'ohp', 'bench', 'pullup', 'pulldown', 'bbrow', 'rdl', 'hipthrust', 'cablecrunch', 'farmer'];
+const NECK_HABITS = ['Change position at least every 30 minutes: stand up, roll your shoulders, do 5 chin tucks.', 'Top of your screen at eye level, about an arm’s length away. Raise a laptop on a stand and use a separate keyboard.', 'Bring your phone up to your eyes instead of dropping your head to the phone.', 'Sleep on your back or side with one pillow that fills the gap between your shoulder and head. Avoid sleeping on your stomach.', 'Carry bags on both shoulders or swap sides, and keep phone calls off your shoulder.', 'Stress and poor sleep turn neck pain up. A daily walk and 7–9 hours of sleep are part of the treatment.'];
+const FAQ_NECK = [
+  { q: 'Is it safe to lift weights with constant neck pain?', a: 'For most long-lasting neck pain without the warning signs listed on this tab, yes. Strengthening the neck, shoulders and upper back is one of the best-supported treatments for it. If your neck has never been assessed, or you have symptoms in an arm, see a doctor or physio before you start and show them this plan.' },
+  { q: 'How is this different from the Build plan?', a: 'The two years of training are the same. This plan adds a 10-minute Neck Care routine every day, a daily neck check-in that sets green, amber or red guidance, a six-step neck strength ladder, a setup cue on every lift that can load the neck, and automatic swaps on amber days.' },
+  { q: 'Which exercises are most likely to bother my neck?', a: 'A bar resting on your shoulders, barbell overhead pressing, hanging from a bar, reaching your chin over the bar on pull-ups, crunches where you pull on your head, heavy carries, and sprints and jumps. All of them stay in the plan with a setup cue, and each has an amber-day swap. Never do behind-the-neck presses or pulldowns, or neck bridges.' },
+  { q: 'Which exercises help the most?', a: 'The neck ladder, plus the shoulder and upper-back work already in the plan: lateral raises, face pulls, reverse pec deck, rows and pulldowns. Don’t skip those accessories; for your neck they matter as much as the main lifts.' },
+  { q: 'How long until it improves?', a: 'Most people notice a change within 4–8 weeks of doing the routine most days, and it keeps improving over the following months as the muscles get stronger. A flare-up along the way is normal: follow the amber or red guidance for a few days and carry on.' },
+  { q: 'What if a lift hurts even with the cue?', a: 'Use its amber swap for two weeks, then try the original again with a lighter weight. If the same lift keeps hurting, keep the swap for the rest of that block: you lose nothing by pressing dumbbells or squatting on a hack machine.' },
 ];
 
 /* ===== App ===== */
@@ -2772,11 +2891,11 @@ const FAQ_G = [
 
   /* ---------- state ---------- */
   const LS = 'rebuild-build.v2', LS_OLD = 'rebuild-build.v1';
-  const defP = (mode = 'back') => ({ bw: null, calm: true, calmStart: null, calmGate: {}, startDate: mode === 'strength' ? todayStr() : PLAN_START, auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, gate: {}, barGate: {}, bench: {}, u: 0 });
+  const defP = (mode = 'back') => ({ bw: null, calm: true, calmStart: null, calmGate: {}, startDate: mode === 'back' ? PLAN_START : todayStr(), auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, gate: {}, barGate: {}, bench: {}, u: 0 });
   const emptyMode = mode => ({ profile: defP(mode), days: {} });
-  const S = { profile: defP('back'), days: {}, modes: { back: emptyMode('back'), strength: emptyMode('strength') }, mode: 'back', tab: 'today', date: todayStr(), planSel: null, libCat: 'all', libQ: '', status: 'local', resetArm: false };
+  const S = { profile: defP('back'), days: {}, modes: { back: emptyMode('back'), strength: emptyMode('strength'), neck: emptyMode('neck') }, mode: 'back', tab: 'today', date: todayStr(), planSel: null, libCat: 'all', libQ: '', status: 'local', resetArm: false };
   function activateMode(mode) {
-    S.mode = mode === 'strength' ? 'strength' : 'back';
+    S.mode = mode === 'strength' || mode === 'neck' ? mode : 'back';
     if (!S.modes[S.mode]) S.modes[S.mode] = emptyMode(S.mode);
     S.profile = S.modes[S.mode].profile;
     S.days = S.modes[S.mode].days;
@@ -2802,7 +2921,7 @@ const FAQ_G = [
     try {
       const raw = localStorage.getItem(LS), o = raw ? JSON.parse(raw) : null;
       if (o && o.modes) {
-        S.modes = { back: normalizeMode('back', o.modes.back), strength: normalizeMode('strength', o.modes.strength) };
+        S.modes = { back: normalizeMode('back', o.modes.back), strength: normalizeMode('strength', o.modes.strength), neck: normalizeMode('neck', o.modes.neck) };
         activateMode(o.activeMode || o.mode || 'back');
         return;
       }
@@ -2822,10 +2941,10 @@ const FAQ_G = [
   function touch(date, soon) {
     const r = rec(date, true); r.u = Date.now();
     clearTimeout(touchT);
-    const go = () => { saveLocal(); Cloud.markDay(date); };
+    const m = S.mode, go = () => { saveLocal(); Cloud.markDay(date); Sync.markDay(m, date); };
     if (soon) touchT = setTimeout(go, 500); else go();
   }
-  function touchProf() { S.profile.u = Date.now(); saveLocal(); Cloud.markProf(); }
+  function touchProf() { S.profile.u = Date.now(); saveLocal(); Cloud.markProf(); Sync.markProf(S.mode); }
 
   /* ---------- account sync (db capability) ---------- */
   const Cloud = {
@@ -2920,12 +3039,222 @@ const FAQ_G = [
     const el = $('#sync');
     if (!el) return;
     el.dataset.s = s;
-    el.textContent = { local: 'Saved on this device', synced: 'Saved to your account', saving: 'Saving', error: 'Sync paused, saved on this device' }[s] || '';
+    const sy = Sync.enabled();
+    el.textContent = { local: 'Saved on this device', synced: sy ? 'Synced across devices' : 'Saved to your account', saving: sy ? 'Syncing' : 'Saving', error: 'Sync paused, saved on this device' }[s] || '';
   }
+
+  /* ---------- device sync by sync code (/api/sync, no login) ---------- */
+  // The code lives only in its own localStorage key and is sent only as the x-sync-code header to this
+  // site's /api/sync. Merge rule as in Cloud: newer `u` wins per day record and per profile, all three modes.
+  const SYNC_LS = 'rebuild-build.sync', SYNC_A = 'ABCDEFGHJKMNPQRSTVWXYZ23456789', SYNC_MODES = ['back', 'strength', 'neck'];
+  const Sync = {
+    st: null, dirty: new Set(), dirtyProf: new Set(), pendReset: {}, remote: {}, t: null, iv: null, busy: false, tries: 0, fails: 0, until: 0, reconciled: false, draft: '', msg: '', pend: null, pendFrom: null, pick: false,
+    norm: s => String(s || '').toUpperCase().replace(/[\s-]/g, ''),
+    valid: s => typeof s === 'string' && s.length === 20 && [...s].every(c => SYNC_A.includes(c)),
+    fmt: c => (c || '').match(/.{1,5}/g).join('-'),
+    link() { return location.origin + location.pathname + '#sync=' + this.st.code; },
+    gen() { // rejection sampling: accept bytes < 240 (= 30 * 8), so byte % 30 is unbiased
+      let c = ''; const b = new Uint8Array(32);
+      while (c.length < 20) { crypto.getRandomValues(b); for (const x of b) if (x < 240 && c.length < 20) c += SYNC_A[x % 30]; }
+      return c;
+    },
+    load() { try { const o = JSON.parse(localStorage.getItem(SYNC_LS) || 'null'); if (o && this.valid(o.code)) this.st = { code: o.code, v: +o.v || 0, resetSeen: o.resetSeen && typeof o.resetSeen === 'object' ? o.resetSeen : {}, last: +o.last || 0 }; if (this.st && o.fresh) this.st.fresh = true; } catch (e) { /* storage unavailable */ } },
+    save() { try { if (this.st) localStorage.setItem(SYNC_LS, JSON.stringify(this.st)); else localStorage.removeItem(SYNC_LS); } catch (e) { /* ignore */ } },
+    enabled() { return !!(this.st && this.st.code); },
+    markDay(m, d) { if (!this.enabled()) return; this.dirty.add(m + '|' + d); this.schedule(); },
+    markProf(m) { if (!this.enabled()) return; this.dirtyProf.add(m); this.schedule(); },
+    async req(method, body, v) {
+      const r = await fetch('/api/sync' + (method === 'GET' ? '?v=' + encodeURIComponent(v) : ''), { method, cache: 'no-store', headers: Object.assign({ 'x-sync-code': this.st.code }, body ? { 'Content-Type': 'application/json' } : {}), body: body ? JSON.stringify(body) : undefined });
+      let j = null; try { j = await r.json(); } catch (e) { /* not JSON */ }
+      if (!r.ok || !j) { const e = new Error((j && j.error) || 'http_' + r.status); e.status = r.status; e.code = j && j.error; throw e; }
+      return j;
+    },
+    // Start (boot, after pairing): full pull, then mark every local record newer than the remote as dirty.
+    start() {
+      if (!this.enabled()) return;
+      clearInterval(this.iv); this.iv = setInterval(() => { if (!document.hidden) this.sync(); }, 60000);
+      this.reconciled = false; this.until = 0; setStatus('saving'); this.sync();
+    },
+    stop() { clearInterval(this.iv); clearTimeout(this.t); this.iv = this.t = null; this.dirty.clear(); this.dirtyProf.clear(); this.pendReset = {}; this.remote = {}; this.reconciled = false; this.pick = false; },
+    wake() { if (this.enabled()) { this.until = 0; this.sync(); } },
+    async sync() {
+      if (!this.enabled() || Date.now() < this.until) return;
+      const full = !this.reconciled, ok = await this.pull(full);
+      if (ok) {
+        if (full) { this.reconciled = true; this.reconcile(); }
+        if (this.dirty.size || this.dirtyProf.size || Object.keys(this.pendReset).length) this.schedule(); else setStatus('synced');
+      }
+      this.refreshSheet();
+    },
+    async pull(full) {
+      const code = this.st.code;
+      try {
+        const j = await this.req('GET', null, full ? 0 : this.st.v);
+        if (!this.st || this.st.code !== code) return false;
+        if (!j.unchanged) {
+          if (j.exists) this.merge(j); else this.remote = {};
+          this.st.v = +j.v || 0;
+          delete this.st.fresh; // first pull with this code is done: later resets do delete older local days
+          const pick = this.pick; this.pick = false;
+          if (pick && j.exists) this.adoptMode();
+        }
+        this.ok(); return true;
+      } catch (e) { if (this.st && this.st.code === code) this.fail(e, false); return false; }
+    },
+    merge(j) {
+      // First pull after pairing: adopt the server's reset times without deleting anything. Those resets
+      // happened before this device joined, so its own older days are kept (the server just won't take them).
+      let changed = false; const rem = this.remote = {}, seen = this.st.resetSeen, fresh = !!this.st.fresh;
+      SYNC_MODES.forEach(m => {
+        const R = (j.modes || {})[m] || {}, rd = R.days || {}, M = S.modes[m] || (S.modes[m] = emptyMode(m)), ru = rem[m] = { prof: (R.profile && R.profile.u) || 0, days: {} };
+        const rt = +((j.reset || {})[m]) || 0;
+        if (rt > (+seen[m] || 0)) { if (!fresh) for (const k in M.days) if ((M.days[k].u || 0) < rt) { delete M.days[k]; this.dirty.delete(m + '|' + k); changed = true; } seen[m] = rt; }
+        const floor = +seen[m] || 0;
+        for (const k in rd) {
+          const r = rd[k]; if (!r || typeof r !== 'object') continue;
+          ru.days[k] = r.u || 0;
+          const l = M.days[k];
+          if ((r.u || 0) >= floor && (!l || (r.u || 0) > (l.u || 0))) { M.days[k] = r; changed = true; }
+        }
+        if (R.profile && (R.profile.u || 0) > (M.profile.u || 0)) { M.profile = Object.assign(defP(m), R.profile); changed = true; }
+      });
+      this.save();
+      if (changed) { activateMode(S.mode); saveLocal(); applyTheme(); FIG.setEnabled(S.profile.anim); softRender(); }
+    },
+    reconcile() {
+      SYNC_MODES.forEach(m => {
+        const M = S.modes[m], ru = this.remote[m] || { prof: 0, days: {} }, floor = +this.st.resetSeen[m] || 0;
+        if (!M) return;
+        // Days not newer than the mode's reset are kept locally but never sent: the server would drop them.
+        for (const k in M.days) { const u = M.days[k].u || 0; if (u > floor && u > (ru.days[k] || 0)) this.dirty.add(m + '|' + k); }
+        if ((M.profile.u || 0) > ru.prof) this.dirtyProf.add(m);
+      });
+    },
+    schedule(ms) {
+      clearTimeout(this.t);
+      if (!this.enabled() || !(this.dirty.size || this.dirtyProf.size || Object.keys(this.pendReset).length)) return;
+      if (Date.now() >= this.until) setStatus('saving'); // while backing off, keep showing "Sync paused"
+      this.t = setTimeout(() => this.flush(), Math.max(ms || 1500, this.until - Date.now()));
+    },
+    async flush() {
+      if (!this.enabled()) return;
+      if (this.busy) { this.schedule(); return; }
+      this.busy = true;
+      const code = this.st.code, body = { modes: {} }, days = [], profs = [...this.dirtyProf], reset = Object.assign({}, this.pendReset);
+      let size = 0;
+      for (const x of this.dirty) { // stay well under the server limits (400 records, 512 KB)
+        const i = x.indexOf('|'), m = x.slice(0, i), k = x.slice(i + 1), r = S.modes[m] && S.modes[m].days[k];
+        if (!r) { this.dirty.delete(x); continue; }
+        size += JSON.stringify(r).length + 20;
+        if (days.length >= 380 || (days.length && size > 400000)) break;
+        days.push(x); const B = body.modes[m] = body.modes[m] || {}; (B.days = B.days || {})[k] = r;
+      }
+      profs.forEach(m => { (body.modes[m] = body.modes[m] || {}).profile = S.modes[m].profile; });
+      if (Object.keys(reset).length) body.reset = reset;
+      days.forEach(x => this.dirty.delete(x)); profs.forEach(m => this.dirtyProf.delete(m)); Object.keys(reset).forEach(m => delete this.pendReset[m]);
+      const v0 = this.st.v;
+      let again = false;
+      try {
+        const j = await this.req('POST', body);
+        if (!this.st || this.st.code !== code) { this.busy = false; return; }
+        days.forEach(x => { const i = x.indexOf('|'), m = x.slice(0, i), k = x.slice(i + 1), r = body.modes[m].days[k]; (this.remote[m] = this.remote[m] || { prof: 0, days: {} }).days[k] = r.u || 0; });
+        // Only advance v when nobody else wrote in between, so their changes still arrive on the next pull.
+        if (+j.v === v0 + (j.written ? 1 : 0)) this.st.v = +j.v;
+        this.tries = 0; this.ok();
+        again = !!(this.dirty.size || this.dirtyProf.size || Object.keys(this.pendReset).length);
+        if (!again) setStatus('synced');
+      } catch (e) {
+        if (this.st && this.st.code === code) {
+          days.forEach(x => this.dirty.add(x)); profs.forEach(m => this.dirtyProf.add(m));
+          for (const m in reset) if (!this.pendReset[m]) this.pendReset[m] = reset[m];
+          this.fail(e, true);
+        }
+      }
+      this.busy = false;
+      if (again) this.schedule(300);
+      this.refreshSheet();
+    },
+    // Settings sheet open: redraw it so "Last synced" and the plan buttons are current. Never while the
+    // user is typing in it; keep its scroll position and, where possible, the focused control.
+    refreshSheet() {
+      if (S.sheet !== 'settings') return;
+      const sh = $('#sheet'), a = document.activeElement;
+      if (!sh) return;
+      if (a && sh.contains(a) && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT' || a.isContentEditable)) return;
+      const y = sh.scrollTop, btns = () => [...sh.querySelectorAll('button')], fi = a && sh.contains(a) && a.tagName === 'BUTTON' ? btns().indexOf(a) : -1;
+      openSettings();
+      sh.scrollTop = y;
+      if (fi >= 0) { const b = btns()[fi]; if (b) b.focus({ preventScroll: true }); }
+    },
+    // Any logged or trained day in any plan on this device?
+    hasLogs() {
+      const filled = r => !!r && typeof r === 'object' && !!(r.done || Object.values(r.sets || {}).some(a => (a || []).some(x => x && (x[0] || x[1] || x[2])))
+        || Object.values(r.chk || {}).some(Boolean) || ['pb', 'pa', 'nb', 'mc', 'lg', 'cz'].some(k => r[k] != null) || (r.notes && String(r.notes).trim()));
+      return SYNC_MODES.some(m => { const M = S.modes[m]; return !!M && Object.values(M.days || {}).some(filled); });
+    },
+    // After joining from a device with no logs: open the plan the synced log was used for most recently.
+    adoptMode() {
+      let best = null, bu = 0;
+      SYNC_MODES.forEach(m => {
+        const M = S.modes[m]; if (!M) return;
+        let u = (M.profile && M.profile.u) || 0;
+        for (const k in M.days) u = Math.max(u, (M.days[k] && M.days[k].u) || 0);
+        if (u > bu) { bu = u; best = m; }
+      });
+      if (!best) return;
+      activateMode(best); saveLocal();
+      S.tab = 'today'; S.date = todayStr(); S.planSel = null;
+      applyTheme(); FIG.setEnabled(S.profile.anim); render(false);
+    },
+    ok() { this.fails = 0; this.until = 0; this.st.last = Date.now(); this.save(); },
+    fail(e, retry) {
+      const st = e && e.status, transient = !st || st === 429 || st >= 500 && e.code !== 'sync_not_configured';
+      setStatus('error');
+      clearTimeout(this.t);
+      if (retry && transient && (this.tries = this.tries + 1) <= 3) { this.t = setTimeout(() => this.flush(), 1500 * 2 ** this.tries + Math.random() * 1000); return; }
+      this.tries = 0; this.fails++;
+      this.until = Date.now() + Math.min(600000, 30000 * 2 ** Math.min(this.fails, 5)); // wait for a later trigger
+    },
+    // Reset this plan: tell the other devices, and drop any unsent days of that mode.
+    reset(m) {
+      if (!this.enabled()) return;
+      const ts = Date.now();
+      [...this.dirty].forEach(x => { if (x.startsWith(m + '|')) this.dirty.delete(x); });
+      this.pendReset[m] = ts; this.st.resetSeen[m] = ts; this.save();
+      this.dirtyProf.add(m); this.until = 0; this.schedule();
+    },
+    join(code) {
+      const empty = !this.hasLogs(); // captured before anything is merged
+      this.stop(); this.st = { code, v: 0, resetSeen: {}, last: 0, fresh: true }; this.pick = empty; this.draft = ''; this.msg = ''; this.save(); this.start();
+    },
+    off() { this.stop(); this.st = null; this.save(); setStatus(Cloud.db ? 'synced' : 'local'); },
+    ask(raw, from) {
+      const code = this.norm(raw);
+      if (!this.valid(code)) { this.msg = 'That code does not look right. It has 20 letters and numbers.'; return openSettings(); }
+      if (this.st && this.st.code === code) { this.msg = 'This device already uses that code.'; return openSettings(); }
+      this.pend = code; this.pendFrom = from; this.msg = '';
+      openSheet(`<div class="sheet-h"><h2>Connect this device?</h2><button class="iconbtn" data-act="sync-cancel" aria-label="Close">${I.close}</button></div>
+        <p>This device will join the synced log for code <span class="synccode">${esc(this.fmt(code))}</span>.</p>
+        <p class="tiny">Logs are merged day by day, and the most recently edited version of each day is kept.${this.enabled() ? ' This device will stop using its current sync code.' : ''}</p>
+        <div class="syncbtns"><button class="btn primary" data-act="sync-confirm">Connect</button><button class="btn" data-act="sync-cancel">Cancel</button></div>`, 'sync-confirm');
+    },
+    lastText() {
+      const t = this.st && this.st.last; if (!t) return 'Not synced yet.';
+      const d = new Date(t), ds = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`, tm = d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      return 'Last synced ' + (ds === todayStr() ? 'today at ' + tm : fmtShort(ds) + ' at ' + tm) + '.';
+    },
+    async copy(btn) {
+      const link = this.link(), done = () => { const o = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => { if (btn.isConnected) btn.textContent = o; }, 1600); };
+      try { await navigator.clipboard.writeText(link); return done(); } catch (e) { /* fall through */ }
+      try { const ta = document.createElement('textarea'); ta.value = link; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;opacity:0;top:0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); if (ok) return done(); } catch (e) { /* fall through */ }
+      const el = $('[data-sync-show]'); if (el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+      btn.textContent = 'Copy the code';
+    },
+  };
 
   /* ---------- plan helpers ---------- */
   const pday = date => {
-    if (S.mode === 'strength') return buildDay(date, S.profile.startDate);
+    if (S.mode !== 'back') return buildDay(date, S.profile.startDate);
     const pd = planDay(date, S.profile.startDate);
     if (pd.before && S.profile.calm !== false && validYmd(S.profile.calmStart)) return calmDay(date, S.profile.calmStart, S.profile.startDate) || pd;
     return pd;
@@ -3041,7 +3370,7 @@ const FAQ_G = [
   const checkBtn = (attr, on, label) => `<button type="button" class="check" ${attr} aria-pressed="${!!on}" aria-label="${esc(label || 'Mark done')}">${I.check}</button>`;
 
   function vToday() {
-    const date = S.date, t = todayStr(), back = S.mode === 'back';
+    const date = S.date, t = todayStr(), back = S.mode === 'back', neck = S.mode === 'neck';
     const pd = pday(date);
     let h = `<div class="col"><div class="datebar">
       <button class="iconbtn" data-nav="-1" aria-label="Previous day">${I.prev}</button>
@@ -3059,15 +3388,18 @@ const FAQ_G = [
     if (T.intro) h += `<p class="muted" style="margin:14px 0 0">${esc(T.intro)}</p>`;
     if (pd.phase === 'n0') h += `<div class="banner calm" style="margin-top:14px"><b>Calm phase, no gym yet.</b> Restart is set for ${esc(fmtLong(pd.restart))}${pd.toGo === 1 ? ' (tomorrow)' : ` (in ${pd.toGo} days)`}. The Calm gate on the Back Care tab moves it.</div>`;
     if (back) h += readiness(date);
+    if (neck) h += readinessNeck(date);
     if (pd.phase === 'n0') h += nerveCheck(date);
-    const light = back ? lightFor(date) : null;
+    const light = back || neck ? lightFor(date) : null;
+    if (neck) h += block('Neck Care routine', neckRoutine(), date, 'n', T.rest ? 'About 10 min, any time today' : 'About 10 min, before you train');
+    if (neck && light === 'red' && !T.rest) h += `<div class="banner sec" style="border-left-color:var(--red)"><b>Red: gentle Neck Care and an easy walk today.</b> No loaded training.</div>`;
     if (T.warm) h += block(T.warm === 'care' ? 'Back Care routine' : T.warm === 'nerve' ? 'Nerve care' : 'Warm-up', WARM[T.warm], date, 'w', T.warm === 'care' ? 'About 15 min' : T.warm === 'nerve' ? 'Extension sequence plus one nerve glide, about 8 min. Repeat the sequence 3–5 times a day.' : T.warm === 'gen' ? 'About 10 min, ending with ramp-up sets' : 'About 8 min');
     if (back && light === 'red' && !T.rest) h += `<div class="banner sec" style="border-left-color:var(--red)"><b>Red: Back Care routine and an easy walk today.</b> No loaded back or leg work.</div>`;
     if (!T.rest && ['g0', 'g1', 'p0', 'p1'].includes(pd.phase)) h += `<div class="banner sec"><b>How hard?</b> RPE 7 means about 3 good reps left in the set, RPE 8 two, RPE 9 one. When every set reaches the top of its rep range with clean form, add the smallest weight step next time.</div>`;
     const items = T.items.map(it => resolveFor(it, pd));
     h += `<div class="stack sec">${items.map((it, i) => exCard(it, i, date, light, pd)).join('')}</div>`;
     if (T.cool) h += block('Cool-down', T.cool === true ? COOL : COOLS[T.cool], date, 'c', 'About 3–5 min');
-    h += back ? finish(date) : finishStrength(date);
+    h += back ? finish(date) : neck ? finish(date, 'Neck') : finishStrength(date);
     const tm = addDays(date, 1), pn = pday(tm);
     if (!pn.before) h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tm}">${esc(D[pn.dayId].t)}</button></p>`;
     return h + '</div>';
@@ -3102,10 +3434,31 @@ const FAQ_G = [
     } else h += `<p class="tiny" style="margin:10px 0 0">Tap a number before you train. It sets today’s green, amber or red guidance.</p>`;
     return h + '</section>';
   }
+  // The daily neck routine; its strength item follows the current step of the neck ladder.
+  const neckRoutine = () => {
+    const st = (S.profile.ladder || {}).neck || 0, L = LADDERS.neck.steps[st];
+    return NECKCARE.map(b => b.ladder ? { x: st < 2 ? 'dnf' : 'neckiso', rx: `Ladder step ${st + 1}, ${L[0].toLowerCase()}: ${L[1]}` } : b);
+  };
+  function readinessNeck(date) {
+    const r = rec(date) || {}, yr = rec(addDays(date, -1));
+    let h = `<section class="card sec ready"><h3>How’s your neck right now?</h3>${painRow('pb', r.pb, 'Neck pain now, 0 to 10')}`;
+    if (trained(yr)) {
+      h += `<div style="margin-top:14px"><div class="small" style="margin-bottom:6px">This morning, compared with before yesterday’s session:</div><div class="seg" role="group" aria-label="Morning check">` +
+        [['same', 'Same or better'], ['stiffer', 'Stiffer, settling'], ['worse', 'Clearly worse']].map(([k, l]) => `<button type="button" data-mc="${k}" aria-pressed="${r.mc === k}">${l}</button>`).join('') + '</div></div>';
+    }
+    h += `<div style="margin-top:14px"><div class="small" style="margin-bottom:6px">Arm symptoms today</div><div class="seg" role="group" aria-label="Arm symptoms today">` +
+      [['none', 'None'], ['some', 'Some ache or tingling into the shoulder blade or arm'], ['worse', 'Spreading, numb, or a weak grip']].map(([k, l]) => `<button type="button" data-lg="${k}" aria-pressed="${r.lg === k}">${l}</button>`).join('') + '</div></div>';
+    const L = lightFor(date);
+    if (L) {
+      const o = NECK_LIGHTS.find(l => l.k === L);
+      h += `<div class="light ${L}" role="status"><span class="dot"></span><div><b>${esc(o.t)}</b><div class="small">${esc(o.do)}</div></div></div>`;
+    } else h += `<p class="tiny" style="margin:10px 0 0">Tap a number before you train. It sets today’s green, amber or red guidance.</p>`;
+    return h + '</section>';
+  }
   function block(title, list, date, pfx, sub) {
     const chk = (rec(date) || {}).chk || {};
     const n = list.filter((_, i) => chk[pfx + i]).length;
-    return `<details class="card blk sec"${n < list.length && pfx === 'w' ? ' open' : ''}><summary><div style="flex:1"><h3>${esc(title)}</h3><div class="tiny">${esc(sub)}</div></div><span class="tiny num">${n}/${list.length}</span>${I.caret}</summary><div class="blk-in">` +
+    return `<details class="card blk sec"${n < list.length && (pfx === 'w' || pfx === 'n') ? ' open' : ''}><summary><div style="flex:1"><h3>${esc(title)}</h3><div class="tiny">${esc(sub)}</div></div><span class="tiny num">${n}/${list.length}</span>${I.caret}</summary><div class="blk-in">` +
       list.map((b, i) => `<div class="mini">${b.x ? `<button type="button" class="figbox fig-s" data-ex="${b.x}" aria-label="Show ${esc(EX[b.x].n)}">${thumb(b.x)}</button>` : '<div></div>'}<div><div class="nm">${esc(b.x ? EX[b.x].n : b.t)}</div><div class="rx">${esc(b.rx)}</div></div>${checkBtn(`data-chk="${pfx}${i}"`, chk[pfx + i], (b.x ? EX[b.x].n : b.t) + ' done')}</div>`).join('') +
       `</div></details>`;
   }
@@ -3122,7 +3475,12 @@ const FAQ_G = [
     let warn = '';
     const flagged = it.key || RISKY.includes(it.x) || BARBELL.includes(it.x) || it.x === 'dbrdl' || /^bext|^sext/.test(it.x);
     const easy = it.x === 'walk' || it.x === 'bike';
-    if (light === 'red' && !easy && (flagged || ['legs', 'core', 'spine', 'athletic'].includes(E.c))) warn = `<div class="warnline red">Red today: skip this and do an easy walk instead.</div>`;
+    const neck = S.mode === 'neck';
+    if (neck) {
+      const a = NECK_AMBER[it.x] || (['push', 'pull'].includes(E.c) ? 'keep last session’s load, no progression.' : '');
+      if (light === 'red' && !easy) warn = `<div class="warnline red">Red today: skip this. Gentle Neck Care and an easy walk instead.</div>`;
+      else if (light === 'amber' && !easy && a) warn = `<div class="warnline amber">Amber today: ${a}</div>`;
+    } else if (light === 'red' && !easy && (flagged || ['legs', 'core', 'spine', 'athletic'].includes(E.c))) warn = `<div class="warnline red">Red today: skip this and do an easy walk instead.</div>`;
     else if (light === 'amber' && !easy && (flagged || E.c === 'legs' || E.c === 'core')) {
       warn = `<div class="warnline amber">Amber today: ${RISKY.includes(it.x) ? 'skip it, or swap for 10 min of easy bike.' : BARBELL.includes(it.x) ? 'do the machine or dumbbell version instead (hack squat, dumbbell RDL, chest-supported row, seated dumbbell press) at last session’s load.' : 'keep last session’s load and range, no progression.'}</div>`;
     }
@@ -3134,7 +3492,7 @@ const FAQ_G = [
         <div>
           <div class="ex-nm"><h3 data-ex="${it.x}">${esc(E.n)}</h3>${it.g ? `<span class="grp" title="Superset: do these back to back">${esc(it.g)}${(it.gi || '')}</span>` : ''}</div>
           <div class="chips">${chips.join('')}</div>
-          ${it.n ? `<p class="note">${esc(it.n)}</p>` : ''}${step}${warn}
+          ${it.n ? `<p class="note">${esc(it.n)}</p>` : ''}${neck && NECK_TIPS[it.x] ? `<p class="note"><b>Neck:</b> ${esc(NECK_TIPS[it.x])}</p>` : ''}${step}${warn}
         </div>
       </div>
       ${setRows(it, key, logged, last)}
@@ -3157,10 +3515,10 @@ const FAQ_G = [
     if (last) h += `<div class="last">Last time, ${esc(fmtShort(last.date))}: ${esc(logSummary(L, last.sets))}</div>`;
     return h + '</div>';
   }
-  function finish(date) {
+  function finish(date, what = 'Back') {
     const r = rec(date) || {};
     let h = `<section class="card sec finish stack"><h3>After the session</h3>
-      <div><div class="small muted" style="margin-bottom:6px">Back pain now that you’re done</div>${painRow('pa', r.pa, 'Back pain after the session, 0 to 10')}</div>
+      <div><div class="small muted" style="margin-bottom:6px">${what} pain now that you’re done</div>${painRow('pa', r.pa, `${what} pain after the session, 0 to 10`)}</div>
       <label class="small muted" for="notes">Notes</label>
       <textarea id="notes" data-notes placeholder="How it felt, what to change next time">${esc(r.notes || '')}</textarea>`;
     if (r.done) {
@@ -3184,7 +3542,7 @@ const FAQ_G = [
   /* plan */
   function currentPhaseId() { const pd = pday(todayStr()); return pd.before ? MODES[S.mode].phases[0] : pd.phase; }
   function vPlan() {
-    const M = MODES[S.mode], build = S.mode === 'strength';
+    const M = MODES[S.mode], build = S.mode !== 'back';
     const opts = (!build && S.profile.calm !== false && validYmd(S.profile.calmStart) ? ['n0'] : []).concat(M.phases);
     let sel = S.planSel || currentPhaseId();
     if (sel !== 'road' && sel !== 'guide' && !opts.includes(sel)) sel = opts[0];
@@ -3195,7 +3553,7 @@ const FAQ_G = [
     return h + '</div>';
   }
   function vGuide() {
-    let h = `<h2 style="margin-top:6px">How to use this plan</h2><p class="muted">Two years of training for any healthy adult: muscle, strength, a strong core and real athleticism, with no deadlifts.</p>`;
+    let h = `<h2 style="margin-top:6px">How to use this plan</h2><p class="muted">Two years of training for any healthy adult: muscle, strength, a strong core and real athleticism, with no deadlifts.${S.mode === 'neck' ? ' Every day starts with the 10-minute Neck Care routine and a neck check-in; the Neck care tab explains both.' : ''}</p>`;
     h += `<div class="stack sec">${GUIDE_G.map(g => `<div class="card"><h3 style="margin-bottom:6px">${esc(g.h)}</h3>${g.p ? `<p class="small" style="margin:0">${esc(g.p)}</p>` : ''}${g.li ? `<ul class="rules">${g.li.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}</div>`).join('')}</div>`;
     h += `<div class="card sec faq"><h2 style="margin-bottom:4px">Questions</h2>${FAQ_G.map(f => `<details><summary><span>${esc(f.q)}</span>${I.caret}</summary><p>${esc(f.a)}</p></details>`).join('')}</div>`;
     h += `<p class="tiny sec">General guidance for healthy adults, not medical advice. If you have an injury, a heart condition or are new to exercise after a long break, check with a doctor or physio first.</p>`;
@@ -3228,7 +3586,7 @@ const FAQ_G = [
     }
     h += `<div class="stack sec">` + ids.filter(d => !D[d].rest).map(d => sessionDetails(D[d], id)).join('') + '</div>';
     h += id === 'n0' ? `<p class="tiny sec">Every Calm day starts with nerve care: the extension sequence and the one nerve glide your physio picked.</p>`
-      : S.mode === 'strength' ? `<p class="tiny sec">Every gym session starts with a 10-minute warm-up and ramp-up sets, and ends with a hip-flexor stretch and an easy walk. Exercise swaps between cycles happen automatically on the Today tab.</p>`
+      : S.mode !== 'back' ? `<p class="tiny sec">${S.mode === 'neck' ? 'Every day starts with the Neck Care routine. ' : ''}Every gym session starts with a 10-minute warm-up and ramp-up sets, and ends with a hip-flexor stretch and an easy walk. Exercise swaps between cycles happen automatically on the Today tab.</p>`
       : `<p class="tiny sec">Every gym session starts with the warm-up (bike plus the back-care “big three”) and ends with the hip-flexor stretch and child’s pose.</p>`;
     return h;
   }
@@ -3335,12 +3693,32 @@ const FAQ_G = [
     return h + '</div>';
   }
 
+  /* neck care */
+  function vNeckCare() {
+    const t = todayStr(), r = rec(t) || {}, L = lightFor(t), Lg = LADDERS.neck, cur = (S.profile.ladder || {}).neck || 0;
+    let h = `<div class="col"><section class="carehero"><div class="figbox" style="cursor:default">${FIG.staticSVG('neckview', { label: 'Front view showing the neck' })}</div>
+      <div><h1 style="font-size:clamp(1.8rem,6vw,2.4rem)">Your neck</h1><p class="muted" style="margin:6px 0 0">Constant neck pain most often comes from muscles and joints that are stiff, under-strength, or held in one position for hours, rather than from damage. The fix is regular movement plus stronger neck, shoulder and upper-back muscles. This plan gives you both alongside the full two-year Build programme.</p>
+      ${L ? `<p class="small" style="margin-top:8px">Today: <b>${esc(NECK_LIGHTS.find(l => l.k === L).t)}</b> (pain ${r.pb == null ? 'not logged' : r.pb + '/10'})</p>` : `<p class="small" style="margin-top:8px"><button class="btn sm" data-tab="today">Log today’s neck pain</button></p>`}</div></section>`;
+    h += `<div class="sec"><h2 style="margin-bottom:10px">Traffic-light rules</h2><div class="lights">${NECK_LIGHTS.map(l => `<div class="light ${l.k}"><span class="dot"></span><div><b>${esc(l.t)}</b><div class="small" style="margin:4px 0">${esc(l.when)}</div><div class="small">${esc(l.do)}</div></div></div>`).join('')}</div></div>`;
+    h += block('Daily Neck Care routine', neckRoutine(), t, 'n', 'About 10 min, every day. On gym days, do it before you train.');
+    h += `<div class="sec"><h2 style="margin-bottom:6px">The neck strength ladder</h2><p class="muted small">${esc(NECK_LADDER_RULE)}</p><div class="ladders"><div class="card ladder"><h3>${esc(Lg.t)}</h3><ol>${Lg.steps.map((s, i) => `<li class="${i === cur ? 'cur' : i < cur ? 'past' : ''}"><div><b>${esc(s[0])}</b>${esc(s[1])}</div></li>`).join('')}</ol>
+      <div style="display:flex;gap:8px;align-items:center"><button class="btn sm" data-ladder="neck|-1" ${cur === 0 ? 'disabled' : ''}>Step down</button><button class="btn sm primary" data-ladder="neck|1" ${cur === Lg.steps.length - 1 ? 'disabled' : ''}>I moved up a step</button></div></div></div></div>`;
+    h += `<div class="card sec"><h3 style="margin-bottom:6px">Setting up the lifts for your neck</h3><ul class="rules">${NECK_SETUP.map(id => `<li><b>${esc(EX[id].n)}:</b> ${esc(NECK_TIPS[id])}</li>`).join('')}</ul><p class="tiny" style="margin:8px 0 0">The same cues appear on each exercise card on the Today tab, with a swap on amber days.</p></div>`;
+    h += `<div class="flag sec" role="note"><h3 style="margin-bottom:6px">When to get medical help</h3><p class="small" style="margin:0">${esc(NECK_REDFLAGS)}</p></div>`;
+    h += `<div class="card sec faq"><h2 style="margin-bottom:4px">Questions</h2>${FAQ_NECK.map(f => `<details><summary><span>${esc(f.q)}</span>${I.caret}</summary><p>${esc(f.a)}</p></details>`).join('')}</div>`;
+    h += `<div class="card sec"><h3 style="margin-bottom:6px">Daily habits that help</h3><ul class="rules">${NECK_HABITS.map(x => `<li>${esc(x)}</li>`).join('')}</ul><p class="tiny" style="margin:8px 0 0">This plan is general guidance, not a medical assessment. If a doctor or physio is treating your neck, show them this plan and follow their advice first.</p></div>`;
+    return h + '</div>';
+  }
+
   /* library */
   function vLib() {
     const q = S.libQ.trim().toLowerCase(), cat = S.libCat;
-    const categories = S.mode === 'strength' ? CATS.filter(([k]) => k !== 'care' && k !== 'spine') : CATS;
-    const visibleCat = S.mode === 'strength' && (cat === 'care' || cat === 'spine') ? 'all' : cat;
-    const ids = Object.keys(EX).filter(id => !(S.mode === 'strength' && ['care', 'spine'].includes(EX[id].c)) && (visibleCat === 'all' || EX[id].c === visibleCat) && (!q || (EX[id].n + ' ' + EX[id].m + ' ' + (EX[id].eq || '')).toLowerCase().includes(q)));
+    // Each plan hides the other plans' care categories; the neck plan borrows two upper-back drills from back care.
+    const hidden = S.mode === 'back' ? ['neck'] : S.mode === 'neck' ? ['care', 'spine'] : ['care', 'spine', 'neck'];
+    const catOf = id => S.mode === 'neck' && (id === 'tspine' || id === 'proneY') ? 'neck' : EX[id].c;
+    const categories = CATS.filter(([k]) => !hidden.includes(k));
+    const visibleCat = hidden.includes(cat) ? 'all' : cat;
+    const ids = Object.keys(EX).filter(id => !hidden.includes(catOf(id)) && (visibleCat === 'all' || catOf(id) === visibleCat) && (!q || (EX[id].n + ' ' + EX[id].m + ' ' + (EX[id].eq || '')).toLowerCase().includes(q)));
     let h = `<div><input class="search" type="search" placeholder="Search exercises or muscles" value="${esc(S.libQ)}" data-q aria-label="Search exercises">
       <div class="filters" role="group" aria-label="Filter by type"><button type="button" data-cat="all" aria-pressed="${visibleCat === 'all'}">All</button>${categories.map(([k, l]) => `<button type="button" data-cat="${k}" aria-pressed="${visibleCat === k}">${esc(l)}</button>`).join('')}</div>`;
     h += ids.length ? `<div class="grid">${ids.map(id => `<button type="button" class="tile" data-ex="${id}"><div class="fig-t">${thumb(id)}</div><b>${esc(EX[id].n)}</b><small>${esc(EX[id].m)}</small></button>`).join('')}</div>`
@@ -3350,7 +3728,7 @@ const FAQ_G = [
 
   /* progress */
   function vProgress() {
-    if (S.mode === 'strength') return vStrengthProgress();
+    if (S.mode !== 'back') return vStrengthProgress();
     const t = todayStr(), days = Object.keys(S.days).sort();
     const done = days.filter(d => S.days[d].done);
     const pdT = pday(t);
@@ -3391,6 +3769,11 @@ const FAQ_G = [
     const thisWeek = done.filter(d => d >= wkStart && d <= t).length;
     const since = pdT.before ? 0 : diffDays(t, pdT.start) + 1;
     let h = `<div class="col"><div class="stats"><div class="stat"><div class="v">${done.length}</div><div class="k">Workouts completed</div></div><div class="stat"><div class="v">${thisWeek}/5</div><div class="k">This week</div></div><div class="stat"><div class="v">${since}</div><div class="k">Days into the plan</div></div></div>`;
+    if (S.mode === 'neck') {
+      const from = addDays(t, -55), pts = range(56).map(i => { const d = addDays(from, i), r = S.days[d]; return { d, pb: r && r.pb, pa: r && r.pa }; });
+      h += `<section class="card sec chart"><div class="sec-h"><h3>Neck pain, last 8 weeks</h3><span class="tiny"><span style="color:var(--ink)">●</span> before  <span style="color:var(--accent)">●</span> after</span></div>` +
+        (pts.some(p => p.pb != null || p.pa != null) ? painChart(pts) : `<div class="empty">Log your neck pain on the Today tab and your trend appears here.</div>`) + '</section>';
+    }
     h += `<section class="card sec chart"><h3 style="margin-bottom:8px">Workouts per week</h3><p class="tiny" style="margin:0 0 8px">Aim for five a week, six with the optional Saturday.</p>${weekBars(t)}</section>`;
     h += extChart('Squat progress', ['backsquat', 'frontsquat']);
     h += extChart('Bench press progress', ['bench', 'incbb']);
@@ -3472,8 +3855,9 @@ const FAQ_G = [
     document.body.style.overflow = '';
   }
   function openEx(id) {
-    const E = S.mode === 'strength' && GEN_EX[id] ? Object.assign({}, EX[id], GEN_EX[id]) : EX[id], last = lastLog(id, '9999-12-31');
-    const catName = (CATS.find(c => c[0] === E.c) || [])[1];
+    const E0 = S.mode !== 'back' && GEN_EX[id] ? Object.assign({}, EX[id], GEN_EX[id]) : EX[id], last = lastLog(id, '9999-12-31');
+    const E = S.mode === 'neck' && NECK_TIPS[id] ? Object.assign({}, E0, { spine: 'Neck: ' + NECK_TIPS[id] + (NECK_AMBER[id] ? ' Amber day: ' + NECK_AMBER[id] : '') }) : E0;
+    const catName = S.mode === 'neck' && (id === 'tspine' || id === 'proneY') ? 'Neck care' : (CATS.find(c => c[0] === E.c) || [])[1];
     let h = `<div class="sheet-h"><h2>${esc(E.n)}</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.close}</button></div>
       <div class="bigfig"><div class="live" data-live="${id}"></div></div>
       <p class="tiny" style="text-align:center;margin-top:-6px">${S.profile.anim && !FIG.reduce ? 'The figure moves from start to finish.' : 'Faint figure: start. Solid figure: finish.'} Pink shows where you should feel it.</p>
@@ -3487,15 +3871,24 @@ const FAQ_G = [
     const P = S.profile, start = P.startDate;
     const sw = (k, l, d) => `<div class="setrow2"><div><div style="font-weight:600">${esc(l)}</div>${d ? `<div class="tiny">${esc(d)}</div>` : ''}</div><button class="switch" role="switch" aria-checked="${!!P[k]}" data-sw="${k}" aria-label="${esc(l)}"></button></div>`;
     let h = `<div class="sheet-h"><h2>Settings</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.close}</button></div>
-      <div class="setrow2"><div><div style="font-weight:600">Workout plan</div><div class="tiny">Each plan has its own settings and workout log on this browser.</div></div><div class="seg" role="group" aria-label="Choose workout plan"><button type="button" data-mode="back" aria-pressed="${S.mode === 'back'}">Back-safe</button><button type="button" data-mode="strength" aria-pressed="${S.mode === 'strength'}">Build (2-year)</button></div></div>
+      <div class="setrow2"><div><div style="font-weight:600">Workout plan</div><div class="tiny">Each plan has its own settings and workout log on this browser.</div></div><div class="seg" role="group" aria-label="Choose workout plan"><button type="button" data-mode="back" aria-pressed="${S.mode === 'back'}">Back-safe</button><button type="button" data-mode="strength" aria-pressed="${S.mode === 'strength'}">Build (2-year)</button><button type="button" data-mode="neck" aria-pressed="${S.mode === 'neck'}">Build + Neck care</button></div></div>
       <div class="setrow2"><div><div style="font-weight:600">${S.mode === 'back' ? 'Restart starts (Day 1)' : 'Plan start date'}</div><div class="tiny">${S.mode === 'back' ? `Day 1 of Restart is ${esc(fmtLong(start))}. The Calm gate on the Back Care tab can set this for you.` : `Day 1 of the Start week is ${esc(fmtLong(start))}. Foundation begins on the following Monday.`}</div></div><label class="fld" style="width:160px"><input type="date" data-start-date value="${esc(start)}" aria-label="${S.mode === 'back' ? 'Restart start date' : 'Plan start date'}"></label></div>
       ${S.mode === 'back' ? sw('calm', 'Include the Calm phase', 'Nerve-friendly home routine before Restart') + (P.calm !== false ? `<div class="setrow2"><div><div style="font-weight:600">Calm phase starts</div><div class="tiny">It runs until the day before Restart.</div></div><label class="fld" style="width:160px"><input type="date" data-calm-start value="${esc(P.calmStart || '')}" aria-label="Calm phase start date"></label></div>` : '') : ''}
       <div class="setrow2"><div><div style="font-weight:600">Body weight</div><div class="tiny">Used for benchmark targets</div></div><label class="fld" style="width:120px"><input type="text" inputmode="decimal" data-bw value="${esc(P.bw || '')}" placeholder="80" aria-label="Body weight in kg"><span>kg</span></label></div>
       ${sw('auto', 'Start rest timer when I tick a set')}${sw('sound', 'Beep and vibrate when rest ends')}${sw('anim', 'Animate exercise figures', 'Turn off to save battery')}
       <div class="setrow2"><div style="font-weight:600">Appearance</div><div class="seg">${[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button type="button" data-themeset="${k}" aria-pressed="${P.theme === k}">${l}</button>`).join('')}</div></div>
-      <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${S.status === 'local' ? 'In this browser on this device. The two workout plans keep separate logs.' : 'In your connected account, with a copy on this device. The two workout plans keep separate logs.'}</div></div></div>
+      <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${esc(Sync.enabled() ? `Synced across the devices that use your sync code, with a copy in this browser${Cloud.db ? ' and in your connected account' : ''}. Each workout plan keeps its own log.` : Cloud.db ? 'In your connected account, with a copy on this device. Each workout plan keeps its own log.' : 'In this browser on this device. Each workout plan keeps its own log.')}</div></div></div>
+      ${Sync.enabled() ? `<div class="setrow2 syncrow"><div><div style="font-weight:600">Sync across devices</div><div class="tiny">On. Open the link on your other device, or enter this code there:</div>
+        <div class="synccode" data-sync-show>${esc(Sync.fmt(Sync.st.code))}</div>
+        <div class="syncbtns"><button class="btn sm" data-act="sync-copy">Copy link</button>${navigator.share ? '<button class="btn sm" data-act="sync-share">Share</button>' : ''}<button class="btn sm" data-act="sync-off">Stop syncing on this device</button></div>
+        <div class="tiny">Anyone with this code or link can see and change this log. Share it only with your own devices.</div>
+        <div class="tiny">${esc(Sync.lastText())}${S.status === 'error' ? ' Sync is paused; your log is still saved on this device.' : ''}</div></div></div>`
+      : `<div class="setrow2"><div><div style="font-weight:600">Sync across devices</div><div class="tiny">Use one log on your phone and computer. No account needed.</div></div><button class="btn sm" data-act="sync-on">Turn on sync</button></div>
+      <div class="setrow2 syncrow"><div><div style="font-weight:600">Have a code from another device?</div>
+        <div class="syncin"><label class="fld"><input type="text" data-sync-code value="${esc(Sync.draft)}" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Sync code"></label><button class="btn sm" data-act="sync-connect">Connect</button></div></div></div>`}
+      ${Sync.msg ? `<p class="tiny" role="alert">${esc(Sync.msg)}</p>` : ''}
       ${Cloud.dl ? `<div class="setrow2"><div style="font-weight:600">Export your log</div><button class="btn sm" data-act="csv">Download CSV</button></div>` : ''}
-      <div class="setrow2"><div><div style="font-weight:600">Reset this plan</div><div class="tiny">Deletes only this plan’s logs and settings. The other plan stays saved.</div></div><button class="btn sm" data-act="reset">${S.resetArm ? 'Tap again to delete' : 'Reset'}</button></div>`;
+      <div class="setrow2"><div><div style="font-weight:600">Reset this plan</div><div class="tiny">Deletes only this plan’s logs and settings. The other plans stay saved.</div></div><button class="btn sm" data-act="reset">${S.resetArm ? 'Tap again to delete' : 'Reset'}</button></div>`;
     openSheet(h, 'settings');
   }
 
@@ -3539,10 +3932,10 @@ const FAQ_G = [
     FIG.unobserveAll(m);
     if (S.mode === 'strength' && S.tab === 'care') S.tab = 'today';
     const tabSet = [['today', 'Today', I.today], ['plan', 'Plan', I.plan]];
-    if (S.mode === 'back') tabSet.push(['care', 'Back care', I.care]);
+    if (S.mode !== 'strength') tabSet.push(['care', S.mode === 'neck' ? 'Neck care' : 'Back care', I.care]);
     tabSet.push(['lib', 'Exercises', I.lib], ['prog', 'Progress', I.prog]);
     if ($('.tabs').dataset.mode !== S.mode) { $('.tabs').innerHTML = tabSet.map(([k, l, ic]) => `<button type="button" data-tab="${k}">${ic}<span>${l}</span></button>`).join(''); $('.tabs').dataset.mode = S.mode; }
-    const v = { today: vToday, plan: vPlan, care: vCare, lib: vLib, prog: vProgress }[S.tab] || vToday;
+    const v = { today: vToday, plan: vPlan, care: S.mode === 'neck' ? vNeckCare : vCare, lib: vLib, prog: vProgress }[S.tab] || vToday;
     m.innerHTML = v();
     mountLive(m);
     $$('.tabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === S.tab ? 'page' : 'false'));
@@ -3611,20 +4004,28 @@ const FAQ_G = [
       return;
     }
     if (d.act === 'done' || d.act === 'undone') { const r = rec(S.date, true); r.done = d.act === 'done'; r.doneAt = r.done ? Date.now() : null; touch(S.date); return render(true); }
-    if (d.act === 'settings') { S.resetArm = false; return openSettings(); }
+    if (d.act === 'settings') { S.resetArm = false; Sync.msg = ''; return openSettings(); }
     if (d.act === 'close') { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } return; }
     if (d.act === 'reset') {
       if (!S.resetArm) { S.resetArm = true; return openSettings(); }
       S.resetArm = false; S.days = {}; S.profile = normalizeMode(S.mode, { profile: defP(S.mode), days: {} }).profile; S.modes[S.mode] = { profile: S.profile, days: S.days }; touchProf();
       if (Cloud.db && S.mode === 'back') { Cloud.dirty.clear(); Cloud.remoteU = {}; Cloud.exists.forEach(m => Cloud.months.doc(m).set({ days: {} }).catch(() => {})); }
+      Sync.reset(S.mode);
       saveLocal(); closeSheet(); applyTheme(); return render(false);
     }
     if (d.mode) {
       if (d.mode === S.mode) return;
-      saveLocal(); activateMode(d.mode); S.tab = 'today'; S.date = todayStr(); S.planSel = null; S.libCat = 'all'; S.libQ = ''; S.resetArm = false;
+      saveLocal(); activateMode(d.mode); saveLocal(); S.tab = 'today'; S.date = todayStr(); S.planSel = null; S.libCat = 'all'; S.libQ = ''; S.resetArm = false;
       applyTheme(); FIG.setEnabled(S.profile.anim); closeSheet(); render(false); return openSettings();
     }
     if (d.act === 'csv') { exportCSV(); return; }
+    if (d.act === 'sync-on') { Sync.join(Sync.gen()); return openSettings(); }
+    if (d.act === 'sync-connect') { const inp = $('[data-sync-code]'); return Sync.ask(inp ? inp.value : Sync.draft, 'settings'); }
+    if (d.act === 'sync-confirm') { const c = Sync.pend, from = Sync.pendFrom; Sync.pend = null; closeSheet(); if (c) Sync.join(c); if (from === 'settings') openSettings(); else if (pendingSoft) { pendingSoft = false; render(true); } return; }
+    if (d.act === 'sync-cancel') { const from = Sync.pendFrom; Sync.pend = null; closeSheet(); if (from === 'settings') openSettings(); else if (pendingSoft) { pendingSoft = false; render(true); } return; }
+    if (d.act === 'sync-copy') { if (Sync.enabled()) Sync.copy(t); return; }
+    if (d.act === 'sync-share') { if (Sync.enabled() && navigator.share) navigator.share({ title: 'Rebuild & Build sync link', url: Sync.link() }).catch(() => {}); return; }
+    if (d.act === 'sync-off') { Sync.off(); return openSettings(); }
     if (d.sw) { S.profile[d.sw] = !S.profile[d.sw]; touchProf(); if (d.sw === 'anim') FIG.setEnabled(S.profile.anim); if (d.sw === 'anim' || d.sw === 'calm') render(true); return openSettings(); }
     if (d.themeset) { S.profile.theme = d.themeset; touchProf(); applyTheme(); return openSettings(); }
     if (d.ladder) { const [k, dv] = d.ladder.split('|'); const n = LADDERS[k].steps.length; S.profile.ladder[k] = Math.max(0, Math.min(n - 1, (S.profile.ladder[k] || 0) + +dv)); touchProf(); return render(true); }
@@ -3644,6 +4045,7 @@ const FAQ_G = [
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && S.sheet) closeSheet();
+    if (e.key === 'Enter' && e.target.matches('[data-sync-code]')) { e.preventDefault(); Sync.ask(e.target.value, 'settings'); return; }
     if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="button"][data-ex]')) { e.preventDefault(); openEx(e.target.dataset.ex); }
   });
   document.addEventListener('input', e => {
@@ -3652,6 +4054,7 @@ const FAQ_G = [
     if (d.notes != null) { const r = rec(S.date, true); r.notes = t.value; touch(S.date, true); return; }
     if (d.q != null) { S.libQ = t.value; const pos = t.selectionStart; render(true); const n = $('[data-q]'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } return; }
     if (d.bw != null) { const v = parseFloat(t.value); S.profile.bw = isFinite(v) && v > 20 && v < 300 ? v : null; touchProf(); return; }
+    if (d.syncCode != null) { Sync.draft = t.value; return; } // keep the typed code; never re-render while typing
   });
   document.addEventListener('change', e => {
     const t = e.target;
@@ -3665,7 +4068,7 @@ const FAQ_G = [
   });
   document.addEventListener('focusout', () => { setTimeout(() => { if (pendingSoft && !S.sheet) { const a = document.activeElement; if (!a || !(a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) { pendingSoft = false; render(true); } } }, 50); });
   $('#scrim').addEventListener('click', () => { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && S.tab === 'today') { const t = todayStr(); if (S.lastSeenDay && S.lastSeenDay !== t && S.date === S.lastSeenDay) { S.date = t; render(false); } S.lastSeenDay = t; } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) Sync.wake(); if (!document.hidden && S.tab === 'today') { const t = todayStr(); if (S.lastSeenDay && S.lastSeenDay !== t && S.date === S.lastSeenDay) { S.date = t; render(false); } S.lastSeenDay = t; } });
 
   async function exportCSV() {
     const rows = [['date', 'phase', 'session', 'exercise', 'set', 'value_1', 'value_2', 'done', 'pain_before', 'pain_after', 'numbness', 'session_complete']];
@@ -3686,10 +4089,16 @@ const FAQ_G = [
     S.lastSeenDay = todayStr();
     $('.top-in').innerHTML = `<div class="brand"><svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="#d7263d"/><circle cx="12" cy="12" r="7.2" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1.2"/><circle cx="12" cy="12" r="2.4" fill="var(--bg)"/></svg>Rebuild &amp; Build</div><div class="sync" id="sync" role="status"></div><button class="iconbtn" data-act="settings" aria-label="Settings">${I.gear}</button>`;
     $('.tabs').innerHTML = [['today', 'Today', I.today], ['plan', 'Plan', I.plan], ['care', 'Back care', I.care], ['lib', 'Exercises', I.lib], ['prog', 'Progress', I.prog]].map(([k, l, ic]) => `<button type="button" data-tab="${k}">${ic}<span>${l}</span></button>`).join('');
+    Sync.load();
+    // Pairing link: #sync=CODE. The fragment never reaches the server; drop it from the address bar at once.
+    const hm = /(?:^#|&)sync=([^&]*)/.exec(location.hash || ''); let linked = null;
+    if (hm) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignore */ } const c = Sync.norm(decodeURIComponent(hm[1])); if (Sync.valid(c) && !(Sync.st && Sync.st.code === c)) linked = c; }
     setStatus('local');
     FIG.setEnabled(S.profile.anim);
     render(false);
     Cloud.init();
+    Sync.start();
+    if (linked) Sync.ask(linked, 'link');
   }
   boot();
 })();
