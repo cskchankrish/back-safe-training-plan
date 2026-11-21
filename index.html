@@ -3456,8 +3456,9 @@ const FAQ_NECK = [
     h += `<div class="stack sec">${items.map((it, i) => exCard(it, i, date, light, pd)).join('')}</div>`;
     if (T.cool) h += block('Cool-down', T.cool === true ? COOL : COOLS[T.cool], date, 'c', 'About 3–5 min');
     h += back ? finish(date) : neck ? finish(date, 'Neck') : finishStrength(date);
-    if (!trained(rec(date)) && date >= S.profile.startDate && !laterTrained(date))
-      h += `<section class="card sec skipcard"><div><h3>Not training ${date === t ? 'today' : 'this day'}?</h3><div class="tiny">Fasting, ill or busy: skip the day and ${esc(T.rest ? 'the rest day' : T.t)} moves to the next day. The rest of the plan follows, one day later.</div></div><div class="syncbtns"><button class="btn sm" data-act="skip">Skip ${date === t ? 'today' : 'this day'}</button><button class="btn sm ghost" data-act="travel">Travelling…</button></div></section>`;
+    if (r.rested) h += `<div class="banner sec">Skipped: counted as this week’s rest day, so nothing moved. To train after all, pick a session in This week’s sessions.</div>`;
+    else if (!trained(rec(date)) && date >= S.profile.startDate && !laterTrained(date))
+      h += `<section class="card sec skipcard"><div><h3>Not training ${date === t ? 'today' : 'this day'}?</h3><div class="tiny">${restSlot(date) >= 0 ? (T.rest ? 'Today is your rest day, so skipping changes nothing. Just rest.' : `Fasting, ill or busy: skip and ${date === t ? 'today' : 'this day'} becomes this week’s rest day. ${esc(T.t)} stays available on another day this week, and the week still ends on time.`) : `Fasting, ill or busy: skip the day and ${esc(T.rest ? 'the rest day' : T.t)} moves to the next day. The rest of the plan follows, one day later.`}</div></div><div class="syncbtns"><button class="btn sm" data-act="skip">Skip ${date === t ? 'today' : 'this day'}</button><button class="btn sm ghost" data-act="travel">Travelling…</button></div></section>`;
     const tm = addDays(date, 1), pn = pday(tm);
     if (!pn.before) h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tm}">${esc(dayTitle(tm))}</button></p>`;
     return h + '</div>';
@@ -3488,24 +3489,37 @@ const FAQ_NECK = [
   const dayTitle = date => { const pd = pday(date); return pd.skipped ? (S.days[date].skip === 'travel' ? 'Travel day' : 'Skipped day') : pd.before ? 'Before the plan starts' : D[pd.dayId].t; };
   const laterTrained = date => Object.keys(S.days).some(d => d > date && trained(S.days[d]));
   // On today: yesterday was a planned session with nothing logged. Offer to move it to today.
+  // A day that counts as rest: a logged session, or a skipped day that used up the week's rest slot.
+  const usedDay = r => trained(r) || !!(r && r.rested);
+  // The week's rest slot, if this date can still take it: returns its index, or -1 (fixed order, no rest day, or rest already taken).
+  function restSlot(date) {
+    const pd = pday(date);
+    if (!pd.flex) return -1;
+    const k = pd.W.slots.findIndex(sl => D[sl.dayId] && D[sl.dayId].rest);
+    if (k < 0) return -1;
+    const d = pd.W.dates[pd.W.asg.indexOf(k)];
+    return d === date || !usedDay(S.days[d]) ? k : -1;
+  }
   function missedPrompt(date, r) {
     const t = todayStr(), y = addDays(date, -1);
     if (date !== t || y < S.profile.startDate || trained(r) || isSkip(y)) return '';
     const yr = rec(y), py = pday(y);
-    if (trained(yr) || (yr && yr.seen) || py.before || !D[py.dayId] || D[py.dayId].rest || laterTrained(y)) return '';
-    return `<div class="banner sec missed" style="margin:0 0 14px">${py.flex
-      ? '<b>Didn’t train yesterday?</b> Skip it and this week gets an extra day, so you can still fit in every session. The rest of the plan follows one day later.'
+    if (usedDay(yr) || (yr && yr.seen) || py.before || !D[py.dayId] || D[py.dayId].rest || laterTrained(y)) return '';
+    const rs = restSlot(y) >= 0;
+    return `<div class="banner sec missed" style="margin:0 0 14px">${rs
+      ? '<b>Didn’t train yesterday?</b> Count it as this week’s rest day. Your other sessions stay this week, and next week starts on time.'
+      : py.flex ? '<b>Didn’t train yesterday?</b> This week’s rest day is already used, so skipping adds an extra day to the week. The rest of the plan follows one day later.'
       : `<b>Missed yesterday’s ${esc(D[py.dayId].t)}?</b> Move it to today, and the rest of the plan follows one day later.`}
-      <div class="syncbtns" style="margin-top:8px"><button class="btn sm primary" data-act="skip" data-d="${y}">${py.flex ? 'Skip yesterday' : 'Do it today'}</button><button class="btn sm ghost" data-act="seen" data-d="${y}">I did train yesterday</button></div></div>`;
+      <div class="syncbtns" style="margin-top:8px"><button class="btn sm primary" data-act="skip" data-d="${y}">${rs ? 'Make it my rest day' : py.flex ? 'Skip yesterday' : 'Do it today'}</button><button class="btn sm ghost" data-act="seen" data-d="${y}">I did train yesterday</button></div></div>`;
   }
   // The week's sessions as cards: pick what to do on this day; finished ones are greyed out.
   function weekPick(pd, date) {
     const W = pd.W, t = todayStr(), locked = trained(rec(date));
     let n = 0;
     const cards = range(7).map(k => {
-      const i = W.asg.indexOf(k), d = W.dates[i], T = D[W.slots[k].dayId], cur = d === date, done = trained(S.days[d]);
+      const i = W.asg.indexOf(k), d = W.dates[i], T = D[W.slots[k].dayId], cur = d === date, rested = !!(S.days[d] && S.days[d].rested), done = usedDay(S.days[d]);
       if (done) n++;
-      const note = cur ? (done ? 'Done' : date === t ? 'Today' : 'This day') : done ? `Done ${WDN[weekdayIdx(d)]}` : d < t ? 'Not done' : `Planned ${WDN[weekdayIdx(d)]}`;
+      const note = cur ? (rested ? 'Rested' : done ? 'Done' : date === t ? 'Today' : 'This day') : done ? `${rested ? 'Rested' : 'Done'} ${WDN[weekdayIdx(d)]}` : d < t ? 'Not done' : `Planned ${WDN[weekdayIdx(d)]}`;
       const dis = !cur && (done || locked);
       return `<button type="button" class="wk${cur ? ' cur' : ''}${done ? ' done' : ''}${T.rest ? ' rest' : ''}" data-pick="${k}" aria-pressed="${cur}"${dis ? ' disabled' : ''}>
         <span class="wk-n">${esc(note)}</span><span class="wk-t">${esc(T.t)}</span><span class="wk-f">${esc(T.f.replace(/^About /, ''))}</span>${done ? `<span class="wk-c">${I.check}</span>` : ''}</button>`;
@@ -4116,13 +4130,20 @@ const FAQ_NECK = [
     }
     if (d.pick != null) {
       const k = +d.pick, pd = pday(S.date), r = rec(S.date, true);
-      if (!pd.flex || trained(r) || pd.slot === k) return;
-      pd.W.dates.forEach(x => { const o = S.days[x]; if (x !== S.date && o && o.pick === k && !trained(o)) { delete o.pick; o.u = Date.now(); Cloud.markDay(x); Sync.markDay(S.mode, x); } });
+      if (!pd.flex || trained(r) || (pd.slot === k && !r.rested)) return;
+      delete r.rested;
+      pd.W.dates.forEach(x => { const o = S.days[x]; if (x !== S.date && o && o.pick === k && !usedDay(o)) { delete o.pick; o.u = Date.now(); Cloud.markDay(x); Sync.markDay(S.mode, x); } });
       r.pick = k; touch(S.date); return render(true);
     }
     if (d.act === 'skip' || d.act === 'unskip') {
       const x = d.d || S.date, on = d.act === 'skip';
       if (x < S.profile.startDate || laterTrained(x) || (on && trained(S.days[x]))) return;
+      const k = on ? restSlot(x) : -1;
+      if (k >= 0) { // use up the week's rest day instead of pushing the plan
+        const W = pday(x).W, r = rec(x, true);
+        W.dates.forEach(z => { const o = S.days[z]; if (z !== x && o && o.pick === k && !usedDay(o)) { delete o.pick; o.u = Date.now(); Cloud.markDay(z); Sync.markDay(S.mode, z); } });
+        r.pick = k; r.rested = true; touch(x); return render(true);
+      }
       movePlan(x, () => { const r = rec(x, true); delete r.pick; if (on) r.skip = true; else delete r.skip; });
       touch(x);
       return render(true);

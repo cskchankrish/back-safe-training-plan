@@ -9,7 +9,7 @@ Standalone static site hosted with Vercel. One page, three plans (switch in Sett
 Flexible scheduling on every plan:
 
 - **Pick any session**: from Rebuild/Foundation onwards, the Today tab shows the week's seven sessions (rest day included) as cards. Pick any one for the day; finished ones grey out. Turn it off in Settings for the fixed weekday order.
-- **Skip a day**: "Skip today" (or "Do it today" / "Skip yesterday" when yesterday was missed) pushes that day's session and the rest of the plan back one day.
+- **Skip a day**: "Skip today" (or the missed-yesterday banner) first uses up the week's rest day, so the other sessions stay in the week and the next week still starts on time. Only when the rest day is already taken (or in the fixed-order phases) does it push the session and the rest of the plan back one day.
 - **Travel days**: mark a trip (Today tab or Settings). The plan pauses for those days and resumes where you left off the day after; block end dates move with it.
 
 All plans rotate accessories and progress core and athletic work from cycle to cycle, deload in the last week of every block, and re-test benchmarks at the end of each cycle.
