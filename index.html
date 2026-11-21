@@ -331,6 +331,21 @@ svg.fig{pointer-events:none}
 body.timer-on main{padding-bottom:calc(190px + env(safe-area-inset-bottom,0px))}
 @media (min-width:900px){body.timer-on main{padding-bottom:110px}}
 .banner.calm{border-left:5px solid #8e9aa4}
+.banner.missed{border-left:5px solid var(--amber-dot)}
+.wkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px}
+.wk{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--rule);background:var(--paper2);min-height:84px}
+.wk-n{font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ink3)}
+.wk-t{font-family:var(--disp);font-weight:600;font-size:1.05rem;line-height:1.15}
+.wk-f{font-size:.78rem;color:var(--ink2)}
+.wk.rest .wk-t{color:var(--ink2)}
+.wk.cur{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--paper)}
+.wk.cur .wk-n{color:var(--accent)}
+.wk.done:not(.cur){opacity:.5;filter:grayscale(1)}
+.wk:disabled{cursor:default}
+.wk-c{position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--green);display:grid;place-items:center}
+.wk-c svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.skipcard{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.skipcard>div{flex:1 1 220px}
 .syncrow>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 .synccode{font-family:var(--disp);font-weight:700;font-size:1.3rem;letter-spacing:.06em;font-variant-numeric:tabular-nums;user-select:all;-webkit-user-select:all;word-break:break-all;color:var(--ink)}
 .syncbtns{display:flex;flex-wrap:wrap;gap:8px}
@@ -1915,6 +1930,7 @@ day('p0_gymA_gate', Object.assign({}, D.p0_gymA, { id: 'p0_gymA_gate', t: 'Gym A
 day('p0_gate', { t: 'Rest and gate check', f: 'About 30 min', warm: 'care', cool: false, gate: true,
   intro: 'Review the gate checklist on the Back Care tab. All five ticked means you start Rebuild tomorrow. If any are missing, move the Restart date in Settings one week later.',
   items: [{ x: 'walk', s: 1, r: '20–30 min easy', log: 'min' }] });
+day('skipped', { t: 'Skipped day', f: 'The plan moved back one day', warm: null, cool: false, rest: true, items: [] });
 day('rest', { t: 'Rest and recover', f: 'Recovery day', warm: null, cool: false, rest: true,
   intro: 'No gym. Sleep 7–8 hours, hit your protein, get your steps in. The Back Care routine is optional today.',
   items: [{ x: 'walk', s: 1, r: '30–45 min easy', log: 'min' }] });
@@ -2891,7 +2907,7 @@ const FAQ_NECK = [
 
   /* ---------- state ---------- */
   const LS = 'rebuild-build.v2', LS_OLD = 'rebuild-build.v1';
-  const defP = (mode = 'back') => ({ bw: null, calm: true, calmStart: null, calmGate: {}, startDate: mode === 'back' ? PLAN_START : todayStr(), auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, gate: {}, barGate: {}, bench: {}, u: 0 });
+  const defP = (mode = 'back') => ({ bw: null, calm: true, calmStart: null, calmGate: {}, startDate: mode === 'back' ? PLAN_START : todayStr(), auto: true, sound: true, anim: true, theme: 'auto', ladder: { bext: 0, sext: 0 }, flex: true, gate: {}, barGate: {}, bench: {}, u: 0 });
   const emptyMode = mode => ({ profile: defP(mode), days: {} });
   const S = { profile: defP('back'), days: {}, modes: { back: emptyMode('back'), strength: emptyMode('strength'), neck: emptyMode('neck') }, mode: 'back', tab: 'today', date: todayStr(), planSel: null, libCat: 'all', libQ: '', status: 'local', resetArm: false };
   function activateMode(mode) {
@@ -2940,6 +2956,7 @@ const FAQ_NECK = [
   let touchT = null;
   function touch(date, soon) {
     const r = rec(date, true); r.u = Date.now();
+    if (r.pick == null && !r.skip) { const pd = pday(date); if (pd.flex) r.pick = pd.slot; } // keep logged sets with the session they belong to
     clearTimeout(touchT);
     const m = S.mode, go = () => { saveLocal(); Cloud.markDay(date); Sync.markDay(m, date); };
     if (soon) touchT = setTimeout(go, 500); else go();
@@ -3253,11 +3270,37 @@ const FAQ_NECK = [
   };
 
   /* ---------- plan helpers ---------- */
-  const pday = date => {
+  // Where a plan date falls, before skipped days and weekly picks are applied.
+  const rawDay = date => {
     if (S.mode !== 'back') return buildDay(date, S.profile.startDate);
     const pd = planDay(date, S.profile.startDate);
     if (pd.before && S.profile.calm !== false && validYmd(S.profile.calmStart)) return calmDay(date, S.profile.calmStart, S.profile.startDate) || pd;
     return pd;
+  };
+  // Skipped days ("I didn't train") push the rest of the plan back one day each. They only count from the plan's start.
+  const isSkip = d => !!(S.days[d] && S.days[d].skip) && d >= S.profile.startDate;
+  const skipList = () => Object.keys(S.days).filter(isSkip).sort();
+  function toPlan(date, sk) { let n = 0; for (const s of sk) { if (s < date) n++; else break; } return n ? addDays(date, -n) : date; }
+  function toCal(p, sk) { let d = p; for (const s of sk) { if (s <= d) d = addDays(d, 1); else break; } return d; }
+  const calRanges = () => { const sk = skipList(); return MODES[S.mode].ranges(S.profile.startDate).map(r => Object.assign({}, r, { from: toCal(r.from, sk), to: toCal(r.to, sk) })); };
+  const FLEX = ['p1', 'A', 'B', 'C', 'g1', 'gA', 'gB', 'gC'];
+  // One plan week: its seven sessions (slots), the calendar date each plan day falls on, and which slot each date does.
+  // A date's own pick wins; then days already trained keep their slot, then today and later days in order, then untrained past days.
+  function weekPlan(pws, sk) {
+    const t = todayStr(), slots = range(7).map(j => rawDay(addDays(pws, j))), dates = range(7).map(j => toCal(addDays(pws, j), sk));
+    const asg = Array(7).fill(null), used = new Set();
+    dates.forEach((d, i) => { const r = S.days[d], k = r ? r.pick : null; if (Number.isInteger(k) && k >= 0 && k < 7 && !used.has(k)) { asg[i] = k; used.add(k); } });
+    const pri = i => trained(S.days[dates[i]]) ? 0 : dates[i] >= t ? 1 : 2;
+    range(7).filter(i => asg[i] == null).sort((a, b) => pri(a) - pri(b) || a - b).forEach(i => { const k = used.has(i) ? range(7).find(j => !used.has(j)) : i; asg[i] = k; used.add(k); });
+    return { slots, dates, asg };
+  }
+  const pday = date => {
+    const sk = skipList();
+    if (isSkip(date)) return Object.assign({}, rawDay(toPlan(date, sk)), { dayId: 'skipped', skipped: true, flex: false });
+    const pd = rawDay(toPlan(date, sk));
+    if (pd.before || S.profile.flex === false || !FLEX.includes(pd.phase) || !pd.weekStart) return pd;
+    const W = weekPlan(pd.weekStart, sk), i = W.dates.indexOf(date), k = W.asg[i], sl = W.slots[k];
+    return Object.assign({}, sl, { flex: true, slot: k, week: pd.week, weekStart: pd.weekStart, W, idx: i });
   };
   // Last day with leg symptoms: the daily leg check after Calm, or numbness 2/10+ or spreading symptoms during Calm.
   function legLast() {
@@ -3382,10 +3425,23 @@ const FAQ_NECK = [
       return h + `<div class="card stack"><h2>Your plan starts ${esc(fmtLong(pd.start))}</h2><p class="muted">That’s ${pd.days} day${pd.days === 1 ? '' : 's'} away. ${back ? 'Until then, keep doing your physio routine and walking.' : 'You can change the start date in Settings.'}</p><button class="btn primary" data-go="${pd.start}">See day 1</button></div></div>`;
     }
     const P = PHASES[pd.phase], T = D[pd.dayId], r = rec(date) || {};
+    if (pd.skipped) {
+      let nx = addDays(date, 1); while (isSkip(nx)) nx = addDays(nx, 1);
+      const pn = pday(nx), late = laterTrained(date), tm1 = addDays(date, 1);
+      const trip = S.days[date].skip === 'travel', tr = trip ? tripOf(date) : null;
+      h += `<section class="hero">${plateHTML(P)}<div><div class="phase">${esc(phaseLine(pd))}</div><h1>${trip ? 'Travel day' : 'Skipped day'}</h1><div class="muted small">${trip ? `Trip: ${esc(fmtMed(tr[0]))} to ${esc(fmtMed(tr[tr.length - 1]))}, ${tr.length} day${tr.length > 1 ? 's' : ''}. Training resumes the day after.` : 'No training. The plan moved back one day.'}</div></div></section>`;
+      if (trip) h += `<p class="muted" style="margin:14px 0 0">No gym needed. If you can, walk 30+ minutes and stand up every hour on long journeys${S.mode === 'back' ? ', and do the Back Care routine wherever you have floor space' : S.mode === 'neck' ? ', and do the Neck Care routine: it needs no equipment' : ''}.</p>`;
+      h += `<div class="card sec stack"><p style="margin:0">${pn.before ? '' : `Next up on ${esc(fmtMed(nx))}: <b>${esc(D[pn.dayId].t)}</b>. `}Everything after this day runs one day later, including the end dates of each block.</p>` +
+        (late ? `<p class="tiny" style="margin:0">You have logged training after this day, so it can’t be un-skipped without moving those sessions.</p>` : `<div class="syncbtns"><button class="btn sm" data-act="unskip">Undo: I’ll train on this day</button>${trip && tr.length > 1 ? `<button class="btn sm ghost" data-act="untrip">Cancel the whole trip</button>` : ''}</div>`) + '</div>';
+      h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tm1}">${esc(dayTitle(tm1))}</button></p>`;
+      return h + '</div>';
+    }
+    h += missedPrompt(date, r);
     h += `<section class="hero">${plateHTML(P)}<div><div class="phase">${esc(phaseLine(pd))}</div><h1>${esc(T.t)}</h1><div class="muted small">${esc(T.f)}</div></div></section>`;
     if (pd.deload) h += `<div class="banner deload sec" style="margin-top:14px"><b>Deload week.</b> Same exercises with fewer sets (already reduced below), RPE 6, no drop sets, sprints at 80%.</div>`;
     if (T.test) h += `<div class="banner test" style="margin-top:14px"><b>Benchmark day.</b> Warm up well, test once, and log the results in Progress too.</div>`;
     if (T.intro) h += `<p class="muted" style="margin:14px 0 0">${esc(T.intro)}</p>`;
+    if (pd.flex) h += weekPick(pd, date);
     if (pd.phase === 'n0') h += `<div class="banner calm" style="margin-top:14px"><b>Calm phase, no gym yet.</b> Restart is set for ${esc(fmtLong(pd.restart))}${pd.toGo === 1 ? ' (tomorrow)' : ` (in ${pd.toGo} days)`}. The Calm gate on the Back Care tab moves it.</div>`;
     if (back) h += readiness(date);
     if (neck) h += readinessNeck(date);
@@ -3400,9 +3456,62 @@ const FAQ_NECK = [
     h += `<div class="stack sec">${items.map((it, i) => exCard(it, i, date, light, pd)).join('')}</div>`;
     if (T.cool) h += block('Cool-down', T.cool === true ? COOL : COOLS[T.cool], date, 'c', 'About 3–5 min');
     h += back ? finish(date) : neck ? finish(date, 'Neck') : finishStrength(date);
+    if (!trained(rec(date)) && date >= S.profile.startDate && !laterTrained(date))
+      h += `<section class="card sec skipcard"><div><h3>Not training ${date === t ? 'today' : 'this day'}?</h3><div class="tiny">Fasting, ill or busy: skip the day and ${esc(T.rest ? 'the rest day' : T.t)} moves to the next day. The rest of the plan follows, one day later.</div></div><div class="syncbtns"><button class="btn sm" data-act="skip">Skip ${date === t ? 'today' : 'this day'}</button><button class="btn sm ghost" data-act="travel">Travelling…</button></div></section>`;
     const tm = addDays(date, 1), pn = pday(tm);
-    if (!pn.before) h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tm}">${esc(D[pn.dayId].t)}</button></p>`;
+    if (!pn.before) h += `<p class="small muted sec" style="text-align:center">Tomorrow: <button class="btn sm ghost" data-go="${tm}">${esc(dayTitle(tm))}</button></p>`;
     return h + '</div>';
+  }
+  // The run of consecutive travel days that includes this date.
+  function tripOf(date) {
+    const out = [date], tv = d => S.days[d] && S.days[d].skip === 'travel';
+    for (let d = addDays(date, -1); tv(d); d = addDays(d, -1)) out.unshift(d);
+    for (let d = addDays(date, 1); tv(d); d = addDays(d, 1)) out.push(d);
+    return out;
+  }
+  function openTravel(msg) {
+    const from = S.date < S.profile.startDate ? S.profile.startDate : S.date;
+    openSheet(`<div class="sheet-h"><h2>Travel days</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.close}</button></div>
+      <p class="small">Mark the days you can’t train. The plan pauses on those days and picks up where you left off the day after you’re back: nothing is missed, and every later block moves by the same number of days.</p>
+      <div class="setrow2"><div><div style="font-weight:600">First travel day</div></div><label class="fld" style="width:160px"><input type="date" data-trip-from value="${esc(from)}" min="${esc(S.profile.startDate)}" aria-label="First travel day"></label></div>
+      <div class="setrow2"><div><div style="font-weight:600">Last travel day</div><div class="tiny">You train again the day after.</div></div><label class="fld" style="width:160px"><input type="date" data-trip-to value="${esc(addDays(from, 2))}" min="${esc(S.profile.startDate)}" aria-label="Last travel day"></label></div>
+      ${msg ? `<p class="small" style="color:var(--red)">${esc(msg)}</p>` : ''}
+      <div class="syncbtns" style="margin-top:12px"><button class="btn primary" data-act="trip-save">Mark travel days</button><button class="btn" data-act="close">Cancel</button></div>`, 'travel');
+  }
+  // Apply a skip/travel change from date x. A later day's pick is kept while that day stays in the same plan week; otherwise it falls back to the default order.
+  function movePlan(x, change) {
+    const wk = k => { const sk = skipList(); return isSkip(k) ? null : rawDay(toPlan(k, sk)).weekStart || null; };
+    const keep = Object.keys(S.days).filter(k => k > x && S.days[k].pick != null && !trained(S.days[k])).map(k => [k, wk(k)]);
+    change();
+    keep.forEach(([k, w]) => { if (wk(k) !== w) { const o = S.days[k]; delete o.pick; o.u = Date.now(); Cloud.markDay(k); Sync.markDay(S.mode, k); } });
+  }
+  const dayTitle = date => { const pd = pday(date); return pd.skipped ? (S.days[date].skip === 'travel' ? 'Travel day' : 'Skipped day') : pd.before ? 'Before the plan starts' : D[pd.dayId].t; };
+  const laterTrained = date => Object.keys(S.days).some(d => d > date && trained(S.days[d]));
+  // On today: yesterday was a planned session with nothing logged. Offer to move it to today.
+  function missedPrompt(date, r) {
+    const t = todayStr(), y = addDays(date, -1);
+    if (date !== t || y < S.profile.startDate || trained(r) || isSkip(y)) return '';
+    const yr = rec(y), py = pday(y);
+    if (trained(yr) || (yr && yr.seen) || py.before || !D[py.dayId] || D[py.dayId].rest || laterTrained(y)) return '';
+    return `<div class="banner sec missed" style="margin:0 0 14px">${py.flex
+      ? '<b>Didn’t train yesterday?</b> Skip it and this week gets an extra day, so you can still fit in every session. The rest of the plan follows one day later.'
+      : `<b>Missed yesterday’s ${esc(D[py.dayId].t)}?</b> Move it to today, and the rest of the plan follows one day later.`}
+      <div class="syncbtns" style="margin-top:8px"><button class="btn sm primary" data-act="skip" data-d="${y}">${py.flex ? 'Skip yesterday' : 'Do it today'}</button><button class="btn sm ghost" data-act="seen" data-d="${y}">I did train yesterday</button></div></div>`;
+  }
+  // The week's sessions as cards: pick what to do on this day; finished ones are greyed out.
+  function weekPick(pd, date) {
+    const W = pd.W, t = todayStr(), locked = trained(rec(date));
+    let n = 0;
+    const cards = range(7).map(k => {
+      const i = W.asg.indexOf(k), d = W.dates[i], T = D[W.slots[k].dayId], cur = d === date, done = trained(S.days[d]);
+      if (done) n++;
+      const note = cur ? (done ? 'Done' : date === t ? 'Today' : 'This day') : done ? `Done ${WDN[weekdayIdx(d)]}` : d < t ? 'Not done' : `Planned ${WDN[weekdayIdx(d)]}`;
+      const dis = !cur && (done || locked);
+      return `<button type="button" class="wk${cur ? ' cur' : ''}${done ? ' done' : ''}${T.rest ? ' rest' : ''}" data-pick="${k}" aria-pressed="${cur}"${dis ? ' disabled' : ''}>
+        <span class="wk-n">${esc(note)}</span><span class="wk-t">${esc(T.t)}</span><span class="wk-f">${esc(T.f.replace(/^About /, ''))}</span>${done ? `<span class="wk-c">${I.check}</span>` : ''}</button>`;
+    });
+    return `<details class="card blk sec wkpick"${locked ? '' : ' open'}><summary><div style="flex:1"><h3>This week’s sessions</h3><div class="tiny">${locked ? 'Today’s session is logged. Clear its sets to switch.' : 'Pick any session for ' + (date === t ? 'today' : 'this day') + ', in any order. Rest counts as one.'}</div></div><span class="tiny num">${n}/7</span>${I.caret}</summary>
+      <div class="blk-in"><div class="wkgrid">${cards.join('')}</div></div></details>`;
   }
   function nerveCheck(date) {
     const r = rec(date) || {};
@@ -3560,7 +3669,7 @@ const FAQ_NECK = [
     return h;
   }
   function vPhase(id) {
-    const P = PHASES[id], R = MODES[S.mode].ranges(S.profile.startDate).filter(r => r.phase === id);
+    const P = PHASES[id], sk = skipList(), R = calRanges().filter(r => r.phase === id);
     let dates;
     if (id === 'g0') dates = `${fmtMed(R[0].from)} to ${fmtYear(R[0].to)}, ${startLen(R[0].from)} days`;
     else if (id === 'g1') dates = `${fmtMed(R[0].from)} to ${fmtYear(R[0].to)}, 6 weeks`;
@@ -3574,13 +3683,14 @@ const FAQ_NECK = [
     if (id === 'p0' || id === 'g0') {
       const list = id === 'p0' ? P.days.concat(Array(bridgeDays(R[0].from)).fill('p0_bridge')) : range(startLen(R[0].from)).map(i => P.week[weekdayIdx(addDays(R[0].from, i))]);
       h += `<div class="card sec"><h3 style="margin-bottom:6px">Day by day</h3><div class="week daylist">` + list.map((d, i) => {
-        const date = addDays(R[0].from, i);
+        const date = toCal(addDays(R[0].from, i), sk);
         return `<div class="wrow"><div class="wd">${esc(fmtMed(date))}</div><div class="t">${esc(D[d].t)}</div><button class="btn sm ghost" data-go="${date}">Open</button></div>`;
       }).join('') + '</div></div>';
       ids = [...new Set(P.days || P.week)];
     } else {
       h += `<div class="card sec"><h3 style="margin-bottom:6px">Weekly schedule</h3><div class="week">` + P.week.map((d, i) => `<div class="wrow${D[d].rest ? ' rest' : ''}"><div class="wd">${WDN[i]}</div><div class="t">${esc(D[d].t)}</div><div class="tiny">${esc(D[d].f.replace(/^About /, ''))}</div></div>`).join('') + '</div>' +
-        (P.test ? `<p class="tiny" style="margin:8px 0 0">In week ${P.test.week}, ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][P.test.wd]} is benchmark day instead.</p>` : '') + '</div>';
+        (P.test ? `<p class="tiny" style="margin:8px 0 0">In week ${P.test.week}, ${['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][P.test.wd]} is benchmark day instead.</p>` : '') +
+        `<p class="tiny" style="margin:8px 0 0">${S.profile.flex === false ? 'This is the fixed order.' : 'This is the default order. On the Today tab you can do the week’s sessions, rest day included, in any order.'} A skipped day moves everything after it back one day.</p>` + '</div>';
       ids = [...new Set(P.week)];
       if (P.test) ids.push(P.test.day);
     }
@@ -3647,7 +3757,7 @@ const FAQ_NECK = [
   function vRoad() {
     const M = MODES[S.mode], back = S.mode === 'back', t = todayStr();
     const calmOn = back && S.profile.calm !== false && validYmd(S.profile.calmStart) && S.profile.calmStart < S.profile.startDate;
-    const R = (calmOn ? [{ phase: 'n0', from: S.profile.calmStart, to: addDays(S.profile.startDate, -1) }] : []).concat(M.ranges(S.profile.startDate));
+    const R = (calmOn ? [{ phase: 'n0', from: S.profile.calmStart, to: addDays(S.profile.startDate, -1) }] : []).concat(calRanges());
     let h = `<h2 style="margin-top:6px">Two years, loaded like a bar</h2><p class="muted">Each block is colour-coded like competition plates: the heavier the plate, the heavier the training. Width shows how long each block lasts. Tap a plate to open it.</p>`;
     h += `<div class="card sleeve">${plateBar(R, t)}</div><div class="legend">` + (calmOn ? ['n0'] : []).concat(M.legend).map(id => `<span>${plateHTML(PHASES[id], true)} ${esc(PHASES[id].name)}</span>`).join('') + '</div>';
     h += `<div class="sec"><h3 style="margin-bottom:8px">What changes each cycle</h3><div class="stack">` + M.cycles().map(c => {
@@ -3875,7 +3985,8 @@ const FAQ_NECK = [
       <div class="setrow2"><div><div style="font-weight:600">${S.mode === 'back' ? 'Restart starts (Day 1)' : 'Plan start date'}</div><div class="tiny">${S.mode === 'back' ? `Day 1 of Restart is ${esc(fmtLong(start))}. The Calm gate on the Back Care tab can set this for you.` : `Day 1 of the Start week is ${esc(fmtLong(start))}. Foundation begins on the following Monday.`}</div></div><label class="fld" style="width:160px"><input type="date" data-start-date value="${esc(start)}" aria-label="${S.mode === 'back' ? 'Restart start date' : 'Plan start date'}"></label></div>
       ${S.mode === 'back' ? sw('calm', 'Include the Calm phase', 'Nerve-friendly home routine before Restart') + (P.calm !== false ? `<div class="setrow2"><div><div style="font-weight:600">Calm phase starts</div><div class="tiny">It runs until the day before Restart.</div></div><label class="fld" style="width:160px"><input type="date" data-calm-start value="${esc(P.calmStart || '')}" aria-label="Calm phase start date"></label></div>` : '') : ''}
       <div class="setrow2"><div><div style="font-weight:600">Body weight</div><div class="tiny">Used for benchmark targets</div></div><label class="fld" style="width:120px"><input type="text" inputmode="decimal" data-bw value="${esc(P.bw || '')}" placeholder="80" aria-label="Body weight in kg"><span>kg</span></label></div>
-      ${sw('auto', 'Start rest timer when I tick a set')}${sw('sound', 'Beep and vibrate when rest ends')}${sw('anim', 'Animate exercise figures', 'Turn off to save battery')}
+      <div class="setrow2"><div><div style="font-weight:600">Travel days</div><div class="tiny">Pause the plan for a trip; it resumes the day after.</div></div><button class="btn sm" data-act="travel">Add a trip</button></div>
+      ${sw('flex', 'Choose each day’s session', 'Do the week’s sessions in any order from cards on the Today tab. Off: fixed weekday order.')}${sw('auto', 'Start rest timer when I tick a set')}${sw('sound', 'Beep and vibrate when rest ends')}${sw('anim', 'Animate exercise figures', 'Turn off to save battery')}
       <div class="setrow2"><div style="font-weight:600">Appearance</div><div class="seg">${[['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].map(([k, l]) => `<button type="button" data-themeset="${k}" aria-pressed="${P.theme === k}">${l}</button>`).join('')}</div></div>
       <div class="setrow2"><div><div style="font-weight:600">Where your log is saved</div><div class="tiny">${esc(Sync.enabled() ? `Synced across the devices that use your sync code, with a copy in this browser${Cloud.db ? ' and in your connected account' : ''}. Each workout plan keeps its own log.` : Cloud.db ? 'In your connected account, with a copy on this device. Each workout plan keeps its own log.' : 'In this browser on this device. Each workout plan keeps its own log.')}</div></div></div>
       ${Sync.enabled() ? `<div class="setrow2 syncrow"><div><div style="font-weight:600">Sync across devices</div><div class="tiny">On. Open the link on your other device, or enter this code there:</div>
@@ -4003,6 +4114,36 @@ const FAQ_NECK = [
       }
       return;
     }
+    if (d.pick != null) {
+      const k = +d.pick, pd = pday(S.date), r = rec(S.date, true);
+      if (!pd.flex || trained(r) || pd.slot === k) return;
+      pd.W.dates.forEach(x => { const o = S.days[x]; if (x !== S.date && o && o.pick === k && !trained(o)) { delete o.pick; o.u = Date.now(); Cloud.markDay(x); Sync.markDay(S.mode, x); } });
+      r.pick = k; touch(S.date); return render(true);
+    }
+    if (d.act === 'skip' || d.act === 'unskip') {
+      const x = d.d || S.date, on = d.act === 'skip';
+      if (x < S.profile.startDate || laterTrained(x) || (on && trained(S.days[x]))) return;
+      movePlan(x, () => { const r = rec(x, true); delete r.pick; if (on) r.skip = true; else delete r.skip; });
+      touch(x);
+      return render(true);
+    }
+    if (d.act === 'travel') return openTravel();
+    if (d.act === 'trip-save') {
+      const a = ($('[data-trip-from]') || {}).value, b = ($('[data-trip-to]') || {}).value;
+      if (!validYmd(a) || !validYmd(b) || b < a) return openTravel('Pick a first and last day, with the last day on or after the first.');
+      if (a < S.profile.startDate) return openTravel(`Travel days count from the plan start, ${fmtMed(S.profile.startDate)}.`);
+      if (diffDays(b, a) > 59) return openTravel('That’s more than 60 days. For a long break, change the start date in Settings instead.');
+      if (laterTrained(a) || trained(S.days[a])) return openTravel('You have logged training on or after the first day, so the plan can’t be moved from there.');
+      movePlan(a, () => { for (let x = a; x <= b; x = addDays(x, 1)) { const r = rec(x, true); delete r.pick; r.skip = 'travel'; r.u = Date.now(); Cloud.markDay(x); Sync.markDay(S.mode, x); } });
+      saveLocal(); closeSheet(); return go('today', a);
+    }
+    if (d.act === 'untrip') {
+      const tr = tripOf(S.date);
+      if (laterTrained(tr[0])) return;
+      movePlan(tr[0], () => tr.forEach(x => { const r = rec(x, true); delete r.skip; r.u = Date.now(); Cloud.markDay(x); Sync.markDay(S.mode, x); }));
+      saveLocal(); return render(true);
+    }
+    if (d.act === 'seen') { const r = rec(d.d, true); r.seen = true; touch(d.d); return render(true); }
     if (d.act === 'done' || d.act === 'undone') { const r = rec(S.date, true); r.done = d.act === 'done'; r.doneAt = r.done ? Date.now() : null; touch(S.date); return render(true); }
     if (d.act === 'settings') { S.resetArm = false; Sync.msg = ''; return openSettings(); }
     if (d.act === 'close') { closeSheet(); if (pendingSoft) { pendingSoft = false; render(true); } return; }
